@@ -1,0 +1,43 @@
+{
+  "recordedAtUtc": "2026-09-14T20:23:09.974388+00:00",
+  "scope": "Physical USB sideload and byte-for-byte readback only; launch/GPS/iPhone acceptance recorded separately.",
+  "model": "Forerunner 165",
+  "partNumber": "006-B4432-00",
+  "softwareVersionRaw": "2905",
+  "sourceCommit": "e64e39d2b031c1783f34dab099c536601d431d8b",
+  "watchSourceSha256": "6eb1774efc350234d8f8f07736bf58e8717532b6b34530afd5c32b8bd6bae4e6",
+  "transfer": {
+    "status": "PASS",
+    "destination": "GARMIN/Apps/FieldMap.prg",
+    "bytes": 127196,
+    "sha256": "cd089ada317a618b73913c03177d854c014d625cf30749b8ff8490897fb24f55",
+    "readback": "PASS: downloaded from watch and compared byte-for-byte"
+  },
+  "build": {
+    "command": "make build-watch",
+    "target": "fr165",
+    "status": "PASS",
+    "warnings": 0
+  },
+  "connection": {
+    "initialUsb": "091e:0003; no MTP session despite user confirming MTP selected",
+    "recovery": "User unplugged, normally restarted watch and reconnected; MTP PID 0x5150 became visible",
+    "workingClient": "OpenMTP 3.3.0 arm64 Kalam",
+    "failedClient": "Legacy mtp-cli failed Garmin response parsing; did not upload"
+  },
+  "tool": {
+    "source": "https://github.com/ganeshrvel/openmtp/releases/tag/v3.3.0",
+    "archiveSha256": "71c8ea9a7efa0a39bf443e56f79a88c2b2068d90d614761dc27584816d1f64ee",
+    "signature": "Apple Developer ID verified; Ganesh Rathinavel (6UR4H85SA2)",
+    "installation": "Temporary directory only; no global Python package or Applications installation"
+  },
+  "launch": {
+    "status": "NOT RUN",
+    "reason": "Awaiting user confirmation after USB disconnect"
+  },
+  "physicalGps": "NOT RUN",
+  "physicalIphone": "NOT RUN",
+  "g0Acceptance": "NOT RUN",
+  "onlineMaps": "HTTPS origin not configured; this physical build strips local HTTP origin and token. Offline GPS is available.",
+  "privacy": "Only application PRG and GarminDevice.xml read back locally. No unit ID, serial, raw device XML or personal GPS/activity file included in source evidence. Existing watch files not deleted or overwritten."
+}

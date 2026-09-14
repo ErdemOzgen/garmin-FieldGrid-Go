@@ -2,7 +2,8 @@
 
 The requested OpenFreeMap, English UI and offline coordinate extension is
 implemented. Local tests pass. **Physical G0/G3 acceptance remains NOT RUN.**
-The user's simulator-only instruction remains in effect.
+The user subsequently requested installation on the connected physical watch.
+USB sideload and readback now PASS; this does not pass physical G0 acceptance.
 
 ## Current delivery
 
@@ -63,3 +64,17 @@ User/account pairing and GPX/FIT/offline city packages remain later-stage scope.
 Source package checks and exact artifact hashes are recorded in
 [automated evidence](evidence/automated.json) and [source-package evidence](evidence/source-package.json).
 No GitHub push or Connect IQ Store publication is performed.
+
+## Physical installation follow-up
+
+`FieldMap.prg` was copied to the actual Forerunner 165 (part 006-B4432-00,
+GarminDevice.xml SoftwareVersion 2905). The 127,196-byte file was downloaded
+back from GARMIN/Apps and matched SHA256 byte-for-byte. Existing watch files were
+not overwritten or removed. After a normal watch restart, MTP enumeration worked;
+OpenMTP 3.3.0 Kalam completed the transfer. The legacy client did not work.
+See [physical installation evidence](evidence/physical-install.json).
+
+Opening the app after disconnect is awaiting user confirmation. Real GPS and
+iPhone/HTTPS acceptance remain NOT RUN. No public tunnel was opened, no permanent
+map service configured, no firmware changed. The installed physical build provides
+offline GPS and omits the Mac-only URL/token.

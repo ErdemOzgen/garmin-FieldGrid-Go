@@ -36,7 +36,11 @@ simülatörü tamamen kapatın, yeniden başlatın ve fixture'ı tekrar yükleyi
    `build/FieldMap.prg.debug.xml`. `FieldMap-simulator.prg` saate kopyalanmaz.
 2. Saati veri destekli USB kablosuyla bağlayın. Gerekirse saat USB/MTP modunu kendi
    menüsünden seçin. macOS için [OpenMTP](https://github.com/ganeshrvel/openmtp)
-   kullanılabilir; bu projede sistem MTP istemcisi kurulmadı.
+   kullanılabilir. Bu Mac’te OpenMTP 3.3.0 arm64 geçici dizinden çalıştırıldı;
+   Kalam motoru ile aktarım ve geri okuma doğrulandı. Sistem geneline kurulmadı.
+   MTP seçili olduğu halde normal saat/şarj ekranı kalır ve istemci depolamayı
+   açamazsa, kabloyu çıkarıp saati normal kapatıp açtıktan sonra yeniden bağlamak
+   bu cihazda sorunu çözdü. Bu bir fabrika sıfırlaması veya firmware değişikliği değildir.
 3. PRG’yi saatin `GARMIN/APPS` klasörüne kopyalayın. Mevcut dosyaları silmeyin.
    Saati güvenli ayırın; uygulama listesinde FieldMap G0’ı açın.
 4. START’a basın, açık alanda GPS’i bekleyin. **DOWN ile internet olmadan enlem/boylam alınabilir. HTTPS renderer ayarı
