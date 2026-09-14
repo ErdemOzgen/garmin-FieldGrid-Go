@@ -1,11 +1,14 @@
 # Güvenlik ve veri sınırları
 
 Bu sürüm kişisel **G0 testi** içindir. İnternete açık çok kullanıcılı hizmet veya
-üretim kimlik sistemi değildir. Sağlayıcı seçimi ve servis yayını henüz yapılmadı.
+üretim kimlik sistemi değildir. Kalıcı barındırma ve gerçek harita sağlayıcısı
+seçilmedi. Kullanıcı onayıyla yapılan geçici sentetik HTTPS deneyi ayrıca belgelenir.
 
 Konum kullanımı saatte START / Open map ile başlar; oturum sonunda GPS aboneliği,
 zamanlayıcı ve ağ işleri kapatılır. Çevrimiçi modda istenen alan Garmin Connect ve
-API üzerinden geçer. Tam hareket izi sunucuya gönderilmez; iz saatin RAM’inde kalır.
+API üzerinden geçer. PNG ayrıca Garmin'in görüntü dönüştürme servisi tarafından
+URL'sinden alınır; bu nedenle salt yerel/LAN görüntü sunucusu yeterli değildir.
+Tam hareket izi sunucuya gönderilmez; iz saatin RAM’inde kalır.
 Konum/URL/token erişim logları devre dışıdır. API validation yanıtları kullanıcı
 girdilerini geri yansıtmaz. Harita sağlayıcısı henüz yoktur; yalnız sentetik raster
 üretilir. Hesap e-postası, aktivite kaydı veya kişisel rota tutulmaz.

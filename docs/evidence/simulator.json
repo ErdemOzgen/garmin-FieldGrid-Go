@@ -1,0 +1,291 @@
+{
+  "recordedAtUtc": "2026-09-14T19:19:08.927076+00:00",
+  "status": "PASS",
+  "scope": "Only the simulator observations enumerated here. G0 physical acceptance is NOT RUN.",
+  "device": "fr165",
+  "sdk": "9.2.0",
+  "syntheticOnly": true,
+  "watchSourceSha256": "a469aa21bc928f12b979b33fd5fe99ef722855c98b6009b6ded134284704583a",
+  "httpsTestBuild": {
+    "status": "PASS",
+    "target": "fr165",
+    "sdkVersion": "9.2.0",
+    "deviceVersion": "3d0fb192a2cf01699aefd0f384af3f527e5885bd",
+    "sourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+    "sourceCommit": "0dccc62208617498b3e2b0ab18a3966637ac512c",
+    "watchSourcesDirty": true,
+    "artifactSha256": "417551df866a4a524238abec04c22fe6f719f57a3a920dc3cccc4b5749ce83a9",
+    "unitTests": false,
+    "simulator": true,
+    "offline": false,
+    "warnings": 0
+  },
+  "finalDelta": {
+    "file": "apps/watch/resources/strings/strings.xml",
+    "onlyChangeSinceHttpsTest": "English Back string: BACK to return -> BACK to map; all other watch sources unchanged.",
+    "verification": "English menu visually inspected; all 17 tests rerun in English and Turkish; English BACK width 154px <= 168px. HTTPS was not reopened for this string-only change."
+  },
+  "tunnel": {
+    "startedAtUtc": "2026-09-14T18:49:58.869421+00:00",
+    "limitSeconds": 1800,
+    "syntheticOnly": true,
+    "stoppedAtUtc": "2026-09-14T19:12:03.380993+00:00",
+    "elapsedSeconds": 1324.5117,
+    "configurationRestored": true,
+    "processExitCode": 0,
+    "apiStopped": true,
+    "accountOrDnsCreated": false,
+    "simulatorDeviceHttpsRequirementRestored": true
+  },
+  "raster": {
+    "status": "PASS",
+    "sizes": [
+      195,
+      256,
+      390
+    ],
+    "themes": [
+      "day",
+      "night"
+    ],
+    "allSixCombinationsDisplayed": true,
+    "zooms": [
+      14,
+      15,
+      16
+    ],
+    "transport": "HTTPS via temporary Cloudflare origin, Garmin image conversion, CIQ fr165 simulator"
+  },
+  "controls": {
+    "panBothAxes": "PASS",
+    "singleBackToFollow": "PASS",
+    "backEndsSessionAndShowsHome": "PASS",
+    "turkishUi": "PASS",
+    "englishHomeAndFinalMenu": "PASS"
+  },
+  "gps": {
+    "input": "Explicit synthetic GPX playback; no hardware GPS",
+    "qualityLoss": "PASS: Poor => gray old fix, observed age 12 seconds",
+    "recovery": "PASS: Good => blue current fix, age 0 seconds",
+    "boundedTrace": "PASS: 180 points while GPS event count increases"
+  },
+  "networkOutage": {
+    "status": "PASS",
+    "injection": "Stop local API process, then restart it; tunnel and GPX remain running",
+    "before": {
+      "gpsEvents": 360,
+      "tracePoints": 180,
+      "images": 12,
+      "lastCode": 0,
+      "lastSuccessfulJobMs": 750,
+      "usedMemoryKiB": 45,
+      "sampledPeakKiB": 44
+    },
+    "during": {
+      "gpsEvents": 485,
+      "tracePoints": 180,
+      "images": 12,
+      "lastCode": -400,
+      "usedMemoryKiB": 44,
+      "sampledPeakKiB": 45
+    },
+    "after": {
+      "gpsEvents": 541,
+      "tracePoints": 180,
+      "images": 13,
+      "lastCode": 0,
+      "lastSuccessfulJobMs": 1114,
+      "usedMemoryKiB": 45,
+      "sampledPeakKiB": 46
+    },
+    "recoveredWithoutUserRetry": true,
+    "oldRasterPreserved": true,
+    "memoryCaveat": "1-second sampled peak can lag instantaneous display. Not a physical or exact peak measurement.",
+    "latencyCaveat": "Individual tiny synthetic raster jobs, not p95 or an NFR acceptance test."
+  },
+  "storage": {
+    "smallRoundTrip": "PASS",
+    "asciiCharacters": 1024,
+    "readComparedAndDeleted": true,
+    "gpsEventsAfterProbe": 557,
+    "previousLargeBoundaryExperiment": "FAIL: uncaught OOM in Storage.setValue; exact failing size not measured",
+    "capacity": "NOT RUN",
+    "bitmapPersistence": "NOT RUN",
+    "reboot": "NOT RUN"
+  },
+  "notRun": [
+    "physical Forerunner 165 GPS/firmware",
+    "physical iPhone/GCM/30-minute connection",
+    "Bluetooth versus internet loss",
+    "display hide/show lifecycle",
+    "two-hour endurance",
+    "physical battery comparison",
+    "real street/path map provider",
+    "physical storage limits/bitmap/reboot"
+  ],
+  "screenshots": [
+    {
+      "file": "screenshots/en-home-offline.png",
+      "sha256": "2b820ef3ce712db5afcf7cc87edc4b1900d7ccdd28e46d587c722ae91f2726ac",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/en-menu-back-fixed.png",
+      "sha256": "7b449b4723fcc6b2df28b18ebb810c4e250e1c141238d65d8323ca81eb035515",
+      "watchSourceSha256": "a469aa21bc928f12b979b33fd5fe99ef722855c98b6009b6ded134284704583a",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-diagnostics-before-outage.png",
+      "sha256": "7ece13f56796eb46d6091666cb1f6958b8bec87c3c1b20b444e61fc5d351ef1c",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-diagnostics-during-outage.png",
+      "sha256": "9a1f30e13dc3b6720fa050125f031e31a30fbf8ceb33d54ac85d163fb0ef67d0",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-diagnostics-recovered.png",
+      "sha256": "635d783d5d1660e08e8d495cfb3ee9de2e3621220e26ded9e5776873a7139403",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-final-195-day.png",
+      "sha256": "c525e373eac3c524ee4484e23ffd20174586984272f6abf84c3ae823a099d9a0",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-final-195-night.png",
+      "sha256": "b2937c0dda301fa8254b94d8f7e3f80211daf8c73b9fad8061ac1fcf27a8a01c",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-final-256-day.png",
+      "sha256": "7c75286133f9bbe7585f52342699030d4ffea3d19a7df513ddf5a041ba1f5bbf",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-final-256-night.png",
+      "sha256": "946637ccadb6c38a42f4dff8b03a53de359c66ca7111b132facffae734ab2e77",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-final-390-day.png",
+      "sha256": "d6cc5cbfda35bcb4e0cb74ed436101e3194ced31abfc7297d6bdd4a5f6387c03",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-final-390-night.png",
+      "sha256": "ad0d1b6fbe15248bf132a34d9c209724042cb589caa0d9af1223142816e42eef",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-final-z14.png",
+      "sha256": "c233d30ac460dbecad7447d34ff13479c6196e3d504094d035e8a2eef795e9f8",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-final-z16.png",
+      "sha256": "dabe928a95d8a00e42d502b494bf07bc1cc369b396018d98c43562ea2fc78d33",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-follow-recentered.png",
+      "sha256": "8fe66c4a4759fb6c2d6d06c8f8486e2c5af29cd7ba0d02c086e088850c35f73a",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-gps-poor-stale.png",
+      "sha256": "995d1382dc6a141a08295aaa12a6b44c301d3276c026d62764b951f14320db88",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-gps-restored.png",
+      "sha256": "f4dd1bce05d24008bf5d8b83c01a5d54b7a632e08c287ed6d2512aa984a54844",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-home-session-stopped.png",
+      "sha256": "37ed9a3ed3fb761dc692b9a762e1a5adac260916e5b7345eaca51e4b873c4422",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-network-outage-gps-live.png",
+      "sha256": "55c1d333d4b2bc635c232c1ccd6d582f7bfd1b5e99bb456a153ada8109314525",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-network-recovered.png",
+      "sha256": "d75925a711cff6e6046c7d17979c34015e3e5111c8265fa474f0a67b0cff7cc1",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-pan-east-west.png",
+      "sha256": "8155e445c181d831ede5cb0b5987cf4751dd4bf5cb78e392b82b53f516426ba9",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    },
+    {
+      "file": "screenshots/tr-storage-1k-pass.png",
+      "sha256": "27d66ed215fae5a03536379e9fcf9cc2c7c67c66fb140e3d7c49770aaceca447",
+      "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
+      "width": 390,
+      "height": 390
+    }
+  ],
+  "unitTests": {
+    "eng": {
+      "status": "PASS",
+      "passed": 17,
+      "rawSdkExitCode": 1,
+      "sourceSha256": "a469aa21bc928f12b979b33fd5fe99ef722855c98b6009b6ded134284704583a",
+      "artifactSha256": "77c1b54635662540cfb5a7c3e96f83314d2118fc7d45802ed3b29d51ab952705"
+    },
+    "tur": {
+      "status": "PASS",
+      "passed": 17,
+      "rawSdkExitCode": 1,
+      "sourceSha256": "a469aa21bc928f12b979b33fd5fe99ef722855c98b6009b6ded134284704583a",
+      "artifactSha256": "77c1b54635662540cfb5a7c3e96f83314d2118fc7d45802ed3b29d51ab952705"
+    }
+  }
+}

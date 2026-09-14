@@ -1,54 +1,68 @@
 # İlerleme — 14 Eylül 2026
 
-## Mevcut sonuç
+**G0 prototipinin yerel geliştirme ve simülatör teslimi hazır. Fiziksel G0 geçişi bekliyor.**
+Kullanıcının “şimdilik yalnızca simülatörle ilerle” seçimi uygulandı. Gerçek
+Forerunner 165 ve iPhone kanıtı olmadan G0/G3 PASS değildir.
 
-**Çalıştırılabilir G0 prototipi hazır; G0 saha geçişi henüz kabul edilmedi.**
-Kullanıcı şartnamesi korunarak Monkey C saat uygulaması, Python test servisi,
-otomatik testler, sürüm kilitleri ve GitHub kaynak teslim düzeni oluşturuldu.
+## Tamamlanan işler
 
-Tamamlanan yerel işler:
+- Monkey C Watch App, `fr165` hedefi, START ile GPS, kalite/yaş/yön ve 180 noktalı iz.
+- Zoom z14/15/16, iki eksende kaydırma, BACK ile takip, gündüz/gece ve EN/TR arayüz.
+- Atomik raster/metaveri, eski callback reddi, tek ağ işi, timeout ve sınırlı retry.
+- FastAPI sentetik raster servisi, 195/256/390 px, HMAC yetkisi, kota/gövde/cache sınırları.
+- `.venv`, sürüm kilitleri, CI, sır taraması, kaynak ZIP'i ve kurulum yönergeleri.
+- **56 Python testi PASS; API satır kapsamı %100 (182 satır).**
+- **17 Monkey C testi EN ve TR dillerinde PASS.** Kesin kaynak/artefakt özetleri
+  [otomatik kanıtta](evidence/automated.json) ve dil test kayıtlarında tutulur.
 
-- Gerçek **Forerunner 165 / fr165** hedefinde uyarısız PRG derlemesi.
-- START ile başlayan gerçek GPS adaptörü, kalite/yaş/yön, sınırlı ve segmentli iz.
-- Kuzey yukarı sentetik alan, zoom, pan, takip, tema, profil ve tanılama ekranları.
-- Nesil/oturum koruması, tek harita işi, atomik raster, timeout ve geri çekilme.
-- Üç PNG boyutu, sürümlü OpenAPI, HMAC görüntü yetkisi, gövde/kota/cache sınırları.
-- İzole `.venv`, özel dosyalar için Git dışlama, CI ve kaynak paketleme.
-- Hedef simülatörde **15 Monkey C testi**: koordinatlar, yaş/kalite, halka tampon,
-  stale callback, invalid metadata, backoff, düğmeler, raster/ekran çizimi ve metin sınırları.
-- **49 Python API/geometri testi**, %100 API satır kapsamı ve gerçek yerel HTTP deneyi. Kesin son sayılar
-  `docs/evidence/automated.json` içindedir.
+## Simülatörde gözlenenler
 
-## Çalıştırılan doğrulamalar
+Kullanıcı onaylı Cloudflare HTTPS deneyi 18:49:58–19:12:03 UTC arasında yaklaşık
+22 dakika sürdü. Yalnız sentetik konum/PNG kullanıldı. Tünel durduruldu, API
+kapatıldı, `.env` ve saat yapılandırması geri yüklendi; kalıcı yayın yapılmadı.
 
-`make doctor`, `make test`, `make build-watch`, `make test-watch`, `make contracts`,
-`make audit`, `scripts/http_smoke.py`, `make evidence`, `make package`.
-Güvenlik taraması çalışma zamanı bağımlılıklarında bilinen açık bildirmedi.
-Python test araçlarında iki upstream deprecation uyarısı var; test başarısı
-bundan etkilenmiyor. Simulator PRG ve fiziksel PRG farklı dosyalardır.
+195/256/390 px boyutların gündüz/gece kombinasyonları, zoom, kaydırma/merkezleme,
+Türkçe ekranlar, GPS kalite kaybı ve toparlanması ekran görüntüleriyle doğrulandı.
+API kapatılınca raster korundu, GPS sayacı 360'tan 485'e ilerledi; API açılınca
+manuel tekrar olmadan görüntü sayacı 12'den 13'e çıktı. İz 180 noktada kaldı.
+Depolama menüsünde 1024 karakter yaz/oku/karşılaştır/sil PASS.
 
-Kaynak ZIP’i başka bir geçici klasöre açılıp yeni Python 3.14 `.venv` ile kilitli
-bağımlılıklar sıfırdan kuruldu. Bu kopyada 49 test ve `fr165` derlemesi de geçti;
-orijinal `.local` dosyaları kullanılmadı. İlk denemede macOS Python 3.9 seçildiği
-için kurulum başarısız oldu; setup’a hem Python hem mevcut venv sürüm kontrolü
-eklendi. Yeni temiz ortamda mevcut Python 3.14 açıkça seçilerek kurulum doğrulandı.
+[Simülatör kaydı](evidence/simulator.json), [görüntüler](evidence/screenshots),
+[bulgu kararları](decisions/003-simulator-findings.md) ve [G0 matrisi](evidence/g0.md)
+ölçümleri ve sınırlarını açıklar. HTTPS deneyinden sonra yalnız İngilizce BACK
+etiketi kısaltıldı; bu değişiklik ayrı görsel ve iki dil testleriyle doğrulandı.
 
-## Açık işler / kısıtlar
+## Bulunan ve düzeltilen hatalar
 
-1. Mac kilidi açılınca görsel kontrol; özellikle Türkçe metinler ve gerçek saat düğmeleri.
-2. Fiziksel GPS, ekran yaşam döngüsü, bitmap/Object Store davranışı, iPhone/GCM
-   köprüsü, 30 dakikalık normal bağlantı ve iki saat dayanıklılık.
-3. Saha için kullanıcının seçeceği özel HTTPS sunucu. Yerel servis dışarıdan erişilebilir değildir.
-4. G0 geçince G1/G2: lisanslı gerçek sokak/patika sağlayıcısı, hesap eşleme,
-   token yenileme/iptal, tercihler portalı ve sağlayıcı atfı. Bu sürüm gerçek harita değildir.
-5. GPX içe aktarma / FIT / offline şehir paketi R1 veya opsiyon; uygulanmadı.
+CIQ JSON sayılarının koordinat hassasiyeti kaybı sekiz ondalıklı metin aktarımıyla
+çözüldü; coğrafi sınır toleransı gevşetilmedi. Eski Properties yapılandırması yeni
+build'i gölgelediği için derleme kaynaklarına geçildi. Büyük Storage deneyi OOM
+ile çöktü; canlı menü güvenli 1K deneyiyle sınırlandı. Türkçe kırpılma, İngilizce
+BACK genişliği, tema geçişi kontrastı ve hatalı başarılı-görüntü sayacı düzeltildi.
+Yerel PNG, Garmin dönüştürücüsünden alınamadı; `make sim-offline` açık ağsız deneme
+sunar. İnteraktif simülatör artık 90 saniyede kesilmez.
 
-SDK bu çalışma için `/tmp` altında tutulur; geçici dizin temizlenirse SDK yeniden
-edinilip yerel yol güncellenmelidir. Garmin cihaz/font verileri SDK Manager’ın
-standart kullanıcı cache’indedir. Global Python paketleri veya shell profili değişmedi.
+## Doğrulama ve kalan sınırlar
 
-## Sonraki görev
+`make test`, `make build-watch`, `make test-watch`, `make contracts`, `make evidence`,
+`make package` çalıştırıldı. Bağımlılıklar değişmedi; önceki `make audit` 14 çalışma
+zamanı bağımlılığında bilinen açık bildirmedi. Test araçlarından gelen iki upstream
+Python deprecation uyarısı sürüyor. Çevrimdışı fiziksel/simülatör derlemesindeki iki
+uyarı boş Türkçe ConfigBaseUrl/ConfigDevToken kaynakları içindir; bu değerler ağ
+servisi kapalı olduğu için bilerek boştur. HTTPS/test PRG derlemesi uyarısızdır.
 
-Kullanıcı eve dönüp Mac’i açtıktan sonra `docs/field-test.md` listesinin 1. bölümünü
-uygula. Ardından uygun HTTPS deneyi ve fiziksel saat kanıtlarını topla. Fiziksel
-kanıt olmadan G0/G3’ü PASS işaretleme veya gerçek sokak haritası MVP’si diye sunma.
+Son kaynak ZIP'i ayrı bir geçici klasöre açıldı: özgün `.local` ve anahtarlar
+olmadan 56 test ve `fr165` derlemesi PASS. Bu kontrol mevcut izole `.venv`
+bağımlılıklarını kullandı; sıfırdan bağımlılık kurulumunun tekrarı değildir. Önceki
+kurulum deneyinde yeni Python 3.14 `.venv` ile 49 test ve hedef derleme geçmişti.
+SDK `/tmp` altındadır; temizlenirse yeniden edinilmelidir. Global Python paketi
+kurulmadı; shell profili değiştirilmedi.
+
+Fiziksel GPS, iPhone/GCM kilitli ekran ve 30 dakika bağlantı, BT/internet ayrımı,
+ekran yaşam döngüsü, gerçek heap/grafik maliyeti, depolama sınırı/bitmap/reboot,
+iki saat dayanıklılık ve pil **NOT RUN**. Saat bağlanması bu teslim için istenmiyor.
+
+Sonraki aşama: kullanıcı fiziksel denemeyi istediğinde [saha listesi](field-test.md).
+G0 kabulünden sonra lisanslı sokak/patika sağlayıcısı, kalıcı HTTPS ve G2 eşleme
+kararları gerekir. Bu teslim gerçek sokak haritası MVP'si veya R1 GPX/FIT/offline
+şehir paketi değildir.

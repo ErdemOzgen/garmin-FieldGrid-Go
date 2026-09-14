@@ -34,6 +34,17 @@ def test_health_labels_synthetic(client):
     assert client.get("/health").headers["cache-control"] == "no-store"
 
 
+def test_watch_decimal_strings_preserve_map_center(client):
+    response = client.post(
+        "/v1/map-renders",
+        json=REQUEST | {"latDeg": "52.00002000", "lonDeg": "5.00003000"},
+    )
+    assert response.status_code == 200
+    assert response.json()["bounds3857"] == pytest.approx(
+        bounds(52.00002, 5.00003, 15), abs=0.00001, rel=0
+    )
+
+
 @pytest.mark.parametrize("size", [195, 256, 390])
 @pytest.mark.parametrize("style", ["day", "night"])
 def test_metadata_and_image_are_coherent(client, size, style):
@@ -65,6 +76,12 @@ def test_metadata_and_image_are_coherent(client, size, style):
         {"url": "https://example.com"},
         {"requestGeneration": -1},
         {"latDeg": None},
+        {"latDeg": True},
+        {"latDeg": "NaN"},
+        {"latDeg": "Infinity"},
+        {"latDeg": "52.000000001"},
+        {"latDeg": "5.2e1"},
+        {"latDeg": "86.00000000"},
     ],
 )
 def test_invalid_inputs_are_sanitized(client, change):

@@ -18,7 +18,7 @@
   <string id="Profile">Image size</string>
   <string id="Diagnostics">Diagnostics</string>
   <string id="Stop">End session</string>
-  <string id="Back">BACK to return</string>
+  <string id="Back">BACK to map</string>
   <string id="Loading">Loading map</string>
   <string id="Offline">Local test grid</string>
   <string id="ServiceIssue">Check connection</string>
@@ -28,4 +28,16 @@
   <string id="Retry">Retry service</string>
   <string id="NorthSouth">Pan north / south</string>
   <string id="EastWest">Pan east / west</string>
+  <string id="Outside">Go outside / START menu</string>
+  <string id="Phone">Phone</string>
+  <string id="Yes">YES</string>
+  <string id="No">NO</string>
+  <string id="LastCode">Last code</string>
+  <string id="Peak">peak</string>
+  <string id="Images">Images</string>
+  <string id="Trace">Trace</string>
+  <string id="Store">Store</string>
+  <string id="NotRun">NOT RUN</string>
+  <string id="WriteFailed">WRITE FAILED</string>
+  <string id="MapPending">Map pending</string>
 </strings>

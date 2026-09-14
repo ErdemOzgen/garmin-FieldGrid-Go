@@ -12,6 +12,9 @@ module Geo {
     function min(a, b) { return a < b ? a : b; }
     function max(a, b) { return a > b ? a : b; }
 
+    // Preserve sub-meter precision across CIQ's JSON dictionary serialization.
+    function coordinateText(degrees) { return degrees.format("%.8f"); }
+
     function finite(v) {
         return (v instanceof Number || v instanceof Float || v instanceof Double || v instanceof Long)
             && v == v && v < 1.0e100d && v > -1.0e100d;

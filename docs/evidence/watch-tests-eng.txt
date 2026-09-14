@@ -30,25 +30,25 @@ Executing test oldCallbackCannotReleaseNewJob...
 PASS
 ------------------------------------------------------------------------------
 Executing test renderEveryScreenAndRaster...
-DEBUG (21:17): 390px canvas rendered. FONT_SMALL=45px; FONT_XTINY=30px
+DEBUG (21:14): 390px canvas rendered. FONT_SMALL=45px; FONT_XTINY=30px
 PASS
 ------------------------------------------------------------------------------
 Executing test criticalLabelsFitRoundScreen...
-DEBUG (21:17): Label width 173 / safe 230
-DEBUG (21:17): Label width 130 / safe 230
-DEBUG (21:17): Label width 228 / safe 230
-DEBUG (21:17): Label width 221 / safe 230
-DEBUG (21:17): Label width 179 / safe 208
-DEBUG (21:17): Label width 160 / safe 208
-DEBUG (21:17): Label width 206 / safe 208
-DEBUG (21:17): Label width 167 / safe 208
-DEBUG (21:17): Label width 192 / safe 208
-DEBUG (21:17): Label width 148 / safe 168
-DEBUG (21:17): Label width 307 / safe 334
-DEBUG (21:17): Label width 253 / safe 363
-DEBUG (21:17): Label width 280 / safe 376
-DEBUG (21:17): Label width 264 / safe 370
-DEBUG (21:17): Label width 309 / safe 350
+DEBUG (21:14): Label width 181 / safe 230
+DEBUG (21:14): Label width 166 / safe 230
+DEBUG (21:14): Label width 169 / safe 230
+DEBUG (21:14): Label width 227 / safe 230
+DEBUG (21:14): Label width 207 / safe 208
+DEBUG (21:14): Label width 184 / safe 208
+DEBUG (21:14): Label width 165 / safe 208
+DEBUG (21:14): Label width 151 / safe 208
+DEBUG (21:14): Label width 151 / safe 208
+DEBUG (21:14): Label width 154 / safe 168
+DEBUG (21:14): Label width 270 / safe 334
+DEBUG (21:14): Label width 242 / safe 363
+DEBUG (21:14): Label width 305 / safe 376
+DEBUG (21:14): Label width 280 / safe 370
+DEBUG (21:14): Label width 298 / safe 350
 PASS
 ------------------------------------------------------------------------------
 Executing test malformedMetadataPreservesActiveMap...

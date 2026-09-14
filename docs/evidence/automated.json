@@ -1,5 +1,5 @@
 {
-  "measuredAtUtc": "2026-09-14T16:43:30.023889+00:00",
+  "measuredAtUtc": "2026-09-14T19:21:07.947495+00:00",
   "environment": {
     "os": "Darwin",
     "osVersion": "26.6.2",
@@ -21,28 +21,32 @@
     "physicalIOS": "NOT MEASURED",
     "physicalGCM": "NOT MEASURED"
   },
-  "sourceSha256": "f4fdc069a7a2b0588755e628e23ad4544654a306dd077634cec6833762e47358",
+  "sourceSha256": "608a0f510877944baf17d9097eafab850b49686390282a6f271bf30104ce72e3",
   "physicalTests": "NOT RUN",
-  "visualReview": "NOT RUN",
+  "visualReview": {
+    "status": "PASS",
+    "record": "docs/evidence/simulator.json",
+    "physicalAcceptance": "NOT RUN"
+  },
   "FieldMap.prg": {
     "status": "PASS",
-    "bytes": 121900,
-    "sha256": "7d3b04059f95b886050b14f1cbfca14418038dbfeba5eca7334310211eb4a375"
+    "bytes": 124156,
+    "sha256": "aeea1a6f36c85a8e7a09a4355d3fa394063cb7b4614b339db9368896d0cafc01"
   },
   "FieldMap-tests.prg": {
     "status": "PASS",
-    "bytes": 135916,
-    "sha256": "c6e84ade597af098fd8bc8e9bc527d9b123c15281f508de051f8b032adf0d3a5"
+    "bytes": 139484,
+    "sha256": "77c1b54635662540cfb5a7c3e96f83314d2118fc7d45802ed3b29d51ab952705"
   },
   "pythonTests": {
-    "tests": 49,
+    "tests": 56,
     "errors": 0,
     "failures": 0,
     "skipped": 0
   },
   "watchTests": {
     "status": "PASS",
-    "passed": 15
+    "passed": 17
   },
   "http-smoke.json": {
     "status": "PASS",
@@ -141,5 +145,5 @@
     ],
     "fixes": []
   },
-  "gitCommitAtMeasurement": null
+  "gitCommitAtMeasurement": "0dccc62208617498b3e2b0ab18a3966637ac512c"
 }

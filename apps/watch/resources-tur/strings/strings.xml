@@ -10,7 +10,7 @@
   <string id="Stale">Eski konum</string>
   <string id="Weak">GPS zayıf</string>
   <string id="Good">GPS iyi</string>
-  <string id="Usable">GPS kullanılabilir</string>
+  <string id="Usable">GPS yeterli</string>
   <string id="NoMap">Harita yok</string>
   <string id="Follow">Konumu izle</string>
   <string id="Browse">Haritayı kaydır</string>
@@ -18,7 +18,7 @@
   <string id="Profile">Görüntü boyutu</string>
   <string id="Diagnostics">Tanılama</string>
   <string id="Stop">Oturumu bitir</string>
-  <string id="Back">Dönmek için BACK</string>
+  <string id="Back">BACK ile dön</string>
   <string id="Loading">Harita yükleniyor</string>
   <string id="Offline">Yerel test ızgarası</string>
   <string id="ServiceIssue">Bağlantı sorunu</string>
@@ -28,4 +28,16 @@
   <string id="Retry">Servisi yeniden dene</string>
   <string id="NorthSouth">Kuzey / güney kaydır</string>
   <string id="EastWest">Doğu / batı kaydır</string>
+  <string id="Outside">Dışarı çık / START menü</string>
+  <string id="Phone">Telefon</string>
+  <string id="Yes">EVET</string>
+  <string id="No">HAYIR</string>
+  <string id="LastCode">Son kod</string>
+  <string id="Peak">tepe</string>
+  <string id="Images">Harita</string>
+  <string id="Trace">İz</string>
+  <string id="Store">Depo</string>
+  <string id="NotRun">DENENMEDİ</string>
+  <string id="WriteFailed">YAZMA HATASI</string>
+  <string id="MapPending">Harita bekliyor</string>
 </strings>

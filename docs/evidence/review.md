@@ -40,3 +40,18 @@ serbest bırakmaması; derleme raporunun kaynak/artefakt SHA256 eşleştirmesi.
 coğrafi resim eşleşmesi, kamuya yayın ve anahtar sızıntısı tekrar kontrol edildi.
 G0 tek geliştirme tokenının üretim kimlik sistemine eşdeğer olduğu iddiası yoktur;
 G2 eşleme eksikliği bu aşamada gizlenmiş bir auth özelliği olarak sunulmaz.
+
+## Simülatör sonrası inceleme
+
+56 Python ve iki dilde 17 saat testi; altı gerçek HTTPS raster aktarımı, ağ
+kesintisi, GPS kalite kaybı ve küçük Storage işlemi kanıtları incelendi.
+Koordinat hassasiyeti, Properties gölgelemesi, büyük Storage OOM, yanlış görüntü
+sayacı, TR/EN kırpılma ve tema kontrastı düzeltildi; ADR 003 nedenleri kaydeder.
+İngilizce BACK etiketinin son değişikliği ağ deneyinden ayrılan kaynak kimliğiyle
+ve ayrı menü görüntüsüyle doğrulandı. Tarihsel FAIL sonuçları saklandı.
+
+Çevrimdışı PRG'de boş ConfigBaseUrl/ConfigDevToken Türkçe kaynak uyarıları beklenir;
+ağ yapılandırmasının kapalı olduğunu yansıtır. Aktif HTTPS PRG uyarısız derlendi.
+Depolama 1K PASS, toplam kapasite/bitmap/reboot PASS olarak sunulmaz. Tanılama
+RAM tepe değeri bir saniyede örneklenir; anlık tepe veya fiziksel bellek kanıtı değildir.
+Geçici tünel 30 dakika sınırından önce kapatıldı ve özel ayarlar geri yüklendi.

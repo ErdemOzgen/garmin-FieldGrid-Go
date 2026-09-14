@@ -36,6 +36,16 @@ def main():
         "physicalTests": "NOT RUN",
         "visualReview": "NOT RUN",
     }
+    visual = output / "simulator.json"
+    if visual.exists():
+        observed = json.loads(visual.read_text())
+        report["visualReview"] = {
+            "status": observed["status"]
+            if observed.get("watchSourceSha256") == watch_source_hash()
+            else "STALE",
+            "record": "docs/evidence/simulator.json",
+            "physicalAcceptance": "NOT RUN",
+        }
     for name in ["FieldMap.prg", "FieldMap-tests.prg"]:
         path = ROOT / "build" / name
         manifest = path.with_suffix(path.suffix + ".json")

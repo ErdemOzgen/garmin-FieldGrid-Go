@@ -26,6 +26,11 @@ class FieldView extends WatchUi.View {
         dc.drawText(195, y, font, text, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
+    function menuFont(dc, label) {
+        return dc.getTextWidthInPixels(label, Graphics.FONT_SMALL) <= 264 ?
+            Graphics.FONT_SMALL : Graphics.FONT_XTINY;
+    }
+
     function onUpdate(dc as Graphics.Dc) as Void {
         var m = session.map; var gps = session.gps;
         var night = "night".equals(m.style);
@@ -55,7 +60,9 @@ class FieldView extends WatchUi.View {
                     dc.setColor(0x187C69, Graphics.COLOR_TRANSPARENT);
                     dc.fillRoundedRectangle(53, y, 284, 45, 15);
                 }
-                line(dc, y + 3, textResource(menuItems[index]), index == selection ? 0xFFFFFF : ink, Graphics.FONT_SMALL);
+                var label = textResource(menuItems[index]);
+                var font = menuFont(dc, label);
+                line(dc, y + (45 - dc.getFontHeight(font)) / 2, label, index == selection ? 0xFFFFFF : ink, font);
             }
             line(dc, 305, (selection + 1).toString() + " / 8", ink, Graphics.FONT_XTINY);
             line(dc, 338, textResource(Rez.Strings.Back), ink, Graphics.FONT_XTINY);
@@ -65,18 +72,20 @@ class FieldView extends WatchUi.View {
             line(dc, 45, textResource(Rez.Strings.Diagnostics), ink, Graphics.FONT_XTINY);
             var stats = System.getSystemStats();
             line(dc, 83, "v0.1.0 / G0", ink, Graphics.FONT_XTINY);
-            line(dc, 115, "Phone: " + (System.getDeviceSettings().phoneConnected ? "YES" : "NO"), ink, Graphics.FONT_XTINY);
-            line(dc, 147, "Last code: " + m.lastCode, ink, Graphics.FONT_XTINY);
-            line(dc, 179, "RAM " + (stats.usedMemory / 1024) + " / peak " + (session.peakMemory / 1024) + " KiB", ink, Graphics.FONT_XTINY);
-            line(dc, 211, "Images " + m.requestCount + " / " + m.lastDuration + " ms", ink, Graphics.FONT_XTINY);
-            line(dc, 243, "Trace " + gps.count + " / GPS " + session.updateCount, ink, Graphics.FONT_XTINY);
-            line(dc, 275, "Store: " + session.storageStatus, ink, Graphics.FONT_XTINY);
+            line(dc, 115, textResource(Rez.Strings.Phone) + ": " + textResource(System.getDeviceSettings().phoneConnected ? Rez.Strings.Yes : Rez.Strings.No), ink, Graphics.FONT_XTINY);
+            line(dc, 147, textResource(Rez.Strings.LastCode) + ": " + m.lastCode, ink, Graphics.FONT_XTINY);
+            line(dc, 179, "RAM " + (stats.usedMemory / 1024) + " / " + textResource(Rez.Strings.Peak) + " " + (session.peakMemory / 1024) + " KiB", ink, Graphics.FONT_XTINY);
+            line(dc, 211, textResource(Rez.Strings.Images) + " " + m.imageCount + " / " + m.lastDuration + " ms", ink, Graphics.FONT_XTINY);
+            line(dc, 243, textResource(Rez.Strings.Trace) + " " + gps.count + " / GPS " + session.updateCount, ink, Graphics.FONT_XTINY);
+            var store = "NOT RUN".equals(session.storageStatus) ? textResource(Rez.Strings.NotRun) :
+                ("WRITE FAILED".equals(session.storageStatus) ? textResource(Rez.Strings.WriteFailed) : session.storageStatus);
+            line(dc, 275, textResource(Rez.Strings.Store) + ": " + store, ink, Graphics.FONT_XTINY);
             line(dc, 325, textResource(Rez.Strings.Back), ink, Graphics.FONT_XTINY);
             return;
         }
         if (m.center == null) {
             line(dc, 154, textResource(Rez.Strings.Waiting), ink, Graphics.FONT_SMALL);
-            line(dc, 205, "Go outside / START menu", ink, Graphics.FONT_XTINY);
+            line(dc, 205, textResource(Rez.Strings.Outside), ink, Graphics.FONT_XTINY);
             drawStatus(dc, ink, bg); return;
         }
         var box = Geo.bounds(m.center[0], m.center[1], m.zoom);
@@ -127,11 +136,16 @@ class FieldView extends WatchUi.View {
         // Ground scale includes latitude; raster dimensions do not alter the geographic box.
         var ll = Geo.inverse(m.center[0], m.center[1]);
         var meters = Geo.resolution(m.zoom) * Math.cos(ll[0] * Geo.PI / 180.0d) * 60;
+        // Readability must survive a theme change while the old raster is kept.
+        dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
+        dc.fillRoundedRectangle(104, 280, 182, 45, 8);
         dc.setColor(ink, Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(3); dc.drawLine(163, 287, 223, 287); dc.setPenWidth(1);
         line(dc, 291, meters.format("%.0f") + " m / z" + m.zoom, ink, Graphics.FONT_XTINY);
         drawStatus(dc, ink, bg);
         if (page == :pan) {
+            dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
+            dc.fillRoundedRectangle(48, 233, 294, 35, 8);
             line(dc, 237, textResource(panAxis == 0 ? Rez.Strings.NorthSouth : Rez.Strings.EastWest), ink, Graphics.FONT_XTINY);
         } else if (session.baseUrl.length() != 0 && !rasterVisible && !m.busy) {
             line(dc, 233, textResource(Rez.Strings.NoMap), ink, Graphics.FONT_XTINY);
@@ -167,14 +181,20 @@ class FieldView extends WatchUi.View {
         dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
         dc.fillRoundedRectangle(56, 34, 278, 45, 18);
         line(dc, 42, status, ink, Graphics.FONT_XTINY);
+        dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
+        dc.fillRoundedRectangle(177, 79, 36, 30, 5);
         line(dc, 82, "N", ink, Graphics.FONT_XTINY);
         var network = textResource(Rez.Strings.Offline);
         if (session.configError || m.permanent) { network = textResource(Rez.Strings.SettingsIssue); }
         else if (m.lastCode != 0) { network = textResource(Rez.Strings.ServiceIssue); }
         else if (session.baseUrl.length() != 0 && (m.busy || m.wanted)) { network = textResource(Rez.Strings.Loading); }
-        else if (session.baseUrl.length() != 0) { network = "Raster / " + m.size + " px"; }
+        else if (session.baseUrl.length() != 0) {
+            network = m.metadata == null ? textResource(Rez.Strings.MapPending) : "Raster / " + m.size + " px";
+        }
         dc.setColor(bg, Graphics.COLOR_TRANSPARENT); dc.fillRectangle(49, 326, 292, 29);
         line(dc, 326, network, ink, Graphics.FONT_XTINY);
+        dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
+        dc.fillRoundedRectangle(25, 101, 340, 36, 8);
         line(dc, 105, textResource(Rez.Strings.Synthetic), ink, Graphics.FONT_XTINY);
     }
 }

@@ -54,7 +54,9 @@ size aittir; Git’e veya sohbete koymayın.
 ## Simülatör
 
 `make sim` simülatörü açar ve uygulamayı gönderir. Masaüstü oturumu açık olmalıdır.
-İlk açılışta bağlantı henüz hazır değilse tekrar çalıştırın. `make test-watch`
+İlk açılışta bağlantı hazır değilse görev kısa aralıklarla en fazla üç kez dener.
+Etkileşimli `make sim` uygulama kapanana kadar çalışır; 90 saniyede sonlandırılmaz.
+`make test-watch`
 derlenmiş Monkey C testlerini aynı `fr165` hedefinde çalıştırır. SDK 9.2.0 komut
 satırı aracı başarı özetine rağmen çıkış kodu 1 döndürebildiği için görev, eksiksiz
 `PASSED (passed=N, failed=0, errors=0)` özetini doğrular; boş/başarısız sonuç geçmez.
@@ -63,6 +65,21 @@ Testlerde GPS koordinatları yapaydır. `make sim` normal uygulamayı başlatır
 otomatik olarak GPS izni vermez veya sentetik GPS enjekte etmez. START sonrası
 simülatör GPS oynatma menüsünde sentetik fixture seçilebilir. Görsel kontrol
 listesi [field-test.md](field-test.md) içindedir.
+
+GPS kalite ayarı `Good` olmalıdır; `Poor` ve `Last Known` kullanılabilir fix değildir.
+SDK 9.2.0, oynatım sürerken yeniden uygulama yüklenirse Activity Data penceresini
+kilitli durumda bırakabildi. Bu durumda simülatörü kapatıp `make sim` ile yeniden
+açın; fixture'ı tekrar seçin. Anahtar Zinciri penceresi açılırsa kullanıcı tamamlar;
+parola depoya veya sohbet kaydına yazılmaz.
+
+`make sim-offline` ayrı bir `FieldMap-offline-simulator.prg` üretir ve ağ çağrısını
+kapatır. Bu mod, canlı GPS yerine sentetik veri enjekte etmez. Normal `make sim`
+ise yapılandırılan servisi kullanır. Derleme yapılandırması Git dışındaki kaynak
+dizisinden okunur; eski `Application.Properties` değerleri yeni build'i gölgelemez.
+
+Yerel API metadata için çalışır; Garmin'in görüntü dönüştürücüsü PNG URL'sine
+dışarıdan erişmelidir. Dolayısıyla localhost ile tam raster aktarımı beklenmez.
+Onaylı, geçici deney [HTTPS planında](https-simulator-test.md) tanımlıdır.
 
 ## Özel HTTPS G0 deneyi
 

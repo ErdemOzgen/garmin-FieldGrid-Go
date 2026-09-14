@@ -1,9 +1,27 @@
 import Toybox.Test;
+import Toybox.Application;
 import Toybox.Math;
 import Toybox.Position;
 import Toybox.Graphics;
 import Toybox.System;
 import Toybox.Time;
+
+(:test)
+function decimalCoordinateWirePrecision(logger) {
+    Test.assert("52.00002000".equals(Geo.coordinateText(52.00002d)));
+    Test.assert("5.00003000".equals(Geo.coordinateText(5.00003d)));
+    Test.assert("-179.99999999".equals(Geo.coordinateText(-179.99999999d)));
+    return true;
+}
+
+(:test)
+function smallStorageProbeRoundTrip(logger) {
+    var s = new FieldSession();
+    s.probeStorage();
+    Test.assert("1K OK".equals(s.storageStatus));
+    Test.assert(Application.Storage.getValue("g0-probe") == null);
+    return true;
+}
 
 (:test)
 function projectionControlPoints(logger) {
@@ -143,8 +161,13 @@ function criticalLabelsFitRoundScreen(logger) {
         [textResource(Rez.Strings.Waiting), 42],
         [textResource(Rez.Strings.Good) + " / 0s", 42],
         [textResource(Rez.Strings.Stale) + " / 9999s", 42],
+        [textResource(Rez.Strings.Usable) + " / 9999s", 42],
         [textResource(Rez.Strings.ServiceIssue), 326],
         [textResource(Rez.Strings.SettingsIssue), 326],
+        [textResource(Rez.Strings.Offline), 326],
+        [textResource(Rez.Strings.MapPending), 326],
+        [textResource(Rez.Strings.Loading), 326],
+        [textResource(Rez.Strings.Back), 338],
         [textResource(Rez.Strings.Synthetic), 105],
         [textResource(Rez.Strings.Consent1), 141],
         [textResource(Rez.Strings.Consent2), 173],
@@ -159,6 +182,11 @@ function criticalLabelsFitRoundScreen(logger) {
         var width = dc.getTextWidthInPixels(label[0], Graphics.FONT_XTINY);
         logger.debug("Label width " + width + " / safe " + allowed.format("%.0f"));
         Test.assert(width <= allowed);
+    }
+    var view = new FieldView(new FieldSession());
+    for (var n = 0; n < view.menuItems.size(); n++) {
+        var label = textResource(view.menuItems[n]);
+        Test.assert(dc.getTextWidthInPixels(label, view.menuFont(dc, label)) <= 264);
     }
     return true;
 }
@@ -197,6 +225,7 @@ function staleRasterCannotReplaceNewCamera(logger) {
     Test.assert(!state.commit({"renderId" => "old"}, null, old, 100));
     Test.assert(state.metadata == null && state.zoom == 16);
     Test.assert(state.commit({"renderId" => "new"}, null, state.generation, 200));
+    Test.assert(state.imageCount == 1);
     state.active = false;
     Test.assert(!state.commit({"renderId" => "late"}, null, state.generation, 300));
     Test.assert("new".equals(state.metadata["renderId"]));

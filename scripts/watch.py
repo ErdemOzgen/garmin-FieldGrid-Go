@@ -9,6 +9,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 from xml.sax.saxutils import escape
 
@@ -86,7 +87,7 @@ def doctor():
     return report
 
 
-def configure_resources(simulator=False):
+def configure_resources(simulator=False, offline=False):
     directory = LOCAL / "watch-resources"
     directory.mkdir(parents=True, exist_ok=True)
     configuration = LOCAL / "watch.json"
@@ -94,7 +95,7 @@ def configure_resources(simulator=False):
     base_url = data.get("baseUrl", "").rstrip("/")
     token = data.get("devToken", "")
     allow_local = data.get("allowLocalHttp", False)
-    if allow_local and not simulator:
+    if offline or (allow_local and not simulator):
         # A simulator loopback origin must never leak into the physical-watch build.
         base_url, token, allow_local = "", "", False
     from urllib.parse import urlsplit
@@ -110,20 +111,21 @@ def configure_resources(simulator=False):
         or parts.path not in {"", "/"}
     ):
         raise SystemExit("Invalid watch origin. Use HTTPS, or explicit local simulator HTTP.")
-    properties = (
-        "<properties>\n"
-        f'<property id="baseUrl" type="string">{escape(base_url)}</property>\n'
-        f'<property id="devToken" type="string">{escape(token)}</property>\n'
-        '<property id="allowLocalHttp" type="boolean">'
-        f"{str(bool(allow_local)).lower()}</property>\n"
-        "</properties>\n"
+    resources = (
+        "<strings>\n"
+        f'<string id="ConfigBaseUrl">{escape(base_url)}</string>\n'
+        f'<string id="ConfigDevToken">{escape(token)}</string>\n'
+        f'<string id="ConfigAllowLocalHttp">{str(bool(allow_local)).lower()}</string>\n'
+        "</strings>\n"
     )
-    path = directory / "properties.xml"
-    path.write_text(properties)
+    # Compile-time resources cannot be shadowed by old simulator Properties.
+    (directory / "properties.xml").unlink(missing_ok=True)
+    path = directory / "configuration.xml"
+    path.write_text(resources)
     path.chmod(0o600)
 
 
-def build(unit_tests=False, simulator=False):
+def build(unit_tests=False, simulator=False, offline=False):
     sdk = sdk_path()
     java = java_path()
     if sdk is None or java is None:
@@ -137,7 +139,7 @@ def build(unit_tests=False, simulator=False):
         raise SystemExit(
             "SDK/device version differs from toolchain.lock.json. Review the update first."
         )
-    configure_resources(simulator=simulator)
+    configure_resources(simulator=simulator, offline=offline)
     BUILD.mkdir(exist_ok=True)
     key = Path(os.getenv("CIQ_DEVELOPER_KEY", str(LOCAL / "keys/developer.der")))
     if not key.exists():
@@ -156,6 +158,8 @@ def build(unit_tests=False, simulator=False):
         with os.fdopen(os.open(key, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "wb") as stream:
             stream.write(der)
     name = "FieldMap-simulator.prg" if simulator else "FieldMap.prg"
+    if offline:
+        name = "FieldMap-offline-simulator.prg"
     output = BUILD / ("FieldMap-tests.prg" if unit_tests else name)
     cmd = [
         java,
@@ -203,6 +207,7 @@ def build(unit_tests=False, simulator=False):
         "artifactSha256": hashlib.sha256(output.read_bytes()).hexdigest(),
         "unitTests": unit_tests,
         "simulator": simulator,
+        "offline": offline,
         "warnings": log.count("WARNING:"),
     }
     output.with_suffix(output.suffix + ".json").write_text(json.dumps(record, indent=2) + "\n")
@@ -210,8 +215,8 @@ def build(unit_tests=False, simulator=False):
     return output
 
 
-def simulate(unit_tests=False):
-    output = build(unit_tests, simulator=True)
+def simulate(unit_tests=False, offline=False):
+    output = build(unit_tests, simulator=True, offline=offline)
     sdk = sdk_path()
     java = java_path()
     subprocess.run(["open", "-a", str(sdk / "bin/ConnectIQ.app")], check=True)
@@ -229,7 +234,46 @@ def simulate(unit_tests=False):
     ]
     if unit_tests:
         cmd.append("-t")
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=90)
+    if not unit_tests:
+        print("Simulator running; exit the watch app to finish this command.", flush=True)
+        with (BUILD / "simulator.log").open("w") as log_file:
+            for attempt in range(3):
+                connect_failed = False
+                with subprocess.Popen(
+                    cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+                ) as process:
+                    for line in process.stdout:
+                        safe_line = line.replace(str(ROOT), "$PROJECT").replace(
+                            str(Path.home()), "$USER"
+                        )
+                        connect_failed |= line.strip() == "Unable to connect to simulator."
+                        log_file.write(safe_line)
+                        log_file.flush()
+                        print(safe_line, end="", flush=True)
+                    return_code = process.wait()
+                if not connect_failed or attempt == 2:
+                    break
+                time.sleep(1)
+        if return_code:
+            raise SystemExit(return_code)
+        return
+    # A failed/timed-out rerun must never leave the previous PASS as fresh evidence.
+    (BUILD / "watch-test-result.json").unlink(missing_ok=True)
+    (BUILD / "watch-tests.log").write_text("")
+    print("Running compiled simulator tests (90 second timeout).", flush=True)
+    for attempt in range(3):
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=90)
+        except subprocess.TimeoutExpired:
+            (BUILD / "watch-tests.log").write_text(
+                "FAILED: simulator timed out after 90 seconds.\n"
+            )
+            raise SystemExit(
+                "Simulator timed out; restart the simulator and rerun tests."
+            ) from None
+        if "Unable to connect to simulator." not in result.stdout + result.stderr or attempt == 2:
+            break
+        time.sleep(1)
     log = (
         (result.stdout + result.stderr)
         .replace(str(ROOT), "$PROJECT")
@@ -263,8 +307,12 @@ def simulate(unit_tests=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=["doctor", "build", "test", "sim"])
+    parser.add_argument("command", choices=["doctor", "build", "test", "sim", "sim-offline"])
     args = parser.parse_args()
-    {"doctor": doctor, "build": build, "test": lambda: simulate(True), "sim": simulate}[
-        args.command
-    ]()
+    {
+        "doctor": doctor,
+        "build": build,
+        "test": lambda: simulate(True),
+        "sim": simulate,
+        "sim-offline": lambda: simulate(offline=True),
+    }[args.command]()

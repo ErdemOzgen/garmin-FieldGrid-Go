@@ -46,9 +46,9 @@ class FieldSession {
                 if (saved["zoom"] == 14 || saved["zoom"] == 15 || saved["zoom"] == 16) { map.zoom = saved["zoom"]; }
                 if ("day".equals(saved["style"]) || "night".equals(saved["style"])) { map.style = saved["style"]; }
             }
-            baseUrl = Application.Properties.getValue("baseUrl");
-            token = Application.Properties.getValue("devToken");
-            var allowLocal = Application.Properties.getValue("allowLocalHttp");
+            baseUrl = WatchUi.loadResource(Rez.Strings.ConfigBaseUrl);
+            token = WatchUi.loadResource(Rez.Strings.ConfigDevToken);
+            var allowLocal = "true".equals(WatchUi.loadResource(Rez.Strings.ConfigAllowLocalHttp));
             if (!(baseUrl instanceof String) || !(token instanceof String)) {
                 baseUrl = ""; token = ""; configError = true;
             }
@@ -154,19 +154,17 @@ class FieldSession {
     }
 
     function probeStorage() {
-        var result = "";
+        // A boundary-sized setValue caused an uncatchable SDK OOM. Keep the live
+        // session probe small; this verifies round-trip behavior, not capacity.
         var s = "0123456789abcdef";
-        while (s.length() < 32768) { s += s; }
-        var sizes = [1024, 32000, 32768];
-        for (var i = 0; i < sizes.size(); i++) {
-            try {
-                Application.Storage.setValue("g0-probe", s.substring(0, sizes[i]));
-                var read = Application.Storage.getValue("g0-probe");
-                result += read instanceof String && read.length() == sizes[i] ? "OK " : "BAD ";
-            } catch (e) { result += "LIMIT "; }
-            try { Application.Storage.deleteValue("g0-probe"); } catch (e) {}
-        }
-        storageStatus = result;
+        while (s.length() < 1024) { s += s; }
+        try {
+            Application.Storage.setValue("g0-probe", s);
+            var read = Application.Storage.getValue("g0-probe");
+            storageStatus = read instanceof String && s.equals(read) ? "1K OK" : "1K BAD";
+        } catch (e) { storageStatus = "WRITE FAILED"; }
+        try { Application.Storage.deleteValue("g0-probe"); }
+        catch (e) { storageStatus = "WRITE FAILED"; }
     }
 }
 
@@ -180,8 +178,8 @@ class MapJob {
         if (owner.token.length() != 0) { headers["Authorization"] = "Bearer " + owner.token; }
         try {
             Communications.makeWebRequest(owner.baseUrl + "/v1/map-renders",
-                {"schemaVersion" => 1, "requestGeneration" => gen, "latDeg" => ll[0],
-                 "lonDeg" => ll[1], "zoom" => m.zoom, "style" => m.style, "imageSize" => m.size},
+                {"schemaVersion" => 1, "requestGeneration" => gen, "latDeg" => Geo.coordinateText(ll[0]),
+                 "lonDeg" => Geo.coordinateText(ll[1]), "zoom" => m.zoom, "style" => m.style, "imageSize" => m.size},
                 {:method => Communications.HTTP_REQUEST_METHOD_POST, :headers => headers,
                  :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON}, method(:onMetadata));
         } catch (e) { fail(-902, null); }
@@ -210,7 +208,12 @@ class MapJob {
         if (obsolete()) { return; }
         if (code != 200) { fail(code, data); return; }
         if (!(data instanceof Dictionary)) { fail(-900, null); return; }
-        if (!owner.map.validate(data, gen, owner.baseUrl) || data["expiresAt"] <= Time.now().value()) {
+        if (!owner.map.validate(data, gen, owner.baseUrl)) {
+            System.println("G0 rejected metadata: " + owner.map.validationIssue);
+            fail(-900, null); return;
+        }
+        if (data["expiresAt"] <= Time.now().value()) {
+            System.println("G0 rejected metadata: expired");
             fail(-900, null); return;
         }
         pending = data;
@@ -226,6 +229,7 @@ class MapJob {
         if (code != 200 || data == null) { fail(code == 200 ? -903 : code, null); return; }
         var bitmap = data instanceof Graphics.BitmapReference ? data.get() : data;
         if (bitmap.getWidth() != pending["imageWidth"] || bitmap.getHeight() != pending["imageHeight"]) {
+            System.println("G0 rejected bitmap dimensions");
             fail(-900, null); return;
         }
         owner.map.commit(pending, data, gen, System.getTimer());

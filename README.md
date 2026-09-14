@@ -30,7 +30,15 @@ Garmin’in bu cihaz için gerçek derleyici kimliği **`fr165`**’tir.
 `127.0.0.1` adresini fiziksel saat paketine taşımaz. HTTPS yapılandırması yoksa
 paket çevrimdışı sentetik ızgarayla çalışır. GPS için START’a basmak gerekir.
 
-## Yerel raster deneyi
+## Simülatörde çalıştırma
+
+Ağ servisi olmadan düğmeleri, GPS tekrarını ve arayüzü denemek için:
+
+```sh
+make sim-offline   # Açıkça etiketli yerel sentetik ızgara; ağ isteği yapmaz
+```
+
+Metadata servisini yerelde denemek için:
 
 ```sh
 make dev-config    # Bir kez; .env ve .local/watch.json üretir. Sırları yazdırmaz.
@@ -45,6 +53,15 @@ Servis durumu: [yerel health](http://127.0.0.1:8765/health).
 [OpenAPI arayüzü](http://127.0.0.1:8765/docs) ve [sürümlü sözleşme](contracts/openapi.json).
 Simülatörde sentetik GPS için `tests/fixtures/synthetic-walk.gpx` dosyasını GPS
 oynatma menüsünden seçin. Gerçek saate sentetik konum yüklenmez.
+
+**Garmin görüntü dönüştürücüsü localhost PNG'sini alamaz.** Yerel HTTP deneyi
+metadata ve API içindir; `makeImageRequest` yolunu doğrulamak için dışarıdan
+erişilebilir HTTPS gerekir. Kullanıcı onaylı geçici HTTPS testi ile üç boyut
+simülatörde doğrulandı. Tekrar için [HTTPS test planı](docs/https-simulator-test.md)
+ve [ayrıntılı simülatör adımları](docs/field-test.md) bulunur. Hiçbir `make` görevi
+kendiliğinden tünel açmaz.
+
+![Türkçe simülatörde sentetik raster](docs/evidence/screenshots/tr-final-390-day.png)
 
 ## Düğmeler
 
@@ -62,7 +79,9 @@ LIGHT ve sistemin uzun basma hareketleri yeniden atanmaz. Güncel raster RAM’d
 konum izi en fazla 180 noktada tutulur. GPS kesintisi izde bağlantısız segment
 oluşturur. Beş saniyeden eski konum eski olarak gösterilir. Üç raster boyutu
 menüden döndürülür: 390 → 195 → 256. G0 tanılama ekranı hata kodu, heap,
-istek süresi ve sayaç gösterir; koordinat veya token yazmaz.
+başarılı harita yükleme süresi ve sayaç gösterir; koordinat veya token yazmaz.
+Depolama testi 1 KB metni yazıp okuyarak siler; toplam kapasite veya bitmap
+kalıcılığı testi değildir.
 
 ## Proje düzeni
 

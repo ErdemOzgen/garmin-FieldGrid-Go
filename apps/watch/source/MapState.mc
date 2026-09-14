@@ -20,7 +20,9 @@ class MapState {
     var lastCode = 0;
     var permanent = false;
     var requestCount = 0;
+    var imageCount = 0;
     var lastDuration = 0;
+    var validationIssue = "none";
 
     function initialize() {}
 
@@ -59,6 +61,7 @@ class MapState {
     }
 
     function validate(data, expectedGeneration, baseUrl) {
+        validationIssue = "schema";
         if (!(data instanceof Dictionary)) { return false; }
         if (data["schemaVersion"] != 1 || data["requestGeneration"] != expectedGeneration ||
             !"EPSG:3857".equals(data["projection"]) || data["imageWidth"] != size ||
@@ -67,14 +70,21 @@ class MapState {
             !"synthetic-grid-v1".equals(data["mapDataVersion"]) ||
             !"SYNTHETIC TEST MAP".equals(data["attribution"])) { return false; }
         var id = data["renderId"]; var url = data["imageUrl"]; var box = data["bounds3857"];
+        validationIssue = "grant";
         if (!(id instanceof String) || id.length() != 32 || !(url instanceof String) ||
             url.find(baseUrl + "/v1/images/" + id + "?") != 0 ||
             !(box instanceof Array) || box.size() != 4 || !Geo.finite(data["expiresAt"])) { return false; }
         var expected = Geo.bounds(center[0], center[1], zoom);
+        validationIssue = "bounds";
         for (var i = 0; i < 4; i++) {
-            if (!Geo.finite(box[i]) || Geo.abs(box[i] - expected[i]) > 2) { return false; }
+            if (!Geo.finite(box[i]) || Geo.abs(box[i] - expected[i]) > 2) {
+                if (Geo.finite(box[i])) { System.println("G0 bounds residual meters: " + (box[i] - expected[i])); }
+                return false;
+            }
         }
-        return box[2] > box[0] && box[3] > box[1];
+        if (box[2] <= box[0] || box[3] <= box[1]) { return false; }
+        validationIssue = "none";
+        return true;
     }
 
     function commit(data, image, gen, now) {
@@ -82,6 +92,7 @@ class MapState {
         if (!active || gen != generation) { wanted = active; return false; }
         // Swap only when both validated resources are available.
         bitmap = image; metadata = data; failures = 0; lastCode = 0;
+        imageCount++;
         lastDuration = now - lastStart;
         return true;
     }
