@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "requestGeneration": 42,
+  "latDeg": 52.0,
+  "lonDeg": 5.0,
+  "zoom": 15,
+  "imageSize": 390,
+  "style": "day"
+}

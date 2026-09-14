@@ -1,0 +1,370 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FieldMap G0 test service",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/map-renders": {
+      "post": {
+        "summary": "Create Render",
+        "operationId": "create_render_v1_map_renders_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RenderResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/images/{render_id}": {
+      "get": {
+        "summary": "Get Image",
+        "operationId": "get_image_v1_images__render_id__get",
+        "parameters": [
+          {
+            "name": "render_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Render Id"
+            }
+          },
+          {
+            "name": "expires",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Expires"
+            }
+          },
+          {
+            "name": "sig",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sig"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "image/png": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiError": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "retryable": {
+            "type": "boolean",
+            "title": "Retryable"
+          },
+          "retryAfterSec": {
+            "type": "integer",
+            "title": "Retryaftersec",
+            "default": 0
+          },
+          "requestId": {
+            "type": "string",
+            "title": "Requestid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "retryable",
+          "requestId"
+        ],
+        "title": "ApiError"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "RenderRequest": {
+        "properties": {
+          "schemaVersion": {
+            "type": "integer",
+            "const": 1,
+            "title": "Schemaversion"
+          },
+          "requestGeneration": {
+            "type": "integer",
+            "maximum": 2147483647.0,
+            "minimum": 0.0,
+            "title": "Requestgeneration"
+          },
+          "latDeg": {
+            "type": "number",
+            "maximum": 85.0511287798066,
+            "minimum": -85.0511287798066,
+            "title": "Latdeg"
+          },
+          "lonDeg": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Londeg"
+          },
+          "zoom": {
+            "type": "integer",
+            "enum": [
+              14,
+              15,
+              16
+            ],
+            "title": "Zoom",
+            "default": 15
+          },
+          "imageSize": {
+            "type": "integer",
+            "enum": [
+              195,
+              256,
+              390
+            ],
+            "title": "Imagesize",
+            "default": 390
+          },
+          "style": {
+            "type": "string",
+            "enum": [
+              "day",
+              "night"
+            ],
+            "title": "Style",
+            "default": "day"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schemaVersion",
+          "requestGeneration",
+          "latDeg",
+          "lonDeg"
+        ],
+        "title": "RenderRequest"
+      },
+      "RenderResponse": {
+        "properties": {
+          "schemaVersion": {
+            "type": "integer",
+            "const": 1,
+            "title": "Schemaversion",
+            "default": 1
+          },
+          "requestGeneration": {
+            "type": "integer",
+            "title": "Requestgeneration"
+          },
+          "renderId": {
+            "type": "string",
+            "title": "Renderid"
+          },
+          "projection": {
+            "type": "string",
+            "const": "EPSG:3857",
+            "title": "Projection",
+            "default": "EPSG:3857"
+          },
+          "bounds3857": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 4,
+            "minItems": 4,
+            "title": "Bounds3857"
+          },
+          "imageWidth": {
+            "type": "integer",
+            "title": "Imagewidth"
+          },
+          "imageHeight": {
+            "type": "integer",
+            "title": "Imageheight"
+          },
+          "zoom": {
+            "type": "integer",
+            "title": "Zoom"
+          },
+          "styleVersion": {
+            "type": "string",
+            "title": "Styleversion"
+          },
+          "mapDataVersion": {
+            "type": "string",
+            "const": "synthetic-grid-v1",
+            "title": "Mapdataversion",
+            "default": "synthetic-grid-v1"
+          },
+          "imageUrl": {
+            "type": "string",
+            "title": "Imageurl"
+          },
+          "expiresAt": {
+            "type": "integer",
+            "title": "Expiresat"
+          },
+          "attribution": {
+            "type": "string",
+            "title": "Attribution",
+            "default": "SYNTHETIC TEST MAP"
+          }
+        },
+        "type": "object",
+        "required": [
+          "requestGeneration",
+          "renderId",
+          "bounds3857",
+          "imageWidth",
+          "imageHeight",
+          "zoom",
+          "styleVersion",
+          "imageUrl",
+          "expiresAt"
+        ],
+        "title": "RenderResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

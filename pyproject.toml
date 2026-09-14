@@ -1,0 +1,19 @@
+[project]
+name = "fr165-fieldmap"
+version = "0.1.0"
+description = "Forerunner 165 G0 GPS and raster feasibility prototype"
+requires-python = ">=3.12,<3.15"
+dependencies = ["fastapi==0.141.1", "uvicorn==0.53.0", "pillow==12.3.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra --strict-markers"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = [".local", "build"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

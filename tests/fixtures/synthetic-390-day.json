@@ -1,0 +1,18 @@
+{
+  "synthetic": true,
+  "request": {
+    "schemaVersion": 1,
+    "requestGeneration": 1,
+    "latDeg": 52.0,
+    "lonDeg": 5.0,
+    "zoom": 15,
+    "imageSize": 390,
+    "style": "day"
+  },
+  "bounds3857": [
+    555665.8776841423,
+    6799193.878115081,
+    557529.0302485934,
+    6801057.030679532
+  ]
+}

@@ -1,0 +1,78 @@
+------------------------------------------------------------------------------
+Executing test projectionControlPoints...
+PASS
+------------------------------------------------------------------------------
+Executing test projectionHemispheres...
+PASS
+------------------------------------------------------------------------------
+Executing test antimeridianAndBadCoordinates...
+PASS
+------------------------------------------------------------------------------
+Executing test gpsAgesAndInvalidSamples...
+PASS
+------------------------------------------------------------------------------
+Executing test boundedTraceAndGaps...
+PASS
+------------------------------------------------------------------------------
+Executing test traceSimplifiesStationaryFixes...
+PASS
+------------------------------------------------------------------------------
+Executing test requestCoalescingAndBackoff...
+PASS
+------------------------------------------------------------------------------
+Executing test oldCallbackCannotReleaseNewJob...
+PASS
+------------------------------------------------------------------------------
+Executing test renderEveryScreenAndRaster...
+DEBUG (18:37): 390px canvas rendered. FONT_SMALL=45px; FONT_XTINY=30px
+PASS
+------------------------------------------------------------------------------
+Executing test criticalLabelsFitRoundScreen...
+DEBUG (18:37): Label width 181 / safe 230
+DEBUG (18:37): Label width 166 / safe 230
+DEBUG (18:37): Label width 169 / safe 230
+DEBUG (18:37): Label width 207 / safe 208
+DEBUG (18:37): Label width 184 / safe 208
+DEBUG (18:37): Label width 270 / safe 334
+DEBUG (18:37): Label width 242 / safe 363
+DEBUG (18:37): Label width 305 / safe 376
+DEBUG (18:37): Label width 280 / safe 370
+DEBUG (18:37): Label width 298 / safe 350
+PASS
+------------------------------------------------------------------------------
+Executing test malformedMetadataPreservesActiveMap...
+PASS
+------------------------------------------------------------------------------
+Executing test menuAndFollowControls...
+PASS
+------------------------------------------------------------------------------
+Executing test staleRasterCannotReplaceNewCamera...
+PASS
+------------------------------------------------------------------------------
+Executing test browseKeepsCamera...
+PASS
+------------------------------------------------------------------------------
+Executing test metadataValidation...
+PASS
+
+==============================================================================
+RESULTS
+Test:                               Status:
+projectionControlPoints             PASS
+projectionHemispheres               PASS
+antimeridianAndBadCoordinates       PASS
+gpsAgesAndInvalidSamples            PASS
+boundedTraceAndGaps                 PASS
+traceSimplifiesStationaryFixes      PASS
+requestCoalescingAndBackoff         PASS
+oldCallbackCannotReleaseNewJob      PASS
+renderEveryScreenAndRaster          PASS
+criticalLabelsFitRoundScreen        PASS
+malformedMetadataPreservesActiveMap PASS
+menuAndFollowControls               PASS
+staleRasterCannotReplaceNewCamera   PASS
+browseKeepsCamera                   PASS
+metadataValidation                  PASS
+Ran 15 tests
+
+PASSED (passed=15, failed=0, errors=0)

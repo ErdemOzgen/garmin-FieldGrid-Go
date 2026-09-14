@@ -1,0 +1,9 @@
+{
+  "sdkVersion": "9.2.0",
+  "sdkMacArchive": "connectiq-sdk-mac-9.2.0-2026-06-09-92a1605b2.dmg",
+  "sdkMacSha256": "13bcc210483284074819c80dc90946db233af37be2518225e3f533d5804ebc1d",
+  "deviceId": "fr165",
+  "deviceVersion": "3d0fb192a2cf01699aefd0f384af3f527e5885bd",
+  "deviceApi": "5.2.0",
+  "minimumApplicationApi": "4.2.1"
+}

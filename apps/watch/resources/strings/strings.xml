@@ -1,0 +1,31 @@
+<strings>
+  <string id="AppName">FieldMap G0</string>
+  <string id="OpenMap">Open map</string>
+  <string id="Consent1">GPS runs while open.</string>
+  <string id="Consent2">Online maps send the area</string>
+  <string id="Consent3">via phone to the service.</string>
+  <string id="Consent4">Phone + internet required.</string>
+  <string id="Synthetic">SYNTHETIC TEST MAP</string>
+  <string id="Waiting">Waiting for GPS</string>
+  <string id="Stale">Old fix</string>
+  <string id="Weak">Weak GPS</string>
+  <string id="Good">GPS good</string>
+  <string id="Usable">GPS usable</string>
+  <string id="NoMap">Map unavailable</string>
+  <string id="Follow">Follow position</string>
+  <string id="Browse">Browse map</string>
+  <string id="Theme">Day / night</string>
+  <string id="Profile">Image size</string>
+  <string id="Diagnostics">Diagnostics</string>
+  <string id="Stop">End session</string>
+  <string id="Back">BACK to return</string>
+  <string id="Loading">Loading map</string>
+  <string id="Offline">Local test grid</string>
+  <string id="ServiceIssue">Check connection</string>
+  <string id="SettingsIssue">Service settings</string>
+  <string id="StorageIssue">Settings not saved</string>
+  <string id="StorageTest">Storage probe</string>
+  <string id="Retry">Retry service</string>
+  <string id="NorthSouth">Pan north / south</string>
+  <string id="EastWest">Pan east / west</string>
+</strings>
