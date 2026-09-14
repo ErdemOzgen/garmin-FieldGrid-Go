@@ -74,7 +74,7 @@ not overwritten or removed. After a normal watch restart, MTP enumeration worked
 OpenMTP 3.3.0 Kalam completed the transfer. The legacy client did not work.
 See [physical installation evidence](evidence/physical-install.json).
 
-Opening the app after disconnect is awaiting user confirmation. Real GPS and
-iPhone/HTTPS acceptance remain NOT RUN. No public tunnel was opened, no permanent
+The user confirms opening the app: maps are absent, other screens appear okay.
+Initial launch is PASS by user report; real GPS and iPhone/HTTPS acceptance remain NOT RUN. No public tunnel was opened, no permanent
 map service configured, no firmware changed. The installed physical build provides
 offline GPS and omits the Mac-only URL/token.

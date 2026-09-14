@@ -32,10 +32,11 @@
     "installation": "Temporary directory only; no global Python package or Applications installation"
   },
   "launch": {
-    "status": "NOT RUN",
-    "reason": "Awaiting user confirmation after USB disconnect"
+    "status": "PASS",
+    "evidence": "User reports that maps are absent and the other screens appear okay after launching the installed app. This is a user report, not an agent-observed watch screenshot.",
+    "reportedAtUtc": "2026-09-14T20:35:13+00:00"
   },
-  "physicalGps": "NOT RUN",
+  "physicalGps": "NOT RUN: no explicit coordinate/fix evidence yet",
   "physicalIphone": "NOT RUN",
   "g0Acceptance": "NOT RUN",
   "onlineMaps": "HTTPS origin not configured; this physical build strips local HTTP origin and token. Offline GPS is available.",
