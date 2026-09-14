@@ -15,6 +15,12 @@ module Geo {
     // Preserve sub-meter precision across CIQ's JSON dictionary serialization.
     function coordinateText(degrees) { return degrees.format("%.8f"); }
 
+    function displayCoordinate(degrees) { return degrees == null ? "--" : degrees.format("%.6f"); }
+
+    function validGps(lat, lon) {
+        return finite(lat) && finite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
+    }
+
     function finite(v) {
         return (v instanceof Number || v instanceof Float || v instanceof Double || v instanceof Long)
             && v == v && v < 1.0e100d && v > -1.0e100d;

@@ -36,7 +36,7 @@ class GpsState {
 
     function accept(newLat, newLon, utc, q, direction, nowUtc, nowMs) {
         quality = q;
-        if (!Geo.valid(newLat, newLon) || !Geo.finite(utc) || utc <= 0 ||
+        if (!Geo.validGps(newLat, newLon) || !Geo.finite(utc) || utc <= 0 ||
             utc > nowUtc + 2 || (q != Position.QUALITY_GOOD && q != Position.QUALITY_USABLE)) {
             gap = true;
             return false;
@@ -46,8 +46,9 @@ class GpsState {
         if (fixUtc != null && (utc - fixUtc > 5 || !usable(nowMs))) { gap = true; }
         lat = newLat; lon = newLon; fixUtc = utc;
         receivedMs = nowMs; initialAge = nowUtc > utc ? nowUtc - utc : 0;
-        xy = Geo.project(lat, lon);
+        xy = Geo.valid(lat, lon) ? Geo.project(lat, lon) : null;
         heading = Geo.finite(direction) && direction >= 0 && direction < 2 * Geo.PI ? direction : null;
+        if (xy == null) { gap = true; return true; }
         var previous = (count > 0 ? trace[(head - 1 + CAPACITY) % CAPACITY] : null) as Array or Null;
         var add = previous == null || gap || utc - previous[2] >= 5;
         if (!add) {

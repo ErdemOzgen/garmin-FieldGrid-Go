@@ -67,8 +67,7 @@ class MapState {
             !"EPSG:3857".equals(data["projection"]) || data["imageWidth"] != size ||
             data["imageHeight"] != size || data["zoom"] != zoom ||
             !(style + "-v1").equals(data["styleVersion"]) ||
-            !"synthetic-grid-v1".equals(data["mapDataVersion"]) ||
-            !"SYNTHETIC TEST MAP".equals(data["attribution"])) { return false; }
+            !validProvider(data)) { return false; }
         var id = data["renderId"]; var url = data["imageUrl"]; var box = data["bounds3857"];
         validationIssue = "grant";
         if (!(id instanceof String) || id.length() != 32 || !(url instanceof String) ||
@@ -85,6 +84,13 @@ class MapState {
         if (box[2] <= box[0] || box[3] <= box[1]) { return false; }
         validationIssue = "none";
         return true;
+    }
+
+    function validProvider(data as Dictionary) {
+        var version = data["mapDataVersion"];
+        return ("synthetic-grid-v1".equals(version) && "SYNTHETIC TEST MAP".equals(data["attribution"])) ||
+            (version instanceof String && version.find("openfreemap-") == 0 && version.length() <= 64 &&
+             "OpenFreeMap | (c) OpenMapTiles | Data from OpenStreetMap".equals(data["attribution"]));
     }
 
     function commit(data, image, gen, now) {

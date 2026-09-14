@@ -66,6 +66,7 @@ otomatik olarak GPS izni vermez veya sentetik GPS enjekte etmez. START sonrası
 simülatör GPS oynatma menüsünde sentetik fixture seçilebilir. Görsel kontrol
 listesi [field-test.md](field-test.md) içindedir.
 
+Uygulama yalnız İngilizce kaynakları paketler; simülatör dili Türkçe olsa da UI İngilizcedir.
 GPS kalite ayarı `Good` olmalıdır; `Poor` ve `Last Known` kullanılabilir fix değildir.
 SDK 9.2.0, oynatım sürerken yeniden uygulama yüklenirse Activity Data penceresini
 kilitli durumda bırakabildi. Bu durumda simülatörü kapatıp `make sim` ile yeniden
@@ -105,3 +106,15 @@ politikası ve süreç yeniden başlatma yapılandırılmalıdır. Uvicorn ve re
 erişim loglarında Authorization, query string ve tam görüntü URL’si bulunmamalı.
 Servis yalnız loopback’e bağlanır; TLS reverse proxy ona yönlenir. Test tüneli
 Mac uyuyunca durur; saha ürünü olarak kabul edilmez. Sağlayıcı/lisans kararı G2’de.
+
+## OpenFreeMap sağlayıcısı
+
+`.env` içine `FR165_MAP_PROVIDER=openfreemap` eklenir (varsayılan). Sağlayıcıya
+API anahtarı gerekmez. `synthetic` yalnız açıkça seçilen test modu olarak kalır.
+`FR165_PUBLIC_BASE_URL` OpenFreeMap URL'si değil, bizim raster dönüştürücünün
+HTTPS origin'idir. Token yalnız bizim servisin yetkisidir. Normal komutlar
+tünel veya kalıcı yayın açmaz. `make sim-offline` ve ev ekranındaki DOWN konum
+ekranı internet olmadan kullanılabilir; yeni gerçek harita için HTTPS gerekir.
+
+Bağımlılıklar kilitli `.venv` içinde HTTPX ve mapbox-vector-tile içerir; vektör
+çözümleme yalnız Mac/sunucudadır. Saat paketine Python, tile cache veya SDK eklenmez.

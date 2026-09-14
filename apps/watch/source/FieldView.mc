@@ -18,7 +18,7 @@ class FieldView extends WatchUi.View {
         View.initialize(); session = s;
         menuItems = [Rez.Strings.Follow, Rez.Strings.Browse, Rez.Strings.Theme,
             Rez.Strings.Profile, Rez.Strings.Diagnostics, Rez.Strings.StorageTest,
-            Rez.Strings.Retry, Rez.Strings.Stop];
+            Rez.Strings.Retry, Rez.Strings.Stop, Rez.Strings.Coordinates, Rez.Strings.MapCredits];
     }
 
     function line(dc, y, text, color, font) {
@@ -47,14 +47,15 @@ class FieldView extends WatchUi.View {
             dc.setColor(0x187C69, Graphics.COLOR_TRANSPARENT);
             dc.fillRoundedRectangle(83, 280, 224, 48, 24);
             line(dc, 287, textResource(Rez.Strings.OpenMap), 0xFFFFFF, Graphics.FONT_XTINY);
-            line(dc, 337, "START", ink, Graphics.FONT_XTINY);
+            line(dc, 335, "DOWN: GPS", ink, Graphics.FONT_XTINY);
             return;
         }
         if (page == :menu) {
             line(dc, 37, "FIELDMAP", ink, Graphics.FONT_SMALL);
-            var first = selection < 4 ? 0 : 4;
+            var first = (selection / 4) * 4;
             for (var j = 0; j < 4; j++) {
                 var index = first + j;
+                if (index >= menuItems.size()) { break; }
                 var y = 94 + j * 48;
                 if (index == selection) {
                     dc.setColor(0x187C69, Graphics.COLOR_TRANSPARENT);
@@ -64,8 +65,30 @@ class FieldView extends WatchUi.View {
                 var font = menuFont(dc, label);
                 line(dc, y + (45 - dc.getFontHeight(font)) / 2, label, index == selection ? 0xFFFFFF : ink, font);
             }
-            line(dc, 305, (selection + 1).toString() + " / 8", ink, Graphics.FONT_XTINY);
+            line(dc, 305, (selection + 1).toString() + " / " + menuItems.size(), ink, Graphics.FONT_XTINY);
             line(dc, 338, textResource(Rez.Strings.Back), ink, Graphics.FONT_XTINY);
+            return;
+        }
+        if (page == :coordinates) {
+            line(dc, 42, "GPS POSITION", ink, Graphics.FONT_XTINY);
+            line(dc, 82, gps.usable(System.getTimer()) ? "Current fix" : (gps.lat == null ? "Waiting for GPS" : "Last known fix"), ink, Graphics.FONT_XTINY);
+            line(dc, 125, "Latitude", ink, Graphics.FONT_XTINY);
+            line(dc, 156, Geo.displayCoordinate(gps.lat), ink, Graphics.FONT_SMALL);
+            line(dc, 214, "Longitude", ink, Graphics.FONT_XTINY);
+            line(dc, 245, Geo.displayCoordinate(gps.lon), ink, Graphics.FONT_SMALL);
+            var age = gps.age(System.getTimer());
+            line(dc, 301, age == null ? "No fix yet" : "Age " + Geo.min(9999, age).toNumber() + "s / WGS84", ink, Graphics.FONT_XTINY);
+            line(dc, 337, "BACK to map", ink, Graphics.FONT_XTINY);
+            return;
+        }
+        if (page == :credits) {
+            line(dc, 56, "MAP CREDITS", ink, Graphics.FONT_XTINY);
+            line(dc, 105, "OpenFreeMap", ink, Graphics.FONT_SMALL);
+            line(dc, 161, "© OpenMapTiles", ink, Graphics.FONT_XTINY);
+            line(dc, 201, "© OpenStreetMap", ink, Graphics.FONT_XTINY);
+            line(dc, 241, "OSM contributors / ODbL", ink, Graphics.FONT_XTINY);
+            line(dc, 285, "openstreetmap.org", ink, Graphics.FONT_XTINY);
+            line(dc, 337, "BACK to map", ink, Graphics.FONT_XTINY);
             return;
         }
         if (page == :diagnostics) {
@@ -84,8 +107,9 @@ class FieldView extends WatchUi.View {
             return;
         }
         if (m.center == null) {
-            line(dc, 154, textResource(Rez.Strings.Waiting), ink, Graphics.FONT_SMALL);
-            line(dc, 205, textResource(Rez.Strings.Outside), ink, Graphics.FONT_XTINY);
+            var outsideMap = gps.lat != null && gps.xy == null;
+            line(dc, 154, outsideMap ? "Outside map coverage" : textResource(Rez.Strings.Waiting), ink, Graphics.FONT_XTINY);
+            line(dc, 205, outsideMap ? "Use GPS coordinates" : textResource(Rez.Strings.Outside), ink, Graphics.FONT_XTINY);
             drawStatus(dc, ink, bg); return;
         }
         var box = Geo.bounds(m.center[0], m.center[1], m.zoom);
@@ -104,7 +128,7 @@ class FieldView extends WatchUi.View {
                 rasterVisible = true;
             }
         }
-        if (session.baseUrl.length() == 0) { drawGrid(dc, box, night); }
+        if (session.baseUrl.length() == 0 && session.networkEnabled) { drawGrid(dc, box, night); }
         dc.setPenWidth(4);
         dc.setColor(0xE29341, Graphics.COLOR_TRANSPARENT);
         var previous = null as Array or Null;
@@ -185,7 +209,9 @@ class FieldView extends WatchUi.View {
         dc.fillRoundedRectangle(177, 79, 36, 30, 5);
         line(dc, 82, "N", ink, Graphics.FONT_XTINY);
         var network = textResource(Rez.Strings.Offline);
-        if (session.configError || m.permanent) { network = textResource(Rez.Strings.SettingsIssue); }
+        if (!session.networkEnabled) { network = "GPS only"; }
+        else if (session.lowMemory) { network = "Low memory"; }
+        else if (session.configError || m.permanent) { network = textResource(Rez.Strings.SettingsIssue); }
         else if (m.lastCode != 0) { network = textResource(Rez.Strings.ServiceIssue); }
         else if (session.baseUrl.length() != 0 && (m.busy || m.wanted)) { network = textResource(Rez.Strings.Loading); }
         else if (session.baseUrl.length() != 0) {
@@ -193,9 +219,20 @@ class FieldView extends WatchUi.View {
         }
         dc.setColor(bg, Graphics.COLOR_TRANSPARENT); dc.fillRectangle(49, 326, 292, 29);
         line(dc, 326, network, ink, Graphics.FONT_XTINY);
-        dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
-        dc.fillRoundedRectangle(25, 101, 340, 36, 8);
-        line(dc, 105, textResource(Rez.Strings.Synthetic), ink, Graphics.FONT_XTINY);
+        var realMap = m.metadata != null && !"synthetic-grid-v1".equals(m.metadata["mapDataVersion"]);
+        if (realMap) {
+            // Attribution stays visible on-map; full links are also in Map credits.
+            dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
+            dc.fillRoundedRectangle(60, 98, 270, 63, 8);
+            line(dc, 99, "© OpenMapTiles", ink, Graphics.FONT_XTINY);
+            line(dc, 129, "© OpenStreetMap", ink, Graphics.FONT_XTINY);
+        } else if (session.baseUrl.length() == 0 && session.networkEnabled) {
+            dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
+            dc.fillRoundedRectangle(25, 101, 340, 36, 8);
+            line(dc, 105, textResource(Rez.Strings.Synthetic), ink, Graphics.FONT_XTINY);
+        } else if (m.metadata != null) {
+            line(dc, 105, textResource(Rez.Strings.Synthetic), ink, Graphics.FONT_XTINY);
+        }
     }
 }
 
@@ -204,7 +241,7 @@ class FieldDelegate extends WatchUi.BehaviorDelegate {
     function initialize(v, s) { BehaviorDelegate.initialize(); view = v; session = s; }
     function redraw() { WatchUi.requestUpdate(); return true; }
     function onSelect() {
-        if (view.page == :home) { session.start(); view.page = :map; }
+        if (view.page == :home) { session.networkEnabled = true; session.start(); view.page = :map; }
         else if (view.page == :map) { view.page = :menu; }
         else if (view.page == :pan) { view.panAxis = (view.panAxis + 1) % 2; }
         else if (view.page == :menu) {
@@ -221,13 +258,18 @@ class FieldDelegate extends WatchUi.BehaviorDelegate {
             else if (n == 5) { session.probeStorage(); view.page = :diagnostics; }
             else if (n == 6) { session.map.permanent = false; session.map.wanted = true; session.map.nextAttempt = 0; }
             else if (n == 7) { session.stop(); view.page = :home; }
+            else if (n == 8) { view.page = :coordinates; }
+            else if (n == 9) { view.page = :credits; }
         } else { view.page = :map; }
         return redraw();
     }
     function onNextPage() { return move(-1); }
     function onPreviousPage() { return move(1); }
     function move(delta) {
-        if (view.page == :menu) { view.selection = (view.selection - delta + 8) % 8; }
+        if (view.page == :home && delta == -1) {
+            session.networkEnabled = false; session.start(); view.page = :coordinates;
+        }
+        else if (view.page == :menu) { view.selection = (view.selection - delta + view.menuItems.size()) % view.menuItems.size(); }
         else if (view.page == :map) { session.map.changeZoom(delta); session.save(); }
         else if (view.page == :pan) {
             session.pan(view.panAxis == 1 ? delta : 0, view.panAxis == 0 ? delta : 0);

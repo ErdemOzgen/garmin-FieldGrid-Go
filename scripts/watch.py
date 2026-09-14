@@ -113,8 +113,8 @@ def configure_resources(simulator=False, offline=False):
         raise SystemExit("Invalid watch origin. Use HTTPS, or explicit local simulator HTTP.")
     resources = (
         "<strings>\n"
-        f'<string id="ConfigBaseUrl">{escape(base_url)}</string>\n'
-        f'<string id="ConfigDevToken">{escape(token)}</string>\n'
+        f'<string id="ConfigBaseUrl">{escape(base_url or "DISABLED")}</string>\n'
+        f'<string id="ConfigDevToken">{escape(token or "DISABLED")}</string>\n'
         f'<string id="ConfigAllowLocalHttp">{str(bool(allow_local)).lower()}</string>\n'
         "</strings>\n"
     )

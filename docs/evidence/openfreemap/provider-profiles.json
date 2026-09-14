@@ -1,0 +1,62 @@
+{
+  "source": "openfreemap-20260906_080001_pt",
+  "attribution": "OpenFreeMap | (c) OpenMapTiles | Data from OpenStreetMap",
+  "sample": "fixed public Utrecht coordinate, not user location",
+  "results": [
+    {
+      "size": 195,
+      "style": "day",
+      "pngBytes": 8429,
+      "milliseconds": 1937,
+      "cacheBytes": 2301880,
+      "cachedTiles": 4,
+      "status": "PASS"
+    },
+    {
+      "size": 195,
+      "style": "night",
+      "pngBytes": 8410,
+      "milliseconds": 1696,
+      "cacheBytes": 2301880,
+      "cachedTiles": 4,
+      "status": "PASS"
+    },
+    {
+      "size": 256,
+      "style": "day",
+      "pngBytes": 11566,
+      "milliseconds": 1432,
+      "cacheBytes": 2301880,
+      "cachedTiles": 4,
+      "status": "PASS"
+    },
+    {
+      "size": 256,
+      "style": "night",
+      "pngBytes": 11541,
+      "milliseconds": 1435,
+      "cacheBytes": 2301880,
+      "cachedTiles": 4,
+      "status": "PASS"
+    },
+    {
+      "size": 390,
+      "style": "day",
+      "pngBytes": 21770,
+      "milliseconds": 1953,
+      "cacheBytes": 2301880,
+      "cachedTiles": 4,
+      "status": "PASS"
+    },
+    {
+      "size": 390,
+      "style": "night",
+      "pngBytes": 21790,
+      "milliseconds": 2016,
+      "cacheBytes": 2301880,
+      "cachedTiles": 4,
+      "status": "PASS"
+    }
+  ],
+  "measurementScope": "Fixed Utrecht sample, local renderer only; GPS is not from a real device. Not a Garmin network percentile."
+}

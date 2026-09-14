@@ -37,6 +37,10 @@ class FieldSession {
     var storageStatus = "NOT RUN";
     var peakMemory = 0;
     var updateCount = 0;
+    var networkEnabled = true;
+    var lowMemory = false;
+    var lastSavedZoom = null;
+    var lastSavedStyle = null;
 
     function initialize() {
         gps = new GpsState(); map = new MapState(); ticker = new Timer.Timer();
@@ -46,8 +50,11 @@ class FieldSession {
                 if (saved["zoom"] == 14 || saved["zoom"] == 15 || saved["zoom"] == 16) { map.zoom = saved["zoom"]; }
                 if ("day".equals(saved["style"]) || "night".equals(saved["style"])) { map.style = saved["style"]; }
             }
+            lastSavedZoom = map.zoom; lastSavedStyle = map.style;
             baseUrl = WatchUi.loadResource(Rez.Strings.ConfigBaseUrl);
             token = WatchUi.loadResource(Rez.Strings.ConfigDevToken);
+            if ("DISABLED".equals(baseUrl)) { baseUrl = ""; }
+            if ("DISABLED".equals(token)) { token = ""; }
             var allowLocal = "true".equals(WatchUi.loadResource(Rez.Strings.ConfigAllowLocalHttp));
             if (!(baseUrl instanceof String) || !(token instanceof String)) {
                 baseUrl = ""; token = ""; configError = true;
@@ -60,8 +67,10 @@ class FieldSession {
     }
 
     function save() {
+        if (lastSavedZoom == map.zoom && map.style.equals(lastSavedStyle)) { return; }
         try {
             Application.Storage.setValue("preferences-v1", {"zoom" => map.zoom, "style" => map.style});
+            lastSavedZoom = map.zoom; lastSavedStyle = map.style;
         } catch (e) { storageStatus = "WRITE FAILED"; }
     }
 
@@ -70,6 +79,8 @@ class FieldSession {
         running = true; gps = new GpsState(); map.metadata = null; map.bitmap = null;
         map.center = null; map.follow = true; map.generation++; map.failures = 0;
         map.nextAttempt = 0; map.permanent = false; map.lastCode = 0;
+        map.lastStart = -5000; map.requestCount = 0; map.imageCount = 0; map.lastDuration = 0;
+        map.wanted = false; lowMemory = false; updateCount = 0; peakMemory = 0;
         resume();
     }
 
@@ -106,7 +117,7 @@ class FieldSession {
             var degrees = info.position.toDegrees();
             if (gps.accept(degrees[0], degrees[1], info.when.value(), info.accuracy,
                 info.heading, Time.now().value(), System.getTimer())) {
-                map.track(gps.xy[0], gps.xy[1]);
+                if (gps.xy != null) { map.track(gps.xy[0], gps.xy[1]); }
                 maybeRequest();
             }
         }
@@ -128,7 +139,11 @@ class FieldSession {
     }
 
     function maybeRequest() {
-        if (baseUrl.length() == 0 || !map.canStart(System.getTimer())) { return; }
+        if (!networkEnabled || baseUrl.length() == 0 || !map.canStart(System.getTimer())) { return; }
+        // Reserve space for incoming metadata/bitmap without dropping the live GPS trace.
+        var stats = System.getSystemStats();
+        lowMemory = stats.freeMemory < 96 * 1024;
+        if (lowMemory) { return; }
         map.start(System.getTimer()); epoch++;
         job = new MapJob(self, epoch, map.generation);
         job.start();
@@ -220,8 +235,17 @@ class MapJob {
         try {
             Communications.makeImageRequest(data["imageUrl"], null,
                 {:maxWidth => owner.map.size, :maxHeight => owner.map.size,
-                 :dithering => Communications.IMAGE_DITHERING_NONE}, method(:onImage));
+                 :dithering => Communications.IMAGE_DITHERING_NONE, :palette => palette()}, method(:onImage));
         } catch (e) { fail(-902, null); }
+    }
+
+    function palette() {
+        if ("night".equals(owner.map.style)) {
+            return [0x15232A,0x243C32,0x315344,0x264B68,0x384248,0x4B535A,0x77838A,0x746249,
+                0xA18F62,0xAA7960,0xC99B64,0x779AA3,0xEEF4EE,0x8A9A8D,0x705C78,0x555555];
+        }
+        return [0xF2F0E7,0xDDE7CE,0xBBD6A4,0x96CADA,0xD8D3C9,0xB2AAA0,0xFFFFFF,0xCDAF82,
+            0xE5CB8C,0xE7A872,0x946E45,0x6E858A,0x203830,0x788174,0xD6C2D8,0xBBBBBB];
     }
 
     function onImage(code as Number, data as Graphics.BitmapReference or WatchUi.BitmapResource or Null) as Void {

@@ -1,0 +1,16 @@
+[
+  {
+    "sample": "Amsterdam",
+    "status": "PASS",
+    "pngBytes": 29274,
+    "milliseconds": 838,
+    "cacheBytes": 1510291
+  },
+  {
+    "sample": "Brussels",
+    "status": "PASS",
+    "pngBytes": 35273,
+    "milliseconds": 2111,
+    "cacheBytes": 4306651
+  }
+]

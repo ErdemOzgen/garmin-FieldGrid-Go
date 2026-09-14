@@ -1,4 +1,4 @@
-"""Small G0 service. No account system, real provider or location database.
+"""Small G0 service. OpenFreeMap rasters, no account or location database.
 
 Loopback by default. An explicitly configured HTTPS base URL and one development
 device token enable a private G0 field experiment. This is not G2 authentication.
@@ -11,6 +11,7 @@ import secrets
 import threading
 import time
 from collections import OrderedDict
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from urllib.parse import urlsplit
 
@@ -20,6 +21,7 @@ from fastapi.responses import JSONResponse, Response
 from starlette.exceptions import HTTPException
 
 from services.api.models import ApiError, RenderRequest, RenderResponse
+from services.api.openfreemap import OpenFreeMap, ProviderError
 from services.api.renderer import render
 
 
@@ -31,6 +33,7 @@ class Settings:
     ttl: int = 120
     max_entries: int = 24
     requests_per_minute: int = 30
+    provider: str = "synthetic"
 
     def __post_init__(self):
         parsed = urlsplit(self.base_url)
@@ -50,18 +53,32 @@ class Settings:
             raise ValueError("remote G0 service requires a random development device token")
         if self.ttl < 1 or self.max_entries < 1 or self.requests_per_minute < 1:
             raise ValueError("service limits must be positive")
+        if self.provider not in {"synthetic", "openfreemap"}:
+            raise ValueError("unsupported map provider")
 
 
-def create_app(settings: Settings | None = None, clock=time.time) -> FastAPI:
+def create_app(settings: Settings | None = None, clock=time.time, provider=None) -> FastAPI:
     settings = settings or Settings(
         base_url=os.getenv("FR165_PUBLIC_BASE_URL", "http://127.0.0.1:8765").rstrip("/"),
         device_token=os.getenv("FR165_DEV_TOKEN", ""),
+        provider=os.getenv("FR165_MAP_PROVIDER", "openfreemap"),
     )
     signing_key = settings.signing_key or secrets.token_bytes(32)
     cache: OrderedDict[str, tuple[float, bytes]] = OrderedDict()
     lock = threading.Lock()
+    render_lock = threading.Lock()
+    provider = provider or (OpenFreeMap() if settings.provider == "openfreemap" else None)
     rate = {"start": clock(), "count": 0}
-    app = FastAPI(title="FieldMap G0 test service", version="0.1.0", docs_url="/docs")
+
+    @asynccontextmanager
+    async def lifespan(_app):
+        yield
+        if provider is not None:
+            provider.close()
+
+    app = FastAPI(
+        title="FieldMap raster service", version="0.1.0", docs_url="/docs", lifespan=lifespan
+    )
 
     def error(status: int, code: str, retry: bool = False, after: int = 0):
         return JSONResponse(
@@ -98,7 +115,7 @@ def create_app(settings: Settings | None = None, clock=time.time) -> FastAPI:
 
     @app.get("/health")
     def health():
-        return {"status": "ok", "stage": "G0", "provider": "synthetic", "version": "0.1.0"}
+        return {"status": "ok", "stage": "G0", "provider": settings.provider, "version": "0.1.0"}
 
     @app.post(
         "/v1/map-renders",
@@ -121,9 +138,22 @@ def create_app(settings: Settings | None = None, clock=time.time) -> FastAPI:
             for key in list(cache):
                 if cache[key][0] <= now:
                     del cache[key]
-            data, box = render(payload)
+        # Never queue unbounded rendering work or hold the image-cache lock over network I/O.
+        if not render_lock.acquire(blocking=False):
+            return error(503, "RENDER_BUSY", True, 1)
+        try:
+            if provider is None:
+                data, box = render(payload)
+                version, attribution = "synthetic-grid-v1", "SYNTHETIC TEST MAP"
+            else:
+                data, box, version, attribution = provider.render(payload)
+        except ProviderError:
+            return error(503, "MAP_PROVIDER_UNAVAILABLE", True, 5)
+        finally:
+            render_lock.release()
+        with lock:
             render_id = secrets.token_hex(16)
-            expires = int(now) + settings.ttl
+            expires = int(clock()) + settings.ttl
             cache[render_id] = (expires, data)
             while len(cache) > settings.max_entries:
                 cache.popitem(last=False)
@@ -138,6 +168,8 @@ def create_app(settings: Settings | None = None, clock=time.time) -> FastAPI:
             imageHeight=payload.imageSize,
             zoom=payload.zoom,
             styleVersion=f"{payload.style}-v1",
+            mapDataVersion=version,
+            attribution=attribution,
             expiresAt=expires,
             imageUrl=f"{settings.base_url}/v1/images/{render_id}?expires={expires}&sig={signature}",
         )

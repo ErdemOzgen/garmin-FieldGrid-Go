@@ -1,0 +1,149 @@
+{
+  "measuredAtUtc": "2026-09-14T19:21:07.947495+00:00",
+  "environment": {
+    "os": "Darwin",
+    "osVersion": "26.6.2",
+    "architecture": "arm64",
+    "python": "3.14.7",
+    "venvPresent": true,
+    "sdk": "9.2.0",
+    "java": "openjdk version \"11.0.32.1\" 2026-08-18",
+    "deviceId": "fr165",
+    "deviceName": "Forerunner\u00ae 165",
+    "deviceVersion": "3d0fb192a2cf01699aefd0f384af3f527e5885bd",
+    "resolution": {
+      "height": 390,
+      "width": 390
+    },
+    "apiGroup": "API level 5.2",
+    "reportedWatchMemoryBytes": 786432,
+    "physicalFirmware": "NOT MEASURED",
+    "physicalIOS": "NOT MEASURED",
+    "physicalGCM": "NOT MEASURED"
+  },
+  "sourceSha256": "608a0f510877944baf17d9097eafab850b49686390282a6f271bf30104ce72e3",
+  "physicalTests": "NOT RUN",
+  "visualReview": {
+    "status": "PASS",
+    "record": "docs/evidence/simulator.json",
+    "physicalAcceptance": "NOT RUN"
+  },
+  "FieldMap.prg": {
+    "status": "PASS",
+    "bytes": 124156,
+    "sha256": "aeea1a6f36c85a8e7a09a4355d3fa394063cb7b4614b339db9368896d0cafc01"
+  },
+  "FieldMap-tests.prg": {
+    "status": "PASS",
+    "bytes": 139484,
+    "sha256": "77c1b54635662540cfb5a7c3e96f83314d2118fc7d45802ed3b29d51ab952705"
+  },
+  "pythonTests": {
+    "tests": 56,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "watchTests": {
+    "status": "PASS",
+    "passed": 17
+  },
+  "http-smoke.json": {
+    "status": "PASS",
+    "transport": "local HTTP (not Garmin bridge)",
+    "synthetic": true,
+    "profiles": [
+      {
+        "size": 195,
+        "pngBytes": 804,
+        "httpMs": 6.54
+      },
+      {
+        "size": 256,
+        "pngBytes": 854,
+        "httpMs": 2.97
+      },
+      {
+        "size": 390,
+        "pngBytes": 973,
+        "httpMs": 4.39
+      }
+    ]
+  },
+  "audit.json": {
+    "dependencies": [
+      {
+        "name": "annotated-doc",
+        "version": "0.0.5",
+        "vulns": []
+      },
+      {
+        "name": "annotated-types",
+        "version": "0.8.0",
+        "vulns": []
+      },
+      {
+        "name": "anyio",
+        "version": "4.15.1",
+        "vulns": []
+      },
+      {
+        "name": "click",
+        "version": "8.5.0",
+        "vulns": []
+      },
+      {
+        "name": "fastapi",
+        "version": "0.141.1",
+        "vulns": []
+      },
+      {
+        "name": "h11",
+        "version": "0.16.0",
+        "vulns": []
+      },
+      {
+        "name": "idna",
+        "version": "3.19",
+        "vulns": []
+      },
+      {
+        "name": "pillow",
+        "version": "12.3.0",
+        "vulns": []
+      },
+      {
+        "name": "pydantic",
+        "version": "2.13.5",
+        "vulns": []
+      },
+      {
+        "name": "pydantic-core",
+        "version": "2.46.5",
+        "vulns": []
+      },
+      {
+        "name": "starlette",
+        "version": "1.6.0",
+        "vulns": []
+      },
+      {
+        "name": "typing-inspection",
+        "version": "0.4.4",
+        "vulns": []
+      },
+      {
+        "name": "typing-extensions",
+        "version": "4.16.0",
+        "vulns": []
+      },
+      {
+        "name": "uvicorn",
+        "version": "0.53.0",
+        "vulns": []
+      }
+    ],
+    "fixes": []
+  },
+  "gitCommitAtMeasurement": "0dccc62208617498b3e2b0ab18a3966637ac512c"
+}

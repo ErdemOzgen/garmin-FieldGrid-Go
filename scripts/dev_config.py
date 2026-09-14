@@ -52,7 +52,10 @@ def main():
         )
         + "\n",
     )
-    write_private(ROOT / ".env", f"FR165_PUBLIC_BASE_URL={url}\nFR165_DEV_TOKEN={token}\n")
+    write_private(
+        ROOT / ".env",
+        f"FR165_PUBLIC_BASE_URL={url}\nFR165_DEV_TOKEN={token}\nFR165_MAP_PROVIDER=openfreemap\n",
+    )
     print("Private .env and .local/watch.json created. Credential values are not displayed.")
     print("Run make api, then make sim. Rebuild before copying the PRG to a physical watch.")
 

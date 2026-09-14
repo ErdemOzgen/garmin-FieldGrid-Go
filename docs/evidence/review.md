@@ -1,3 +1,5 @@
+> Historical synthetic-G0 review. Current extension review: [OpenFreeMap and offline position](openfreemap/review.md).
+
 # Teslim öncesi karşı inceleme
 
 İncelenen kapsam: G0 kaynakları, çalıştırma komutları ve tamamlanma iddiaları.

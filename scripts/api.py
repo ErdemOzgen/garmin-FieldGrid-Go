@@ -15,7 +15,11 @@ def main():
     if env_file.exists():
         for line in env_file.read_text().splitlines():
             key, separator, value = line.partition("=")
-            if separator and key in {"FR165_PUBLIC_BASE_URL", "FR165_DEV_TOKEN"}:
+            if separator and key in {
+                "FR165_PUBLIC_BASE_URL",
+                "FR165_DEV_TOKEN",
+                "FR165_MAP_PROVIDER",
+            }:
                 os.environ.setdefault(key, value)
     uvicorn.run(
         "services.api.main:app",

@@ -8,14 +8,16 @@ Fiziksel sonuçlar gelmeden G0 geçmez.
 1. Ağsız ekran/GPS kontrolü için `make sim-offline` kullanın. Tam PNG aktarımı
    için kullanıcı onaylı [HTTPS test planını](https-simulator-test.md) uygulayın;
    localhost metadata döndürse de Garmin dönüştürücüsü PNG'ye erişemez.
-2. İlk ekran açıklamasını okuyun; START öncesi GPS başlamamalı. START ile haritayı açın.
+2. Uygulama İngilizce açılır. START veya DOWN öncesi GPS başlamamalı. START harita,
+   DOWN ise ağ isteği yapmayan GPS-only/enlem-boylam oturumu başlatır.
 3. Simulation → Activity Data → FIT/GPX Playable File → Load File ile
    `tests/fixtures/synthetic-walk.gpx` seçin. Alttaki üçgen oynatma düğmesini
    kullanın; Data Field Timer Start ayrı bir kontroldür. Settings → Set GPS
    Quality → Good seçin. Bu kayıt tamamen yapaydır. Daha uzun deney için
    `.venv/bin/python scripts/synthetic_walk.py` komutunun ürettiği
    `build/synthetic-20min.gpx` dosyasını seçebilirsiniz.
-4. Konum işareti, iz, GPS yaşı, görünür sentetik etiketi ve yuvarlak kenarlarda
+4. Konum işareti, iz, GPS yaşı, gerçek haritada OpenMapTiles/OSM atfı
+   (sentetik modda test etiketi) ve yuvarlak kenarlarda
    kırpılma olmadığını kontrol edin. UP/DOWN ile üç zoom; menü ile iki tema ve
    195/256/390 boyutlarını deneyin. Kaydırma modunda START yön eksenini değiştirir,
    BACK tek adımda konuma döner.
@@ -37,8 +39,8 @@ simülatörü tamamen kapatın, yeniden başlatın ve fixture'ı tekrar yükleyi
    kullanılabilir; bu projede sistem MTP istemcisi kurulmadı.
 3. PRG’yi saatin `GARMIN/APPS` klasörüne kopyalayın. Mevcut dosyaları silmeyin.
    Saati güvenli ayırın; uygulama listesinde FieldMap G0’ı açın.
-4. START’a basın, açık alanda GPS’i bekleyin. **HTTPS ayarı olmadan sadece yerel
-   sentetik ızgara beklenir. Gerçek sokak haritası bu sürümde yoktur.**
+4. START’a basın, açık alanda GPS’i bekleyin. **DOWN ile internet olmadan enlem/boylam alınabilir. HTTPS renderer ayarı
+   olmadan yeni sokak haritası indirilemez; OpenFreeMap gerçek harita desteği vardır.**
 
 ## 3. Fiziksel kanıt formu
 
@@ -87,3 +89,11 @@ ayrıca POC06’da ölçülmelidir; bu testler tamamlandı sayılmaz.
 Gerçek ekran/iz paylaşımı isteğe bağlıdır. Paylaşmadan önce konum, özel URL veya
 kimlik bilgisi bulunmadığını kontrol edin; yalnız sürüm, sayaç, hata kodu ve
 PASS/FAIL gözlemi yeterli başlangıç geri bildirimidir.
+
+## 5. İngilizce konum ve kaynak kontrolü
+
+DOWN: GPS only → beklerken `--`; fix gelince Latitude/Longitude, Age, WGS84.
+Poor kalitesinde son koordinat sabit kalmalı, Last known fix ve büyüyen yaş görünmeli;
+Good geri geldiğinde Current fix olmalı. Bu sırada API kapalıdır. BACK → map →
+START → Diagnostics bölümünde Images 0 kalır. Map credits ve iki tema da 390px
+yuvarlak alanda incelenir. Gerçek enlem/boylamı halka açık kanıta eklemeyin.

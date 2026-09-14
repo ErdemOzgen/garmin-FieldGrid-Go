@@ -1,0 +1,55 @@
+{
+  "measuredAtUtc": "2026-09-14T19:59:01.832789+00:00",
+  "status": "PASS",
+  "transport": "real loopback HTTP, not Garmin bridge",
+  "provider": "openfreemap",
+  "sample": "fixed public Utrecht, no user GPS",
+  "profiles": [
+    {
+      "size": 195,
+      "style": "day",
+      "bytes": 10852,
+      "milliseconds": 1972,
+      "sha256": "843766b9560da19b8c4f7c792e1166658ac2acad147267910e92ad65b318498d"
+    },
+    {
+      "size": 195,
+      "style": "night",
+      "bytes": 10756,
+      "milliseconds": 1705,
+      "sha256": "87441ea34fbd4bca91f2593c83184dc244c3a8e61aab24746224e0f9ab58743a"
+    },
+    {
+      "size": 256,
+      "style": "day",
+      "bytes": 16221,
+      "milliseconds": 1340,
+      "sha256": "cba96c160d7bfd8baf5fbdcd985b2d961cc9c02987cfb8c23b5304910f1349d0"
+    },
+    {
+      "size": 256,
+      "style": "night",
+      "bytes": 16146,
+      "milliseconds": 1318,
+      "sha256": "0a7ebdd3e26a625d469db25e268aa047a60509584f07926a921e3ba682c68300"
+    },
+    {
+      "size": 390,
+      "style": "day",
+      "bytes": 32761,
+      "milliseconds": 1843,
+      "sha256": "26de192101c533cd76e358c4042240aca701929e680672c081d286c5a83f4543"
+    },
+    {
+      "size": 390,
+      "style": "night",
+      "bytes": 32856,
+      "milliseconds": 1844,
+      "sha256": "4d8d1859328a80aadb7a6fd44b61a1c2da932f69d5ae6b6461b6c42a1782e84e"
+    }
+  ],
+  "unauthenticatedRender": "401 PASS",
+  "apiStopped": true,
+  "zoom": 15,
+  "coordinateSource": "Fixed synthetic test center 52.0907, 5.1214 (not user position)"
+}

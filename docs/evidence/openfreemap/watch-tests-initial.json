@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "passed": 21,
+  "rawSdkExitCode": 1,
+  "sourceSha256": "c838ed1cdf5c9998085e371d68978d3ecad62f6ae4dcf8be3212a04ccf4be280",
+  "artifactSha256": "ebdcbe34daeb02a5e75ec75c332b4c63287915386f71b7944b8323cdd1276ee2"
+}

@@ -43,7 +43,7 @@ class RenderResponse(BaseModel):
     imageHeight: int
     zoom: int
     styleVersion: str
-    mapDataVersion: Literal["synthetic-grid-v1"] = "synthetic-grid-v1"
+    mapDataVersion: str = "synthetic-grid-v1"
     imageUrl: str
     expiresAt: int
     attribution: str = "SYNTHETIC TEST MAP"

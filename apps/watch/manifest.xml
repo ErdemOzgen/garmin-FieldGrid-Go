@@ -6,6 +6,6 @@
       <iq:uses-permission id="Positioning"/>
       <iq:uses-permission id="Communications"/>
     </iq:permissions>
-    <iq:languages><iq:language>eng</iq:language><iq:language>tur</iq:language></iq:languages>
+    <iq:languages><iq:language>eng</iq:language></iq:languages>
   </iq:application>
 </iq:manifest>

@@ -1,17 +1,17 @@
 # Güvenlik ve veri sınırları
 
 Bu sürüm kişisel **G0 testi** içindir. İnternete açık çok kullanıcılı hizmet veya
-üretim kimlik sistemi değildir. Kalıcı barındırma ve gerçek harita sağlayıcısı
-seçilmedi. Kullanıcı onayıyla yapılan geçici sentetik HTTPS deneyi ayrıca belgelenir.
+üretim kimlik sistemi değildir. Gerçek harita sağlayıcısı OpenFreeMap seçildi; kalıcı barındırma
+henüz yapılandırılmadı. Süreli HTTPS deneyleri ayrı kullanıcı iznine tabidir.
 
-Konum kullanımı saatte START / Open map ile başlar; oturum sonunda GPS aboneliği,
+Konum kullanımı saatte START / Open map veya DOWN / GPS-only ile başlar; oturum sonunda GPS aboneliği,
 zamanlayıcı ve ağ işleri kapatılır. Çevrimiçi modda istenen alan Garmin Connect ve
 API üzerinden geçer. PNG ayrıca Garmin'in görüntü dönüştürme servisi tarafından
 URL'sinden alınır; bu nedenle salt yerel/LAN görüntü sunucusu yeterli değildir.
 Tam hareket izi sunucuya gönderilmez; iz saatin RAM’inde kalır.
 Konum/URL/token erişim logları devre dışıdır. API validation yanıtları kullanıcı
-girdilerini geri yansıtmaz. Harita sağlayıcısı henüz yoktur; yalnız sentetik raster
-üretilir. Hesap e-postası, aktivite kaydı veya kişisel rota tutulmaz.
+girdilerini geri yansıtmaz. OpenFreeMap yalnız görünümle kesişen tile adreslerini alır; cihaz tokenı
+sağlayıcıya gönderilmez. DOWN GPS-only modunda hiçbir harita isteği yapılmaz. Hesap e-postası, aktivite kaydı veya kişisel rota tutulmaz.
 
 Fiziksel saatte yalnız geçerli HTTPS origin kabul edilir. HTTP sadece açıkça
 seçilmiş `127.0.0.1:8765` simülatör derlemesinde kullanılır. Sertifika doğrulaması
@@ -19,7 +19,7 @@ kapatılmaz. Uygulama bir rastgele URL proxy’si değildir. JSON ek alanları r
 
 G0 özel cihaz tokenı `.env` ve `.local/watch.json` içinde, imzalama anahtarı
 `.local/keys` içinde saklanır. Dosyalar Git dışında ve 0600 iznindedir. Token
-üretim hesabına erişim vermez; servis sadece test rasterlarını sunar. İptal etmek
+üretim hesabına erişim vermez; servis sadece harita rasterlarını sunar. İptal etmek
 için bu tokenı iki uçta değiştirin ve servisi yeniden başlatın. G2’de kısa erişim
 tokenı, yenileme ve cihaz kaldırma ayrıca geliştirilecektir.
 
@@ -37,3 +37,10 @@ altında tutun ve paylaşmadan önce kendiniz gözden geçirin.
 Sorun raporuna token, görüntü URL’si veya gerçek koordinat eklemeyin. Proje henüz
 kamuya yayınlanmadığı için güvenlik iletişim kanalı repo sahibi tarafından yayın
 sırasında belirlenecektir.
+
+OpenFreeMap TileJSON adresi sabittir; içindeki tile şablonu yalnız
+`https://tiles.openfreemap.org/planet/<version>/{z}/{x}/{y}.pbf` biçiminde kabul edilir.
+Yönlendirme izlenmez, TLS doğrulanır, alınan/decompress edilen veri ve RAM cache
+boyutu sınırlıdır. Sağlayıcı hataları koordinat/URL yansıtmadan 503 döndürür.
+Kilit ayrıcalığı: yavaş dış istek sırasında mevcut PNG okuması bloke olmaz;
+yeni renderlar sınırsız kuyruğa alınmaz. Kalıcı konum, tile veya bitmap dosyası yoktur.

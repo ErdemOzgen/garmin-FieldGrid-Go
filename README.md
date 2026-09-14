@@ -1,117 +1,121 @@
 # FieldMap · Forerunner 165
 
-Forerunner 165 için bağımsız Connect IQ saat uygulaması. Gerçek saat GPS’ini kullanır;
-rota yüklemeden konum, yaş/kalite ve sınırlı hareket izi gösterir. Saatin düğmeleriyle
-zoom, kaydırma, yeniden merkezleme ve tema seçimi yapılır.
+English Connect IQ watch app with GPS coordinates, a bounded movement trace and
+OpenStreetMap street/path maps supplied by **OpenFreeMap**. GPS works without a
+phone or internet; downloading new map images needs Garmin Connect and internet.
 
-**Bu teslim G0 teknik prototipidir.** Harita, açıkça etiketlenen sentetik test
-ızgarasıdır; henüz gerçek sokak/patika haritası sağlayıcısı değildir. Derleme ve
-yerel testler hazırlanmıştır. iPhone köprüsü, gerçek saat GPS/pil ölçümleri ve görsel
-saha kabulü tamamlanmadan “sahada hazır MVP” iddiasında bulunulmaz. Gereksinim
-belgesinin G0 → G1 → G2 → G3 geçiş koşulları korunur.
+**G0 prototype, simulator-tested; physical Forerunner 165 / iPhone acceptance is
+still NOT RUN.** The user requested the real-map integration before physical G0
+acceptance. This does not mark G0/G3 passed or claim field-tested navigation.
 
-## Hızlı başlangıç
+## Start with offline GPS
 
-Python 3.12–3.14, mevcut Java 11+ ve Garmin Connect IQ SDK gerekir.
-Python paketlerinin tamamı proje içindeki `.venv` ortamına kurulur.
+Python 3.12–3.14, Java 11+ and Garmin SDK 9.2.0 / `fr165` device package:
 
 ```sh
-make setup
+make setup                  # Packages only inside project .venv
 make doctor
 make test
-make build-watch
+make build-watch            # build/FieldMap.prg
 make test-watch
+make sim-offline
 ```
 
-SDK ve Forerunner 165 cihaz paketi için [kurulum yönergesi](docs/setup.md).
-Garmin’in bu cihaz için gerçek derleyici kimliği **`fr165`**’tir.
+See [setup](docs/setup.md). On this Mac, `.venv` and the SDK configuration already
+exist. Press **DOWN on the home screen for GPS only**. Latitude and longitude use
+six decimal places in WGS84, with fix age and Current/Last known status. No fix is
+shown as `--`. Displayed decimal places are not a GPS accuracy guarantee. The
+GPS-only session makes no map/network requests and does not save location history.
 
-**Saat dosyası:** `build/FieldMap.prg`. `make build-watch`, yerel simülatörün
-`127.0.0.1` adresini fiziksel saat paketine taşımaz. HTTPS yapılandırması yoksa
-paket çevrimdışı sentetik ızgarayla çalışır. GPS için START’a basmak gerekir.
+In the simulator, explicitly load a synthetic GPX through Simulation → Activity
+Data; [instructions](docs/field-test.md). The physical watch uses its own GPS,
+never the test fixture. START opens a normal map session instead.
 
-## Simülatörde çalıştırma
+![English offline coordinates — synthetic simulator GPS](docs/evidence/screenshots/en-offline-no-phone-coordinates-final.png)
 
-Ağ servisi olmadan düğmeleri, GPS tekrarını ve arayüzü denemek için:
+## Free real maps: what the URL and token mean
+
+[OpenFreeMap](https://openfreemap.org/) is free, with no registration, API key or
+request/view quota. Its public service has no SLA. It provides **vector tiles,
+not PNGs** ([upstream limitations](https://github.com/hyperknot/openfreemap#limitations-of-this-project)).
+Our Python service converts only the visible area into a small 16-color PNG for
+the watch. The watch does not download a vector database or city map package.
+
+```dotenv
+FR165_MAP_PROVIDER=openfreemap
+FR165_PUBLIC_BASE_URL=http://127.0.0.1:8765
+```
+
+`FR165_PUBLIC_BASE_URL` is the address of **your raster converter**, not OpenFreeMap.
+`127.0.0.1` means this Mac only. Local HTTP is useful for API development, but the
+Garmin image converter cannot fetch a localhost PNG. A reachable **HTTPS renderer**
+is required for online maps on the watch. Changing the URL to `openfreemap.org`
+will not work because it is a different API.
+
+`FR165_DEV_TOKEN` protects your own renderer; it is not a map-provider API key,
+subscription or charge. The provider receives no such token. Local rendering is
+limited to 30 jobs/minute to prevent resource abuse; this is an application guard,
+not an OpenFreeMap account quota. The watch starts at most one job per five seconds.
 
 ```sh
-make sim-offline   # Açıkça etiketli yerel sentetik ızgara; ağ isteği yapmaz
+make dev-config             # First setup only; existing private files are preserved
+make api                    # Terminal 1: local renderer
+make sim                    # Terminal 2: configured watch build
 ```
 
-Metadata servisini yerelde denemek için:
+OpenFreeMap is the default provider. Set `FR165_MAP_PROVIDER=synthetic` explicitly
+for test grids. Provider failures preserve the last map and GPS; they never replace
+real maps with a synthetic grid. `make sim-offline` is an explicit local test mode.
 
-```sh
-make dev-config    # Bir kez; .env ve .local/watch.json üretir. Sırları yazdırmaz.
-make api           # Terminal 1: http://127.0.0.1:8765, sadece bu Mac
-make sim           # Terminal 2: FieldMap-simulator.prg
-```
+A tunnel is temporary development access: the Mac must stay awake and online.
+Permanent hosting is a separate choice; no paid account or permanent deployment
+has been created. [HTTPS test plan](docs/https-simulator-test.md).
 
-`make dev-config` mevcut yapılandırmayı değiştirmez. `.env` veya `.local/watch.json`
-zaten varsa bu adımı atlayın. Bu çalışma klasörü için yerel yapılandırma hazırlanmıştır.
+## Controls
 
-Servis durumu: [yerel health](http://127.0.0.1:8765/health).
-[OpenAPI arayüzü](http://127.0.0.1:8765/docs) ve [sürümlü sözleşme](contracts/openapi.json).
-Simülatörde sentetik GPS için `tests/fixtures/synthetic-walk.gpx` dosyasını GPS
-oynatma menüsünden seçin. Gerçek saate sentetik konum yüklenmez.
-
-**Garmin görüntü dönüştürücüsü localhost PNG'sini alamaz.** Yerel HTTP deneyi
-metadata ve API içindir; `makeImageRequest` yolunu doğrulamak için dışarıdan
-erişilebilir HTTPS gerekir. Kullanıcı onaylı geçici HTTPS testi ile üç boyut
-simülatörde doğrulandı. Tekrar için [HTTPS test planı](docs/https-simulator-test.md)
-ve [ayrıntılı simülatör adımları](docs/field-test.md) bulunur. Hiçbir `make` görevi
-kendiliğinden tünel açmaz.
-
-![Türkçe simülatörde sentetik raster](docs/evidence/screenshots/tr-final-390-day.png)
-
-## Düğmeler
-
-| Eylem | Düğme |
+| Action | Button |
 |---|---|
-| Haritayı aç; haritada menü | START |
-| Zoom z14 / z15 / z16 | UP / DOWN |
-| Menüde seç / gezin | START / UP / DOWN |
-| Kaydırma modunda yön değiştir | START: kuzey-güney / doğu-batı |
-| Kaydır; tek adımda konuma dön | UP/DOWN; BACK |
-| Menüden haritaya dön | BACK |
-| Harita oturumunu bitir | Haritada BACK veya menüde End session |
+| Home: start offline GPS coordinates | DOWN |
+| Home: start map session | START |
+| Map: menu | START |
+| Map: zoom z14 / z15 / z16 | UP / DOWN |
+| Menu: move / select | UP / DOWN, then START |
+| Browse: choose north–south / east–west axis | START |
+| Browse: pan / return to following | UP / DOWN, BACK |
+| Coordinates, credits or menu: return to map | BACK |
+| Map: stop session, clear trace and release image | BACK |
 
-LIGHT ve sistemin uzun basma hareketleri yeniden atanmaz. Güncel raster RAM’de,
-konum izi en fazla 180 noktada tutulur. GPS kesintisi izde bağlantısız segment
-oluşturur. Beş saniyeden eski konum eski olarak gösterilir. Üç raster boyutu
-menüden döndürülür: 390 → 195 → 256. G0 tanılama ekranı hata kodu, heap,
-başarılı harita yükleme süresi ve sayaç gösterir; koordinat veya token yazmaz.
-Depolama testi 1 KB metni yazıp okuyarak siler; toplam kapasite veya bitmap
-kalıcılığı testi değildir.
+Menu includes theme, 195/256/390 image size, diagnostics, a safe 1K storage probe,
+GPS coordinates and map credits. UI remains English regardless of watch language.
 
-## Proje düzeni
+## Bounded resource use
 
-| Dizin | İçerik |
-|---|---|
-| `apps/watch` | Monkey C uygulaması, İngilizce/Türkçe kaynaklar, saat testleri |
-| `services/api` | FastAPI, sentetik raster, kısa ömürlü görüntü yetkisi |
-| `contracts` | OpenAPI ve sentetik istek örneği |
-| `tests` | Koordinat, protokol, limit, erişim ve eşzamanlılık testleri |
-| `scripts` | İzole kurulum, build, test, kanıt ve paketleme |
-| `docs/evidence` | Ölçülen sonuçlar ve henüz yapılmayan saha testleri |
+- Watch: 180 trace points; one active image plus at most one incoming image;
+  16-color conversion, single network job and timeout/backoff. GPS continues while
+  new maps are paused for low memory. No persistent map cache or GPS history.
+- Preferences: one small key, rewritten only when values change. Storage probe
+  writes, compares and removes 1024 ASCII characters; it is not a capacity test.
+- Renderer: at most 9 visible-area tiles per view; 1 MiB each, 16 cached tiles AND
+  8 MiB total compressed cache, one decoded tile at a time, one render at a time,
+  18-second deadline, at most 64 KiB PNG, 24 short-lived output images. No disk tiles.
 
-## Teslim ve devam
+[Measured results and limits](docs/evidence/g0.md) distinguish accelerated event
+stress from real elapsed-time, physical RAM and battery testing.
 
-- [İlerleme ve bilinen eksikler](docs/progress.md)
-- [G0 kanıt matrisi](docs/evidence/g0.md)
-- [Gerçek saat kurulum ve saha listesi](docs/field-test.md)
-- [Mimari kararlar](docs/decisions/001-g0-scope.md)
-- [Gereksinim eşlemesi](docs/traceability.md)
-- [Güvenlik ve veri akışı](SECURITY.md)
+## Delivery
 
 ```sh
-make audit         # Bilinen Python güvenlik açıkları; internet gerekir
-make evidence      # Kanıtları mevcut test çıktılarından üretir
-make package       # GitHub’a uygun kaynak ZIP’i; SDK/.venv/anahtar içermez
+make audit                  # Online dependency vulnerability check
+make contracts              # Regenerate OpenAPI
+make evidence               # Current artifacts + observed tests, never physical PASS
+make package                # Shareable source ZIP
 ```
 
-GitHub’a `.venv`, `.local`, `.env`, SDK, PRG, gerçek konum veya özel saha loglarını
-yüklemeyin. Bunlar `.gitignore` ile dışlanır; kaynak ZIP’i yalnızca paylaşılabilir
-dosyaları toplar. Otomatik CI Python testlerini çalıştırır; lisanslı Garmin
-araçlarıyla saat doğrulaması yerel Mac’te yapılır. GitHub’a yayın/push veya Connect
-IQ Store yüklemesi bu teslimde yapılmaz. Kod için ayrıca bir açık kaynak lisansı
-seçilmemiştir.
+[Progress](docs/progress.md) · [Architecture decision](docs/decisions/004-openfreemap-and-offline-position.md)
+· [Requirements traceability](docs/traceability.md) · [Security](SECURITY.md)
+
+Source ZIP: `dist/FieldMap-G0-source.zip`. Watch file: `build/FieldMap.prg`.
+Git ignores `.venv`, `.local`, `.env`, SDK/build outputs and private logs. Do not
+upload the whole folder through an interface that ignores `.gitignore`; use Git or
+the source ZIP. No GitHub push or Connect IQ Store publication is performed here.
+No source-code license has been chosen; map-data attribution/licenses still apply.

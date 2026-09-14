@@ -146,7 +146,7 @@ function renderEveryScreenAndRaster(logger) {
     view.onUpdate(dc);
     view.page = :pan; view.onUpdate(dc);
     view.page = :menu;
-    for (var i = 0; i < 8; i++) { view.selection = i; view.onUpdate(dc); }
+    for (var i = 0; i < view.menuItems.size(); i++) { view.selection = i; view.onUpdate(dc); }
     view.page = :diagnostics; view.onUpdate(dc);
     logger.debug("390px canvas rendered. FONT_SMALL=" + dc.getFontHeight(Graphics.FONT_SMALL) +
         "px; FONT_XTINY=" + dc.getFontHeight(Graphics.FONT_XTINY) + "px");
@@ -256,5 +256,102 @@ function metadataValidation(logger) {
     Test.assert(!state.validate(data, state.generation, "https://example.com"));
     data["imageWidth"] = 390; data["bounds3857"] = [0, 0, 1, 1];
     Test.assert(!state.validate(data, state.generation, "https://example.com"));
+    return true;
+}
+
+(:test)
+function coordinatesWithoutInternetAndAtPoles(logger) {
+    var s = new FieldSession(); var v = new FieldView(s); var d = new FieldDelegate(v, s);
+    // Home DOWN is an explicit GPS-only action, and must never start a network job.
+    d.onNextPage();
+    Test.assert(s.running && s.subscribed && !s.networkEnabled && v.page == :coordinates);
+    var now = Time.now().value();
+    Test.assert(s.gps.accept(-33.123456d, -179.999999d, now, Position.QUALITY_GOOD, null, now, System.getTimer()));
+    s.map.track(s.gps.xy[0], s.gps.xy[1]); s.maybeRequest();
+    Test.assert(s.job == null && s.map.requestCount == 0);
+    Test.assert("-33.123456".equals(Geo.displayCoordinate(s.gps.lat)));
+    Test.assert("-179.999999".equals(Geo.displayCoordinate(s.gps.lon)));
+    Test.assert("--".equals(Geo.displayCoordinate(null)));
+    var gps = new GpsState();
+    Test.assert(gps.accept(90.0d, 180.0d, now, Position.QUALITY_GOOD, null, now, 0));
+    Test.assert(gps.lat == 90 && gps.xy == null && gps.usable(1000));
+    Test.assert(!gps.usable(6000));
+    Test.assert("90.000000".equals(Geo.displayCoordinate(gps.lat)));
+    s.stop();
+    Test.assert(!s.running && !s.subscribed && s.job == null && s.map.bitmap == null);
+    Test.assert(s.gps.lat == null && s.gps.count == 0);
+    return true;
+}
+
+(:test)
+function coordinatesAndCreditsFitRoundScreen(logger) {
+    var canvas = Graphics.createBufferedBitmap({:width => 390, :height => 390});
+    var dc = canvas.get().getDc();
+    var labels = [["-90.000000",156,Graphics.FONT_SMALL], ["-180.000000",245,Graphics.FONT_SMALL],
+        ["Age 9999s / WGS84",301,Graphics.FONT_XTINY], ["DOWN: GPS",335,Graphics.FONT_XTINY],
+        ["Current fix",82,Graphics.FONT_XTINY], ["Last known fix",82,Graphics.FONT_XTINY],
+        ["© OpenMapTiles",99,Graphics.FONT_XTINY], ["© OpenStreetMap",129,Graphics.FONT_XTINY],
+        ["openstreetmap.org",285,Graphics.FONT_XTINY], ["GPS only",326,Graphics.FONT_XTINY],
+        ["Low memory",326,Graphics.FONT_XTINY]];
+    for (var i=0; i<labels.size(); i++) {
+        var item=labels[i]; var height=dc.getFontHeight(item[2]);
+        var edge=Geo.max(Geo.abs(item[1]-195),Geo.abs(item[1]+height-195));
+        var allowed=2*Math.sqrt(195*195-edge*edge)-12;
+        logger.debug("Coordinate/credit width " + dc.getTextWidthInPixels(item[0],item[2]) + " / " + allowed);
+        Test.assert(dc.getTextWidthInPixels(item[0],item[2]) <= allowed);
+    }
+    var s = new FieldSession(); var v = new FieldView(s);
+    v.page=:coordinates; v.onUpdate(dc);
+    s.gps.lat=-90.0d; s.gps.lon=-180.0d; s.gps.receivedMs=System.getTimer();
+    v.onUpdate(dc); v.page=:credits; v.onUpdate(dc);
+    return true;
+}
+
+(:test)
+function repeatedSessionsAndTwoHourGpsStream(logger) {
+    var s = new FieldSession(); s.networkEnabled=false;
+    var baseline=0; var peak=0; var bitmapPeak=0;
+    for (var cycle=0; cycle<40; cycle++) {
+        s.start();
+        var now=Time.now().value();
+        // First cycle exercises 2 hours of one-second events; subsequent cycles churn sessions.
+        var length=cycle==0 ? 7200 : 200;
+        for (var i=0; i<length; i++) {
+            var utc=now+i;
+            s.gps.accept(52.0d+(i%200)*0.0001d,5.0d,utc,Position.QUALITY_GOOD,null,utc,i*1000);
+        }
+        Test.assert(s.gps.count==180 && s.gps.trace.size()==180);
+        // Native bitmap allocation/replacement with an explicitly bounded palette.
+        for (var j=0; j<4; j++) {
+            var size=cycle%3==0 ? 195 : (cycle%3==1 ? 256 : 390);
+            var pal=new MapJob(s,0,0).palette();
+            var bmp=Graphics.createBufferedBitmap({:width=>size,:height=>size,:palette=>pal});
+            // Measure while BOTH old and incoming native bitmap references are alive.
+            var live=System.getSystemStats();
+            if (live.usedMemory>bitmapPeak) { bitmapPeak=live.usedMemory; }
+            Test.assert(live.usedMemory < live.totalMemory*0.8);
+            s.map.bitmap=bmp;
+            bmp=null;
+        }
+        s.stop();
+        Test.assert(s.gps.count==0 && s.gps.lat==null && s.map.bitmap==null && s.map.metadata==null);
+        Test.assert(!s.subscribed && !s.running && s.job==null && !s.map.busy);
+        var used=System.getSystemStats().usedMemory;
+        if (cycle==5) { baseline=used; }
+        if (used>peak) { peak=used; }
+        if (cycle>5) { Test.assert(used <= baseline+16384); }
+    }
+    logger.debug("40 sessions / 15000 GPS events / 160 bitmap replacements; baseline="+baseline+", peak="+peak+", end="+System.getSystemStats().usedMemory+", bitmap overlap peak="+bitmapPeak);
+    Test.assert(Application.Storage.getValue("g0-probe")==null);
+    return true;
+}
+
+(:test)
+function realProviderMetadataIsAuthenticatedAndAtomic(logger) {
+    var state = new MapState(); state.camera(0,0);
+    var data={"mapDataVersion"=>"openfreemap-test-v1","attribution"=>"OpenFreeMap | (c) OpenMapTiles | Data from OpenStreetMap"};
+    Test.assert(state.validProvider(data));
+    data["attribution"]="Wrong source"; Test.assert(!state.validProvider(data));
+    data["mapDataVersion"]="other-provider"; Test.assert(!state.validProvider(data));
     return true;
 }

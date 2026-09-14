@@ -43,5 +43,17 @@ Kullanıcı 14 Eylül 2026'da bu deneyi açıkça onayladı. 18:49:58–19:12:03
 arasında 1324,5 saniye çalıştı; tünel süreci çıkış kodu 0 ile kapandı. API de
 durduruldu, `.env` ve `.local/watch.json` özgün içerikleriyle 0600 izinle geri
 yüklendi; simülatörün cihaz HTTPS gerekliliği yeniden etkinleştirildi. Hesap/DNS
-veya kalıcı servis oluşturulmadı. Ayrıntılı sonuç [simulator.json](evidence/simulator.json).
+veya kalıcı servis oluşturulmadı. Ayrıntılı sonuç [historical simulator record](evidence/previous-synthetic-simulator.json).
 Tekrar çalıştırma yeni, süreli yayın izni gerektirir.
+
+## OpenFreeMap follow-up (new authorization required)
+
+The earlier synthetic-grid authorization has ended. For the requested real-map
+update, the converter and English/offline-GPS screens are implemented and tested
+locally. A separate, at-most-30-minute Cloudflare Quick Tunnel can verify the full
+Garmin PNG path with OpenFreeMap street maps. Only the fixed Utrecht sample and an
+explicitly generated GPX path will be sent; no real user GPS or phone data.
+Cloudflare sees renderer traffic; Garmin converts PNGs; OpenFreeMap receives only
+viewport tile requests. No paid service, account or permanent deployment. Preserve
+`.env` and `.local/watch.json`, restore them and stop the tunnel/API afterwards.
+The previous test's approval does not authorize this new run.

@@ -1,5 +1,5 @@
 {
-  "measuredAtUtc": "2026-09-14T19:21:07.947495+00:00",
+  "measuredAtUtc": "2026-09-14T20:00:03.715560+00:00",
   "environment": {
     "os": "Darwin",
     "osVersion": "26.6.2",
@@ -21,7 +21,7 @@
     "physicalIOS": "NOT MEASURED",
     "physicalGCM": "NOT MEASURED"
   },
-  "sourceSha256": "608a0f510877944baf17d9097eafab850b49686390282a6f271bf30104ce72e3",
+  "sourceSha256": "fe81fc97f1cb363997c1695c7972c46fece9577de33ca8518aee0f7fe4658d7d",
   "physicalTests": "NOT RUN",
   "visualReview": {
     "status": "PASS",
@@ -30,45 +30,78 @@
   },
   "FieldMap.prg": {
     "status": "PASS",
-    "bytes": 124156,
-    "sha256": "aeea1a6f36c85a8e7a09a4355d3fa394063cb7b4614b339db9368896d0cafc01"
+    "bytes": 127196,
+    "sha256": "cd089ada317a618b73913c03177d854c014d625cf30749b8ff8490897fb24f55"
   },
   "FieldMap-tests.prg": {
     "status": "PASS",
-    "bytes": 139484,
-    "sha256": "77c1b54635662540cfb5a7c3e96f83314d2118fc7d45802ed3b29d51ab952705"
+    "bytes": 148108,
+    "sha256": "98ff5f68ce3c9bd6cd4d8120bea5d0a23b1d11ab0c915a9102884eef4555b869"
   },
   "pythonTests": {
-    "tests": 56,
+    "tests": 89,
     "errors": 0,
     "failures": 0,
     "skipped": 0
   },
   "watchTests": {
     "status": "PASS",
-    "passed": 17
+    "passed": 21
   },
   "http-smoke.json": {
+    "measuredAtUtc": "2026-09-14T19:59:01.832789+00:00",
     "status": "PASS",
-    "transport": "local HTTP (not Garmin bridge)",
-    "synthetic": true,
+    "transport": "real loopback HTTP, not Garmin bridge",
+    "provider": "openfreemap",
+    "sample": "fixed public Utrecht, no user GPS",
     "profiles": [
       {
         "size": 195,
-        "pngBytes": 804,
-        "httpMs": 6.54
+        "style": "day",
+        "bytes": 10852,
+        "milliseconds": 1972,
+        "sha256": "843766b9560da19b8c4f7c792e1166658ac2acad147267910e92ad65b318498d"
+      },
+      {
+        "size": 195,
+        "style": "night",
+        "bytes": 10756,
+        "milliseconds": 1705,
+        "sha256": "87441ea34fbd4bca91f2593c83184dc244c3a8e61aab24746224e0f9ab58743a"
       },
       {
         "size": 256,
-        "pngBytes": 854,
-        "httpMs": 2.97
+        "style": "day",
+        "bytes": 16221,
+        "milliseconds": 1340,
+        "sha256": "cba96c160d7bfd8baf5fbdcd985b2d961cc9c02987cfb8c23b5304910f1349d0"
+      },
+      {
+        "size": 256,
+        "style": "night",
+        "bytes": 16146,
+        "milliseconds": 1318,
+        "sha256": "0a7ebdd3e26a625d469db25e268aa047a60509584f07926a921e3ba682c68300"
       },
       {
         "size": 390,
-        "pngBytes": 973,
-        "httpMs": 4.39
+        "style": "day",
+        "bytes": 32761,
+        "milliseconds": 1843,
+        "sha256": "26de192101c533cd76e358c4042240aca701929e680672c081d286c5a83f4543"
+      },
+      {
+        "size": 390,
+        "style": "night",
+        "bytes": 32856,
+        "milliseconds": 1844,
+        "sha256": "4d8d1859328a80aadb7a6fd44b61a1c2da932f69d5ae6b6461b6c42a1782e84e"
       }
-    ]
+    ],
+    "unauthenticatedRender": "401 PASS",
+    "apiStopped": true,
+    "zoom": 15,
+    "coordinateSource": "Fixed synthetic test center 52.0907, 5.1214 (not user position)"
   },
   "audit.json": {
     "dependencies": [
@@ -88,6 +121,11 @@
         "vulns": []
       },
       {
+        "name": "certifi",
+        "version": "2026.7.22",
+        "vulns": []
+      },
+      {
         "name": "click",
         "version": "8.5.0",
         "vulns": []
@@ -103,13 +141,43 @@
         "vulns": []
       },
       {
+        "name": "httpcore",
+        "version": "1.0.9",
+        "vulns": []
+      },
+      {
+        "name": "httpx",
+        "version": "0.28.1",
+        "vulns": []
+      },
+      {
         "name": "idna",
         "version": "3.19",
         "vulns": []
       },
       {
+        "name": "mapbox-vector-tile",
+        "version": "2.2.0",
+        "vulns": []
+      },
+      {
+        "name": "numpy",
+        "version": "2.5.3",
+        "vulns": []
+      },
+      {
         "name": "pillow",
         "version": "12.3.0",
+        "vulns": []
+      },
+      {
+        "name": "protobuf",
+        "version": "6.33.6",
+        "vulns": []
+      },
+      {
+        "name": "pyclipper",
+        "version": "1.4.0",
         "vulns": []
       },
       {
@@ -120,6 +188,11 @@
       {
         "name": "pydantic-core",
         "version": "2.46.5",
+        "vulns": []
+      },
+      {
+        "name": "shapely",
+        "version": "2.1.2",
         "vulns": []
       },
       {
@@ -145,5 +218,5 @@
     ],
     "fixes": []
   },
-  "gitCommitAtMeasurement": "0dccc62208617498b3e2b0ab18a3966637ac512c"
+  "gitCommitAtMeasurement": "e133c0c9559e6ed674690bb1f5650311ba853aad"
 }

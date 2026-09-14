@@ -1,10 +1,10 @@
 {
   "status": "PASS",
-  "tests": 56,
+  "method": "Source ZIP extracted under /tmp; no private .local, .env, SDK, keys, build or venv included. Tests reuse project .venv; build generates its own key/configuration. No fresh dependency installation.",
+  "archiveSha256AtTest": "4c617cf5b4e8aa96664ceb54ead3ce2394b21a1c12a0539fbb62023bedfcef8f",
+  "tests": 89,
   "fr165Build": "PASS",
-  "sourceCodeSha256": "608a0f510877944baf17d9097eafab850b49686390282a6f271bf30104ce72e3",
-  "watchSourceSha256": "a469aa21bc928f12b979b33fd5fe99ef722855c98b6009b6ded134284704583a",
-  "method": "Source ZIP extracted under /tmp; no .local/build/keys/venv included. Python tests reused existing project .venv; build created a new local key and empty configuration. No dependency reinstallation.",
-  "archiveSha256AtTest": "2566af3dc348a1daec424ac48fa3d5a9b382675c92c1c1a784d2012464dc28b3",
-  "subsequentChanges": "Evidence documentation only; final ZIP checksum is in dist/SHA256SUMS."
+  "sourceCodeSha256": "fe81fc97f1cb363997c1695c7972c46fece9577de33ca8518aee0f7fe4658d7d",
+  "watchSourceSha256": "6eb1774efc350234d8f8f07736bf58e8717532b6b34530afd5c32b8bd6bae4e6",
+  "subsequentChanges": "Evidence documentation only; final archive checksum in dist/SHA256SUMS."
 }

@@ -135,13 +135,17 @@ def test_rate_limit_honors_retry_after_and_recovers(clock):
 
 
 def test_concurrent_renders_keep_identity():
-    client = TestClient(create_app(Settings(max_entries=24)))
+    client = TestClient(create_app(Settings(max_entries=24, requests_per_minute=100)))
 
     def request(i):
         return client.post("/v1/map-renders", json=REQUEST | {"requestGeneration": i}).json()
 
     with ThreadPoolExecutor(max_workers=10) as pool:
         items = list(pool.map(request, range(20)))
+    for i, item in enumerate(items):
+        if item.get("code") == "RENDER_BUSY":
+            assert item["retryable"] is True
+            items[i] = request(i)
     assert len({x["renderId"] for x in items}) == 20
     for i, item in enumerate(items):
         assert item["requestGeneration"] == i

@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "tests": 56,
+  "fr165Build": "PASS",
+  "sourceCodeSha256": "608a0f510877944baf17d9097eafab850b49686390282a6f271bf30104ce72e3",
+  "watchSourceSha256": "a469aa21bc928f12b979b33fd5fe99ef722855c98b6009b6ded134284704583a",
+  "method": "Source ZIP extracted under /tmp; no .local/build/keys/venv included. Python tests reused existing project .venv; build created a new local key and empty configuration. No dependency reinstallation.",
+  "archiveSha256AtTest": "2566af3dc348a1daec424ac48fa3d5a9b382675c92c1c1a784d2012464dc28b3",
+  "subsequentChanges": "Evidence documentation only; final ZIP checksum is in dist/SHA256SUMS."
+}

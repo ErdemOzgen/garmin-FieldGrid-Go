@@ -1,0 +1,44 @@
+.venv/bin/ruff check services scripts tests
+All checks passed!
+.venv/bin/ruff format --check services scripts tests
+20 files already formatted
+python3 scripts/check_secrets.py
+Publishing check PASS: no prohibited artifacts or detected credential values.
+.venv/bin/python -m pytest --cov=services.api --cov-report=term-missing --junitxml=build/pytest.xml
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0
+rootdir: $PROJECT
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.1.0, anyio-4.15.1
+collected 89 items
+
+tests/test_api.py .......................................                [ 43%]
+tests/test_geo.py .................                                      [ 62%]
+tests/test_openfreemap.py .................................              [100%]
+
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  $PROJECT/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+.venv/lib/python3.14/site-packages/starlette/testclient.py:53
+  $PROJECT/.venv/lib/python3.14/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: $PROJECT/build/pytest.xml -
+================================ tests coverage ================================
+_______________ coverage: platform darwin, python 3.14.7-final-0 _______________
+
+Name                          Stmts   Miss  Cover   Missing
+-----------------------------------------------------------
+services/api/__init__.py          0      0   100%
+services/api/geo.py              25      0   100%
+services/api/main.py            124      0   100%
+services/api/models.py           28      0   100%
+services/api/openfreemap.py     194     14    93%   132, 176, 193, 202, 228, 274, 285, 290-293, 298-307
+services/api/renderer.py         27      0   100%
+-----------------------------------------------------------
+TOTAL                           398     14    96%
+======================== 89 passed, 2 warnings in 0.87s ========================

@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "FieldMap G0 test service",
+    "title": "FieldMap raster service",
     "version": "0.1.0"
   },
   "paths": {
@@ -303,7 +303,6 @@
           },
           "mapDataVersion": {
             "type": "string",
-            "const": "synthetic-grid-v1",
             "title": "Mapdataversion",
             "default": "synthetic-grid-v1"
           },
