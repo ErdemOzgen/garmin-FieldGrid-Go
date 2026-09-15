@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "scope": "offline grid, synthetic simulator only",
+  "watchSourceSha256": "e28dc8e1ba43ed8034090e792feb572ccf77cc635759c25eaa24b08677885cef",
+  "record": "docs/evidence/grid/result.json",
+  "physicalAcceptance": "NOT RUN"
+}

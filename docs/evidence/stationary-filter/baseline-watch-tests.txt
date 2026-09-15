@@ -1,0 +1,119 @@
+------------------------------------------------------------------------------
+Executing test projectionAndDateLine...
+PASS
+------------------------------------------------------------------------------
+Executing test gpsFreshnessQualityAndPolar...
+PASS
+------------------------------------------------------------------------------
+Executing test stationaryNoiseDoesNotGrowTrace...
+DEBUG (13:50): SYNTHETIC: 600 stationary fixes, +/-3 m: 1 point / 0 m trace
+PASS
+------------------------------------------------------------------------------
+Executing test stationaryWideDriftCannotOverrideLowSpeed...
+
+Error: Unhandled Exception
+Exception: ASSERTION FAILED
+Stack:
+  - API code 0x30000203
+  - API code 0x30000174
+  - stationaryWideDriftCannotOverrideLowSpeed() at $PROJECT/apps/watch/tests/CoreTests.mc:71 0x10001db8
+  - evaluate_test_entries_0_to_22() at $PROJECT/build/gen/006-B4432-00/source/UnitTests.mcgen:78 0x100036ac
+  - runTest() at $PROJECT/build/gen/006-B4432-00/source/UnitTests.mcgen:129 0x10003a55
+ERROR
+------------------------------------------------------------------------------
+Executing test stoppedWalkDoesNotConsumeStationaryDrift...
+
+Error: Unhandled Exception
+Exception: ASSERTION FAILED
+Stack:
+  - API code 0x30000203
+  - API code 0x30000174
+  - stoppedWalkDoesNotConsumeStationaryDrift() at $PROJECT/apps/watch/tests/CoreTests.mc:87 0x10000839
+  - evaluate_test_entries_0_to_22() at $PROJECT/build/gen/006-B4432-00/source/UnitTests.mcgen:80 0x100036c7
+  - runTest() at $PROJECT/build/gen/006-B4432-00/source/UnitTests.mcgen:129 0x10003a55
+ERROR
+------------------------------------------------------------------------------
+Executing test walkingAndSlowWalkingRemainResponsive...
+PASS
+------------------------------------------------------------------------------
+Executing test unknownSpeedStillWalks...
+PASS
+------------------------------------------------------------------------------
+Executing test isolatedAndPersistentJumps...
+PASS
+------------------------------------------------------------------------------
+Executing test ordinarySpikeMedianRejection...
+PASS
+------------------------------------------------------------------------------
+Executing test gapsDoNotAccumulateTeleportDistance...
+PASS
+------------------------------------------------------------------------------
+Executing test movementAcrossDateLine...
+PASS
+------------------------------------------------------------------------------
+Executing test stopThenResumeMoving...
+PASS
+------------------------------------------------------------------------------
+Executing test gridZoomPanAndLimits...
+PASS
+------------------------------------------------------------------------------
+Executing test boundedLongTraceAndRepeatedSessions...
+DEBUG (13:51): SYNTHETIC 30 sessions / 30000 fixes; peak measured heap bytes: 55728
+PASS
+------------------------------------------------------------------------------
+Executing test homeDoesNotStartGpsAndStopReleases...
+PASS
+------------------------------------------------------------------------------
+Executing test englishTextAndRoundScreenFit...
+DEBUG (13:51): All English pages rendered, both themes; screenshot review separate
+PASS
+------------------------------------------------------------------------------
+Executing test redrawStressAndSharpTurn...
+DEBUG (13:51): SYNTHETIC 1000 redraws + 90-degree turn; heap peak bytes: 57816
+PASS
+------------------------------------------------------------------------------
+Executing test noPersistentPreferencesOrGpsData...
+DEBUG (13:51): No application persistence: old keys removed; grid-only session creates no preferences/GPS history
+PASS
+------------------------------------------------------------------------------
+Executing test repeatedGpsLifecycleDoesNotRetainTrace...
+DEBUG (13:51): 40 GPS start/stop cycles / 12000 fixes; peak post-stop heap bytes: 38592
+PASS
+------------------------------------------------------------------------------
+Executing test pauseResumeAndExitStayEphemeral...
+PASS
+------------------------------------------------------------------------------
+Executing test buttonFlowHasOnlyLocalSessions...
+PASS
+------------------------------------------------------------------------------
+Executing test liveSpeedRequiresFreshFilteredPosition...
+PASS
+
+==============================================================================
+RESULTS
+Test:                                     Status:
+projectionAndDateLine                     PASS
+gpsFreshnessQualityAndPolar               PASS
+stationaryNoiseDoesNotGrowTrace           PASS
+stationaryWideDriftCannotOverrideLowSpeed ERROR
+stoppedWalkDoesNotConsumeStationaryDrift  ERROR
+walkingAndSlowWalkingRemainResponsive     PASS
+unknownSpeedStillWalks                    PASS
+isolatedAndPersistentJumps                PASS
+ordinarySpikeMedianRejection              PASS
+gapsDoNotAccumulateTeleportDistance       PASS
+movementAcrossDateLine                    PASS
+stopThenResumeMoving                      PASS
+gridZoomPanAndLimits                      PASS
+boundedLongTraceAndRepeatedSessions       PASS
+homeDoesNotStartGpsAndStopReleases        PASS
+englishTextAndRoundScreenFit              PASS
+redrawStressAndSharpTurn                  PASS
+noPersistentPreferencesOrGpsData          PASS
+repeatedGpsLifecycleDoesNotRetainTrace    PASS
+pauseResumeAndExitStayEphemeral           PASS
+buttonFlowHasOnlyLocalSessions            PASS
+liveSpeedRequiresFreshFilteredPosition    PASS
+Ran 22 tests
+
+FAILED (passed=20, failed=0, errors=2)

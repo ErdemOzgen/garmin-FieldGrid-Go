@@ -1,10 +1,23 @@
 # Physical OpenFreeMap test through temporary HTTPS
 
-Prepared 14 September 2026. **NOT STARTED — awaiting explicit authorization.**
-The installed app opens on the actual Forerunner 165, but its build intentionally
-omits the Mac-only localhost origin. This is why it cannot fetch real street maps.
-The previous authorization covered only the completed synthetic simulator test;
-it does not cover a new public endpoint carrying real watch location.
+Prepared 14 September 2026. **CLOSED — authorized experiment completed.**
+The real location HTTPS test began at 20:58:42 UTC. Automatic shutdown completed
+at 21:28:43 UTC (1,800.5 seconds including process cleanup). Tunnel/API processes
+stopped, both local listening ports closed, and original .env/watch configuration
+was restored byte for byte. No further public exposure is authorized by this test.
+
+The previous installed build omitted the Mac only localhost origin. A new `fr165`
+build with the temporary HTTPS origin has now been transferred and downloaded
+back from the physical watch; all 127,276 bytes match. HTTPS preflight with a fixed
+public Utrecht sample returned a real OpenFreeMap PNG and rejected an unauthorized
+render request. The first physical run crashed in drawBitmap2 after successful
+downloads. A native color fix was tested, installed and read back (128,012 B).
+The user confirms real maps now display without crashing and a short locked iPhone
+refresh with UP/DOWN zoom works. Continuous 30-minute background endurance remains
+NOT RUN. The physical watch
+retains this fixed test build, whose temporary origin has now expired. Offline GPS
+continues to work; fresh online maps require a separately configured stable service.
+See [sanitized evidence](evidence/physical-https.json).
 
 ## Concrete proposed action
 
@@ -17,7 +30,7 @@ it does not cover a new public endpoint carrying real watch location.
    local configuration, compile `make build-watch` for `fr165`, and replace only
    our FieldMap application on the watch. Retain the prior PRG privately for rollback.
 4. User disconnects USB, keeps the watch paired with Garmin Connect on the iPhone,
-   and explicitly selects START to open a map. DOWN remains network-free GPS only.
+   and explicitly selects START to open a map. DOWN remains network free GPS only.
 5. Confirm streets/paths and OpenMapTiles/OpenStreetMap credits on the real watch.
    Collect only success/failure, image count, error code and memory; do not request
    the user's exact coordinates or publish raw location/screenshots.
@@ -26,15 +39,15 @@ it does not cover a new public endpoint carrying real watch location.
 
 ## Data and access
 
-START in an online session sends the watch's map-center coordinates to the Python
+START in an online session sends the watch's map center coordinates to the Python
 renderer through Garmin and Cloudflare. Garmin's converter also retrieves the
 signed PNG, whose bounds reveal the viewed area. OpenFreeMap receives viewport
-vector-tile requests (the approximate viewed area), not the application's token.
+vector tile requests (the approximate viewed area), not the application's token.
 No GPS history database is created. API access logs are disabled. Private tokens,
-signed URLs, raw device XML, location-bearing logs and personal screenshots stay
+signed URLs, raw device XML, location bearing logs and personal screenshots stay
 out of Git. Anonymous render calls are rejected; image grants last 120 seconds.
 
-Only this single-device service is exposed. Health/OpenAPI may be public; code,
+Only this single device service is exposed. Health/OpenAPI may be public; code,
 local files and the filesystem are not served. Cloudflare Quick Tunnels are a
 public, temporary origin, and the Mac must remain awake and online during the test.
 

@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "method": "Source ZIP extracted under /tmp; no private .local, .env, SDK, keys, build or venv included. Tests reuse project .venv; build generates its own key/configuration. No fresh dependency installation.",
+  "archiveSha256AtTest": "4c617cf5b4e8aa96664ceb54ead3ce2394b21a1c12a0539fbb62023bedfcef8f",
+  "tests": 89,
+  "fr165Build": "PASS",
+  "sourceCodeSha256": "fe81fc97f1cb363997c1695c7972c46fece9577de33ca8518aee0f7fe4658d7d",
+  "watchSourceSha256": "6eb1774efc350234d8f8f07736bf58e8717532b6b34530afd5c32b8bd6bae4e6",
+  "subsequentChanges": "Historical source-package validation before native-raster and compact-attribution fixes. Current local checks are in physical-https.json and compact-attribution/result.json; latest archive checksum is in dist/SHA256SUMS."
+}

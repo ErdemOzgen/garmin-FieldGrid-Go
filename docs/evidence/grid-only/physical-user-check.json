@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "scope": "Physical app launch and grid display without IQ error, reported by user",
+  "observedAtUtc": "2026-09-15T09:45:33.128909+00:00",
+  "device": "Forerunner 165",
+  "appVersion": "0.2.1",
+  "userReport": "The grid opened without an error",
+  "independentlyMeasured": false,
+  "physicalGpsAccuracy": "NOT RUN",
+  "physicalEndSessionExplicitConfirmation": "NOT RUN",
+  "physicalBatteryEndurance": "NOT RUN",
+  "fullG0G3": "NOT RUN",
+  "userReportTranslatedFrom": "Turkish"
+}

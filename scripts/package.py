@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
-    if check_secrets():
+    if check_secrets([]):
         raise SystemExit(1)
     out = ROOT / "dist"
     out.mkdir(exist_ok=True)

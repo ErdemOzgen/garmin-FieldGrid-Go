@@ -1,0 +1,9 @@
+{
+  "version": "0.2.2",
+  "status": "FAIL",
+  "source": "Physical user report",
+  "reportedAtUtc": "2026-09-15T12:23:12.967056+00:00",
+  "observation": "Stationary position still drifts 7 to 11 meters when the arm moves slightly. User reports improvement compared with the previous version.",
+  "diagnosticMotion": "Not supplied",
+  "locationOrSensorTraceCollected": false
+}

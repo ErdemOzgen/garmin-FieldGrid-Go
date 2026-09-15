@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "measuredAtUtc": "2026-09-15T12:14:53.587180+00:00",
+  "version": "0.2.2",
+  "device": "Forerunner 165",
+  "transport": "OpenMTP 3.3.0 Kalam",
+  "destination": "GARMIN/Apps/FieldMap.prg",
+  "bytes": 125260,
+  "sha256": "d07074ec525697505226db3aa795cccf47b3602bc534f9f1af07f44b6dfe5828",
+  "readbackByteForByte": true,
+  "previousPrgAtDestination": false,
+  "personalActivityFilesReadOrChanged": false,
+  "physicalGpsAndSensors": "NOT RUN",
+  "notes": "USB command line inventory returned no Garmin entry, but the native MTP client exposed the device and completed verified transfer."
+}

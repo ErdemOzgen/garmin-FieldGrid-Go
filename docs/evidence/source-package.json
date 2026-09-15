@@ -1,10 +1,12 @@
 {
   "status": "PASS",
-  "method": "Source ZIP extracted under /tmp; no private .local, .env, SDK, keys, build or venv included. Tests reuse project .venv; build generates its own key/configuration. No fresh dependency installation.",
-  "archiveSha256AtTest": "4c617cf5b4e8aa96664ceb54ead3ce2394b21a1c12a0539fbb62023bedfcef8f",
-  "tests": 89,
-  "fr165Build": "PASS",
-  "sourceCodeSha256": "fe81fc97f1cb363997c1695c7972c46fece9577de33ca8518aee0f7fe4658d7d",
-  "watchSourceSha256": "6eb1774efc350234d8f8f07736bf58e8717532b6b34530afd5c32b8bd6bae4e6",
-  "subsequentChanges": "Evidence documentation only; final archive checksum in dist/SHA256SUMS."
+  "tests": 116,
+  "target": "fr165",
+  "warnings": 0,
+  "watchSourceSha256": "6fa8087b2c620907ade388a154ef0ecad370137d1bc2168b9ba2734816dc05d8",
+  "sdkVersion": "9.2.0",
+  "publicationScan": "PASS in extracted source without Git",
+  "method": "Source ZIP extracted under /tmp. All 116 tests pass using the existing isolated .venv. Clean fr165 build has zero warnings, matching watch source identity and an independent temporary signing key. Extracted source secret scan passes. Final archive adds documentation/evidence corrections only; packaged bytes are checked against current source.",
+  "excluded": "No Git directory, SDK, virtualenv, private keys/configuration, build outputs, user photos, real GPS traces or historical Turkish images.",
+  "version": "0.2.3"
 }

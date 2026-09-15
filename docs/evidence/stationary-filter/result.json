@@ -1,0 +1,71 @@
+{
+  "measuredAtUtc": "2026-09-15T12:16:55.067206+00:00",
+  "version": "0.2.2",
+  "target": "fr165",
+  "automatedStatus": "PASS",
+  "pythonTests": 116,
+  "watchTests": 32,
+  "productionBuild": {
+    "status": "PASS",
+    "target": "fr165",
+    "sdkVersion": "9.2.0",
+    "deviceVersion": "3d0fb192a2cf01699aefd0f384af3f527e5885bd",
+    "sourceSha256": "f9e484c4cca196a2d61009c83284ff90bc6c0eea6d56359fc4213ba5b5f67a93",
+    "sourceCommit": "b06f5313381a356b72b74f02712982fc50a2930e",
+    "watchSourcesDirty": true,
+    "artifactSha256": "d07074ec525697505226db3aa795cccf47b3602bc534f9f1af07f44b6dfe5828",
+    "unitTests": false,
+    "simulator": false,
+    "offline": true,
+    "networkEnabled": false,
+    "activityRecording": false,
+    "dataRetention": "memory-only",
+    "warnings": 0
+  },
+  "watchTestArtifact": {
+    "status": "PASS",
+    "passed": 32,
+    "rawSdkExitCode": 1,
+    "sourceSha256": "f9e484c4cca196a2d61009c83284ff90bc6c0eea6d56359fc4213ba5b5f67a93",
+    "artifactSha256": "ea2cd81cb423d3876c054a9efc6e514850978bcc9f667adb7471dfd2cfc5309f"
+  },
+  "artifactBytes": 125260,
+  "baseline": {
+    "passed": 20,
+    "assertionErrors": 2,
+    "status": "FAIL"
+  },
+  "oldPhysicalStationaryBehavior": "FAIL by user report",
+  "currentPhysicalInstallation": "PASS with identical readback",
+  "currentPhysicalMotion": "FAIL by later user report: 7 to 11 m drift when arm moves slightly",
+  "fullG0G3": "NOT RUN",
+  "peakSyntheticTestHeapBytes": 68208,
+  "sensorLifecyclePostStopPeakBytes": 47648,
+  "productionSimulatorSnapshotKiB": 26,
+  "sensorBatches": 12000,
+  "sensorSamples": 300000,
+  "gpsSamplesStress": 42000,
+  "redraws": 1000,
+  "interactiveContinuousReplay": "NOT RUN to completion: valid GPS and acceleration stream not sustained during simulator setup",
+  "permissions": [
+    "Positioning",
+    "Sensor"
+  ],
+  "activityRecording": false,
+  "applicationStorageWrites": false,
+  "networkCalls": false,
+  "syntheticOnly": true,
+  "publicationScans": {
+    "working": "PASS",
+    "staged": "PASS",
+    "reachableHistory": "PASS"
+  },
+  "freshSourceExtraction": {
+    "status": "PASS",
+    "pythonTests": 116,
+    "fr165BuildWarnings": 0,
+    "independentSigningKey": true,
+    "sourceSha256": "f9e484c4cca196a2d61009c83284ff90bc6c0eea6d56359fc4213ba5b5f67a93"
+  },
+  "followUp": "../wrist-motion/v022-physical-result.json"
+}

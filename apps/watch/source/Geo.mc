@@ -12,7 +12,7 @@ module Geo {
     function min(a, b) { return a < b ? a : b; }
     function max(a, b) { return a > b ? a : b; }
 
-    // Preserve sub-meter precision across CIQ's JSON dictionary serialization.
+    // Decimal formatting preserves WGS84 precision.
     function coordinateText(degrees) { return degrees.format("%.8f"); }
 
     function displayCoordinate(degrees) { return degrees == null ? "--" : degrees.format("%.6f"); }
@@ -55,5 +55,29 @@ module Geo {
         x += Math.round((center - x) / WORLD) * WORLD;
         return [(x - box[0]) * size / (box[2] - box[0]),
             (box[3] - y) * size / (box[3] - box[1])];
+    }
+
+    function wrapX(x) { return x - Math.floor((x + WORLD / 2) / WORLD) * WORLD; }
+    function distance(a as Array, b as Array, latitude) {
+        var dx = wrapX(a[0] - b[0]); var dy = a[1] - b[1];
+        return Math.sqrt(dx * dx + dy * dy) * Math.cos(latitude * PI / 180.0d);
+    }
+    function gridStep(span) {
+        var power = 0.000001d;
+        while (power * 10 < span) { power *= 10; }
+        if (span <= power) { return power; }
+        if (span <= 2 * power) { return 2 * power; }
+        if (span <= 5 * power) { return 5 * power; }
+        return 10 * power;
+    }
+    function distanceText(meters) {
+        if (meters == null) { return "--"; }
+        return meters >= 1000 ? (meters / 1000.0).format("%.2f") + " km" : meters.format("%.0f") + " m";
+    }
+    function timeText(seconds) {
+        var s = max(0, seconds).toNumber();
+        var hours = s / 3600; var minutes = (s / 60) % 60;
+        return hours > 0 ? hours + ":" + minutes.format("%02d") + ":" + (s % 60).format("%02d") :
+            minutes.format("%02d") + ":" + (s % 60).format("%02d");
     }
 }

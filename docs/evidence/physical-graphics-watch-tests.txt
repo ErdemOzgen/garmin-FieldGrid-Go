@@ -1,0 +1,126 @@
+------------------------------------------------------------------------------
+Executing test decimalCoordinateWirePrecision...
+PASS
+------------------------------------------------------------------------------
+Executing test smallStorageProbeRoundTrip...
+PASS
+------------------------------------------------------------------------------
+Executing test projectionControlPoints...
+PASS
+------------------------------------------------------------------------------
+Executing test projectionHemispheres...
+PASS
+------------------------------------------------------------------------------
+Executing test antimeridianAndBadCoordinates...
+PASS
+------------------------------------------------------------------------------
+Executing test gpsAgesAndInvalidSamples...
+PASS
+------------------------------------------------------------------------------
+Executing test boundedTraceAndGaps...
+PASS
+------------------------------------------------------------------------------
+Executing test traceSimplifiesStationaryFixes...
+PASS
+------------------------------------------------------------------------------
+Executing test requestCoalescingAndBackoff...
+PASS
+------------------------------------------------------------------------------
+Executing test oldCallbackCannotReleaseNewJob...
+PASS
+------------------------------------------------------------------------------
+Executing test renderEveryScreenAndRaster...
+DEBUG (23:21): 390px canvas rendered. FONT_SMALL=45px; FONT_XTINY=30px
+PASS
+------------------------------------------------------------------------------
+Executing test downloadedPaletteUsesNativeRaster...
+G0 rejected bitmap dimensions
+PASS
+------------------------------------------------------------------------------
+Executing test criticalLabelsFitRoundScreen...
+DEBUG (23:21): Label width 181 / safe 230
+DEBUG (23:21): Label width 166 / safe 230
+DEBUG (23:21): Label width 169 / safe 230
+DEBUG (23:21): Label width 227 / safe 230
+DEBUG (23:21): Label width 207 / safe 208
+DEBUG (23:21): Label width 184 / safe 208
+DEBUG (23:21): Label width 165 / safe 208
+DEBUG (23:21): Label width 151 / safe 208
+DEBUG (23:21): Label width 151 / safe 208
+DEBUG (23:21): Label width 154 / safe 168
+DEBUG (23:21): Label width 270 / safe 334
+DEBUG (23:21): Label width 320 / safe 363
+DEBUG (23:21): Label width 305 / safe 376
+DEBUG (23:21): Label width 280 / safe 370
+DEBUG (23:21): Label width 265 / safe 350
+PASS
+------------------------------------------------------------------------------
+Executing test malformedMetadataPreservesActiveMap...
+G0 rejected metadata: schema
+PASS
+------------------------------------------------------------------------------
+Executing test menuAndFollowControls...
+PASS
+------------------------------------------------------------------------------
+Executing test staleRasterCannotReplaceNewCamera...
+PASS
+------------------------------------------------------------------------------
+Executing test browseKeepsCamera...
+PASS
+------------------------------------------------------------------------------
+Executing test metadataValidation...
+G0 bounds residual meters: 931.576282
+PASS
+------------------------------------------------------------------------------
+Executing test coordinatesWithoutInternetAndAtPoles...
+PASS
+------------------------------------------------------------------------------
+Executing test coordinatesAndCreditsFitRoundScreen...
+DEBUG (23:21): Coordinate/credit width 188 / 370.120392
+DEBUG (23:21): Coordinate/credit width 209 / 328.587738
+DEBUG (23:21): Coordinate/credit width 234 / 267.492401
+DEBUG (23:21): Coordinate/credit width 138 / 179.049728
+DEBUG (23:21): Coordinate/credit width 120 / 305.842743
+DEBUG (23:21): Coordinate/credit width 166 / 305.842743
+DEBUG (23:21): Coordinate/credit width 194 / 327.464294
+DEBUG (23:21): Coordinate/credit width 209 / 354.982300
+DEBUG (23:21): Coordinate/credit width 224 / 295.408508
+DEBUG (23:21): Coordinate/credit width 102 / 208.036362
+DEBUG (23:21): Coordinate/credit width 151 / 208.036362
+PASS
+------------------------------------------------------------------------------
+Executing test repeatedSessionsAndTwoHourGpsStream...
+DEBUG (23:21): 40 sessions / 15000 GPS events / 160 bitmap replacements; baseline=46656, peak=46656, end=46768, bitmap overlap peak=65560
+PASS
+------------------------------------------------------------------------------
+Executing test realProviderMetadataIsAuthenticatedAndAtomic...
+PASS
+
+==============================================================================
+RESULTS
+Test:                                        Status:
+decimalCoordinateWirePrecision               PASS
+smallStorageProbeRoundTrip                   PASS
+projectionControlPoints                      PASS
+projectionHemispheres                        PASS
+antimeridianAndBadCoordinates                PASS
+gpsAgesAndInvalidSamples                     PASS
+boundedTraceAndGaps                          PASS
+traceSimplifiesStationaryFixes               PASS
+requestCoalescingAndBackoff                  PASS
+oldCallbackCannotReleaseNewJob               PASS
+renderEveryScreenAndRaster                   PASS
+downloadedPaletteUsesNativeRaster            PASS
+criticalLabelsFitRoundScreen                 PASS
+malformedMetadataPreservesActiveMap          PASS
+menuAndFollowControls                        PASS
+staleRasterCannotReplaceNewCamera            PASS
+browseKeepsCamera                            PASS
+metadataValidation                           PASS
+coordinatesWithoutInternetAndAtPoles         PASS
+coordinatesAndCreditsFitRoundScreen          PASS
+repeatedSessionsAndTwoHourGpsStream          PASS
+realProviderMetadataIsAuthenticatedAndAtomic PASS
+Ran 22 tests
+
+PASSED (passed=22, failed=0, errors=0)

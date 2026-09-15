@@ -1,0 +1,107 @@
+------------------------------------------------------------------------------
+Executing test projectionAndDateLine...
+PASS
+------------------------------------------------------------------------------
+Executing test gpsFreshnessQualityAndPolar...
+PASS
+------------------------------------------------------------------------------
+Executing test stationaryNoiseDoesNotGrowTrace...
+DEBUG (11:14): SYNTHETIC: 600 stationary fixes, +/-3 m: 1 point / 0 m trace
+PASS
+------------------------------------------------------------------------------
+Executing test walkingAndSlowWalkingRemainResponsive...
+PASS
+------------------------------------------------------------------------------
+Executing test unknownSpeedStillWalks...
+PASS
+------------------------------------------------------------------------------
+Executing test isolatedAndPersistentJumps...
+PASS
+------------------------------------------------------------------------------
+Executing test ordinarySpikeMedianRejection...
+PASS
+------------------------------------------------------------------------------
+Executing test gapsDoNotAccumulateTeleportDistance...
+PASS
+------------------------------------------------------------------------------
+Executing test movementAcrossDateLine...
+PASS
+------------------------------------------------------------------------------
+Executing test stopThenResumeMoving...
+PASS
+------------------------------------------------------------------------------
+Executing test gridZoomPanAndLimits...
+PASS
+------------------------------------------------------------------------------
+Executing test recordingPauseResumeSave...
+PASS
+------------------------------------------------------------------------------
+Executing test recordingFailuresRetainRecoverableHandle...
+PASS
+------------------------------------------------------------------------------
+Executing test discardFailureAndNoSession...
+PASS
+------------------------------------------------------------------------------
+Executing test nativeFitSessionSmoke...
+DEBUG (11:14): Native simulator FIT start/pause/resume/discard PASS; physical sync NOT RUN
+PASS
+------------------------------------------------------------------------------
+Executing test boundedLongTraceAndRepeatedSessions...
+DEBUG (11:14): SYNTHETIC 30 sessions / 30000 fixes; peak measured heap bytes: 59496
+PASS
+------------------------------------------------------------------------------
+Executing test homeDoesNotStartGpsAndStopReleases...
+PASS
+------------------------------------------------------------------------------
+Executing test englishTextAndRoundScreenFit...
+DEBUG (11:14): All English pages rendered, both themes; screenshot review separate
+PASS
+------------------------------------------------------------------------------
+Executing test nativeFitSaveAndAllSportTypes...
+DEBUG (11:14): SYNTHETIC simulator native FIT save PASS; Walk/Run/Hike/Bike creation PASS
+PASS
+------------------------------------------------------------------------------
+Executing test hiddenAppAndRecordingExitLifecycle...
+PASS
+------------------------------------------------------------------------------
+Executing test redrawStressAndSharpTurn...
+DEBUG (11:14): SYNTHETIC 1000 redraws + 90-degree turn; heap peak bytes: 62096
+PASS
+------------------------------------------------------------------------------
+Executing test noPersistentPreferencesOrGpsData...
+DEBUG (11:14): No application persistence: old keys removed; grid-only session creates no preferences/GPS history
+PASS
+------------------------------------------------------------------------------
+Executing test repeatedGpsLifecycleDoesNotRetainTrace...
+DEBUG (11:14): 40 GPS start/stop cycles / 12000 fixes; peak post-stop heap bytes: 42880
+PASS
+
+==============================================================================
+RESULTS
+Test:                                    Status:
+projectionAndDateLine                    PASS
+gpsFreshnessQualityAndPolar              PASS
+stationaryNoiseDoesNotGrowTrace          PASS
+walkingAndSlowWalkingRemainResponsive    PASS
+unknownSpeedStillWalks                   PASS
+isolatedAndPersistentJumps               PASS
+ordinarySpikeMedianRejection             PASS
+gapsDoNotAccumulateTeleportDistance      PASS
+movementAcrossDateLine                   PASS
+stopThenResumeMoving                     PASS
+gridZoomPanAndLimits                     PASS
+recordingPauseResumeSave                 PASS
+recordingFailuresRetainRecoverableHandle PASS
+discardFailureAndNoSession               PASS
+nativeFitSessionSmoke                    PASS
+boundedLongTraceAndRepeatedSessions      PASS
+homeDoesNotStartGpsAndStopReleases       PASS
+englishTextAndRoundScreenFit             PASS
+nativeFitSaveAndAllSportTypes            PASS
+hiddenAppAndRecordingExitLifecycle       PASS
+redrawStressAndSharpTurn                 PASS
+noPersistentPreferencesOrGpsData         PASS
+repeatedGpsLifecycleDoesNotRetainTrace   PASS
+Ran 23 tests
+
+PASSED (passed=23, failed=0, errors=0)

@@ -1,37 +1,35 @@
-# ADR 001 — G0 sınırı ve araç hedefi
+# ADR 001 — G0 scope and toolchain target
 
-Durum: kabul edilen yerel uygulama kararı, 14 Eylül 2026.
+Accepted local implementation decision, 14 September 2026. Historical raster
+architecture; [ADR 007](007-local-only-no-recording.md) defines the current scope.
 
-Gereksinim bölümleri 5, 20 ve 22, fiziksel GPS/raster/iPhone doğrulaması olmadan
-sonraki aşamaya geçilmemesini ister. Bu nedenle ürün G0 prototipi olarak teslim
-edilir. Geniş portal, hesap eşleme, gerçek harita sağlayıcısı, GPX işleme, FIT kaydı
-ve offline paket yapılmadı. Bunların yerine geçiyormuş gibi demo ekranı sunulmaz.
+The original specification required physical GPS, raster and iPhone evidence
+before advancing beyond G0. A local simulator pass could not pass that gate.
+The initial delivery excluded a large portal, production account pairing, GPX
+processing, FIT recording and offline map packages.
 
-Tek Monkey C Watch App + tek FastAPI süreci seçildi. Alternatif, daha ilk günden
-vektör renderer/özel iOS uygulaması kurmaktı; cihaz yeteneği henüz fiziksel olarak
-ölçülmediğinden bunun ek maliyeti ve riski gerekçelendirilemiyor. Raster adaptörü
-küçük ve değiştirilebilir tutuldu. Python yalnız `.venv` içinde.
+One Monkey C Watch App and one FastAPI process were selected. Starting with a full
+vector engine or a custom iOS app would add cost before device capability was
+measured. The raster adapter stayed small and replaceable. Python used `.venv`.
 
-Garmin SDK Manager’ın **Forerunner 165** paketi `deviceId=fr165`, ekran
-390×390, API 5.2, Watch App limiti 786432 bayt bildiriyor. Gereksinimde kullanılan
-`forerunner165` adı gerçek CLI kimliği olmadığı için `make build-watch` **fr165**
-hedefini kullanır. Başka modele düşülmez. `compiler.json` içindeki firmwareVersion
-cihaz paketinin bilgisi olup kullanıcının saatinden okunmuş sürüm değildir.
+SDK Manager's Forerunner 165 package reports `deviceId=fr165`, 390 × 390 pixels,
+API 5.2 and a Watch App limit of 786432 bytes. The original `forerunner165` name is
+not the CLI identifier; all builds use `fr165`, never a substitute model.
+The device package's `firmwareVersion` is not a measurement of the user's watch.
 
-SDK sürümü 9.2.0 ve cihaz paketinin kimliği `toolchain.lock.json` içinde sabittir.
-SDK indirme sayfasındaki yayın tarihi ile arşiv kataloğunun tarihi farklı olabilir;
-kanıt, indirilen `2026-06-09-92a1605b2` arşivinin SHA256’sı ve gerçek araç çıktısıdır.
+SDK 9.2.0 and the device package are pinned in `toolchain.lock.json`. The archive
+`2026-06-09-92a1605b2`, its SHA256 and actual tool output identify the installation;
+dates in the SDK catalogue and download page can differ.
 
-Simülatör testi `drawScaledBitmap` fonksiyonunun bu modelde bulunmadığını gösterdi.
-Yerine cihazı destekleyen `drawBitmap2` + `AffineTransform` kullanıldı. Minimum
-uygulama API’si bu fonksiyon için **4.2.1** seçildi; cihazın API 5.2 desteğiyle
-karıştırılmaz. Görüntü dönüşümleri ve font boyutları simülatörde çalıştırıldı.
+The simulator lacked `drawScaledBitmap` on this target. The raster prototype used
+`drawBitmap2` with `AffineTransform`, requiring minimum API 4.2.1. This minimum is
+separate from the device's API 5.2 support. Rendering and fonts were tested locally.
+The later physical bitmap correction is recorded in ADR 005.
 
-G0 sonrasında gerçek raster sağlayıcısı seçilirken sunucuda işleme, yeniden
-boyutlandırma, cache, atıf ve maliyet hakları ayrıca doğrulanacak. Standart OSM tile
-sunucusuna otomatik istek veya toplu indirme yapılmadı.
+Provider processing, resizing, cache, attribution and cost rights required a separate
+decision. Standard OSM tiles were not automatically requested or downloaded in bulk.
 
-Kaynaklar: [Garmin SDK](https://developer.garmin.com/connect-iq/sdk/),
+References: [Garmin SDK](https://developer.garmin.com/connect-iq/sdk/),
 [Graphics Dc](https://developer.garmin.com/connect-iq/api-docs/Toybox/Graphics/Dc.html),
 [Communications](https://developer.garmin.com/connect-iq/api-docs/Toybox/Communications.html).
-API isimleri ayrıca indirilen SDK’nın yerel belgeleri ve cihaz simülatörüyle doğrulandı.
+API names were also checked against installed SDK documentation and the simulator.

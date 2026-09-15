@@ -1,103 +1,66 @@
-# Tek seferlik G0 saha kontrol listesi
+# Historical raster field checklist
 
-Simülatör gözlemleri `docs/evidence/simulator.json` içinde ayrı kaydedilir.
-Fiziksel sonuçlar gelmeden G0 geçmez.
+This checklist describes the former map application. Use the
+[current grid checklist](grid-field-test.md) for FieldGrid. Simulator evidence and
+physical results are separate; missing physical observations cannot pass G0.
 
-## 1. Mac’te görsel kontrol
+## Simulator review
 
-1. Ağsız ekran/GPS kontrolü için `make sim-offline` kullanın. Tam PNG aktarımı
-   için kullanıcı onaylı [HTTPS test planını](https-simulator-test.md) uygulayın;
-   localhost metadata döndürse de Garmin dönüştürücüsü PNG'ye erişemez.
-2. Uygulama İngilizce açılır. START veya DOWN öncesi GPS başlamamalı. START harita,
-   DOWN ise ağ isteği yapmayan GPS-only/enlem-boylam oturumu başlatır.
-3. Simulation → Activity Data → FIT/GPX Playable File → Load File ile
-   `tests/fixtures/synthetic-walk.gpx` seçin. Alttaki üçgen oynatma düğmesini
-   kullanın; Data Field Timer Start ayrı bir kontroldür. Settings → Set GPS
-   Quality → Good seçin. Bu kayıt tamamen yapaydır. Daha uzun deney için
-   `.venv/bin/python scripts/synthetic_walk.py` komutunun ürettiği
-   `build/synthetic-20min.gpx` dosyasını seçebilirsiniz.
-4. Konum işareti, iz, GPS yaşı, gerçek haritada OpenMapTiles/OSM atfı
-   (sentetik modda test etiketi) ve yuvarlak kenarlarda
-   kırpılma olmadığını kontrol edin. UP/DOWN ile üç zoom; menü ile iki tema ve
-   195/256/390 boyutlarını deneyin. Kaydırma modunda START yön eksenini değiştirir,
-   BACK tek adımda konuma döner.
-5. API’yi Ctrl+C ile durdurun. GPS/iz devam etmeli; harita/bağlantı hatası ayrı
-   görünmeli. Tekrar `make api` ile geri gelmelidir. Menüden oturumu bitirin.
+1. The former offline command tested screen/GPS without network. Full PNG transfer
+   needed the separately authorized [HTTPS plan](https-simulator-test.md), since the
+   external Garmin converter could not fetch localhost images.
+2. Confirm English UI and no GPS before explicit START or DOWN. The former START
+   opened maps; DOWN opened coordinates without map requests.
+3. Explicitly load `tests/fixtures/synthetic-walk.gpx`, use the playback triangle
+   rather than Data Field Timer Start, and set GPS quality to Good. Longer generated
+   data was available through `.venv/bin/python scripts/synthetic_walk.py`.
+4. Inspect marker, trace, age, visible attribution and English labels at 390 px.
+   Test three zooms, both themes, 195/256/390 rasters and pan axes; BACK recentered.
+5. Stop the API and check continuing GPS, separate network status and recovery after
+   restart. End the session after testing.
 
-Yerel HTTP metadata deneyi, simülatörün Use Device HTTPS Requirements seçeneğiyle
-engellenebilir (-1001). Yalnızca localhost deneyi için bu simülasyon seçeneği
-kapatılabilir; HTTPS testi ve normal kullanımda açık tutulmalıdır. Fiziksel PRG
-HTTP kabul etmez. SDK 9.2.0 GPS oynatımı sırasında yeniden yüklemede takılırsa
-simülatörü tamamen kapatın, yeniden başlatın ve fixture'ı tekrar yükleyin.
+The SDK could reject loopback HTTP with -1001 under device HTTPS requirements.
+Any temporary simulator adjustment applied only to the approved loopback experiment;
+normal and physical use retained HTTPS. A reload during GPS playback sometimes
+required closing/reopening the simulator and loading the fixture again.
 
-## 2. Fiziksel saate yükleme
+## Historical physical installation
 
-1. `make build-watch` çalıştırın. Çıktı `build/FieldMap.prg`; debug eşlikçisi
-   `build/FieldMap.prg.debug.xml`. `FieldMap-simulator.prg` saate kopyalanmaz.
-2. Saati veri destekli USB kablosuyla bağlayın. Gerekirse saat USB/MTP modunu kendi
-   menüsünden seçin. macOS için [OpenMTP](https://github.com/ganeshrvel/openmtp)
-   kullanılabilir. Bu Mac’te OpenMTP 3.3.0 arm64 geçici dizinden çalıştırıldı;
-   Kalam motoru ile aktarım ve geri okuma doğrulandı. Sistem geneline kurulmadı.
-   MTP seçili olduğu halde normal saat/şarj ekranı kalır ve istemci depolamayı
-   açamazsa, kabloyu çıkarıp saati normal kapatıp açtıktan sonra yeniden bağlamak
-   bu cihazda sorunu çözdü. Bu bir fabrika sıfırlaması veya firmware değişikliği değildir.
-3. PRG’yi saatin `GARMIN/APPS` klasörüne kopyalayın. Mevcut dosyaları silmeyin.
-   Saati güvenli ayırın; uygulama listesinde FieldMap G0’ı açın.
-4. START’a basın, açık alanda GPS’i bekleyin. **DOWN ile internet olmadan enlem/boylam alınabilir. HTTPS renderer ayarı
-   olmadan yeni sokak haritası indirilemez; OpenFreeMap gerçek harita desteği vardır.**
+Build only `fr165`, copy the PRG rather than its debug companion, and connect with a
+USB data cable. OpenMTP 3.3.0 arm64 in Kalam mode was validated from `/tmp`, without a
+system installation. If the device showed only charging despite MTP selection, a
+normal power cycle and reconnect resolved earlier transfer failures. This was not
+a factory reset or firmware change. Do not delete personal files.
 
-## 3. Fiziksel kanıt formu
+Copy the app to `GARMIN/Apps`, disconnect and open it. The former FieldMap START
+required reachable HTTPS for maps; DOWN offered offline coordinates. Current
+FieldGrid has no map download or server requirement.
 
-| Alan | Doldurulacak değer |
-|---|---|
-| Tarih, saat, kaynak commit / SHA256 | |
-| Saat model / firmware / Connect IQ API | |
-| iPhone model / iOS / Garmin Connect sürümü | |
-| PRG SHA256 (`shasum -a 256 build/FieldMap.prg`) | |
-| Ekran parlaklığı / always-on / GPS modu / sıcaklık | |
-| Başlangıç-bitiş pil / test süresi | |
-| Heap boş / tepe / görüntü boyutu | |
-| Gözlenen hata kodu / tekrar toparlanma | |
+## Evidence fields
 
-İlk 20–30 dakikalık yürüyüşte z14/z15/z16, kaydırma/merkezleme, GPS zayıflaması ve
-oturumdan çıkış denenir. Tanılama ekranındaki en yüksek heap, başarılı harita sayısı ve son
-süreyi not edin. Sadece ana ekranı açabilmek GPS/raster kabulü değildir.
+Record artifact/source digest, SDK/device version, firmware, iPhone/iOS/GCM if
+relevant, brightness, always on, GPS mode, temperature, duration, battery before/after,
+heap/peak, image size, error code, recovery and PASS/FAIL/NOT RUN. Do not publish real
+coordinates, private URLs or identifiers. A home screen alone was not raster acceptance.
 
-## 4. iPhone / HTTPS deneyi
+## Historical phone profiles
 
-Önce özel HTTPS origin hazırlığı [setup.md](setup.md) uyarınca yapılmalı. Telefon
-köprüsünün erişemeyeceği localhost ile bu test geçerli olmaz.
+H01: locked phone/GCM background for at least 30 minutes and all raster sizes.
+H02: another phone app open. H03: GCM force closed, without assuming success.
+H04: internet off, Bluetooth on. H05: outside Bluetooth range and return.
+H06: weak GPS, quality/age and trace gap. H07: dimming, inactive and exit behavior.
+H08: device/phone restart and fresh GPS.
 
-| Profil | En az yapılacak gözlem |
-|---|---|
-| H01 iPhone kilitli, GCM arka planda | En az 30 dakika ardışık raster; 195/256/390 aktarım süreleri |
-| H02 Telefon başka uygulamada | Raster yenileme ve kontrol yanıtı |
-| H03 GCM zorla kapalı | Başarı garantisi yok; gözlenen bağlantı sonucu |
-| H04 İnternet kapalı, Bluetooth açık | GPS açık kalır; harita durumu ayrı; geri bağlantı toparlar |
-| H05 Bluetooth menzili dışı | Eski harita kapsamı / GPS / geri bağlantı |
-| H06 GPS zayıf | Kalite, 5 s yaş eşiği, kesintide çizilmeyen iz segmenti |
-| H07 Bilek indirme, ekran sönme, çıkış | Abonelik yaşam döngüsü ve taze fix bekleme |
-| H08 Saat/telefon yeniden başlatma | Ayarlar ve yeni oturum; eski iz kalıcı olmamalı |
+Begin with a 20–30 minute walk and then two hours of endurance. Battery NFR09 needed
+at least three matched reference sessions. Latency targets needed 300 GPS events,
+100 button actions, 20 first maps and 100 area changes. Single observations could
+not establish p95 or full resource acceptance.
 
-Sonra iki saat dayanıklılık yapılır. Pil için aynı koşullardaki referans GPS
-oturumuyla en az üç eşleştirilmiş deney gerekir. Tek pil yüzdesi NFR09’u kanıtlamaz.
-GPS → çizim gecikmesi en az 300 örnek, düğme gecikmesi 100 eylem, soğuk harita 20,
-alan yenileme 100 örnekle ölçülmelidir. Hedefler gereksinim belgesindeki gibidir.
+The old Storage probe wrote/read/compared/deleted 1024 ASCII characters. A larger
+attempt had caused uncaught OOM, so it was removed from the live menu. That 1K pass
+was not total capacity, bitmap persistence or restart evidence. The current grid
+has no probe and no new persistent writes.
 
-Storage probe menüsü 1024 karakterlik ASCII metni yazıp okur ve siler (`1K OK`).
-Önceki büyük değer denemesi SDK'da yakalanamayan Out Of Memory hatası verdiği için
-canlı uygulamadan kaldırıldı. Bu sonuç toplam kapasite ölçümü değildir.
-Bitmap kalıcılığı, yeniden başlatma sonrası geri okuma ve toplam Object Store limiti
-ayrıca POC06’da ölçülmelidir; bu testler tamamlandı sayılmaz.
-
-Gerçek ekran/iz paylaşımı isteğe bağlıdır. Paylaşmadan önce konum, özel URL veya
-kimlik bilgisi bulunmadığını kontrol edin; yalnız sürüm, sayaç, hata kodu ve
-PASS/FAIL gözlemi yeterli başlangıç geri bildirimidir.
-
-## 5. İngilizce konum ve kaynak kontrolü
-
-DOWN: GPS only → beklerken `--`; fix gelince Latitude/Longitude, Age, WGS84.
-Poor kalitesinde son koordinat sabit kalmalı, Last known fix ve büyüyen yaş görünmeli;
-Good geri geldiğinde Current fix olmalı. Bu sırada API kapalıdır. BACK → map →
-START → Diagnostics bölümünde Images 0 kalır. Map credits ve iki tema da 390px
-yuvarlak alanda incelenir. Gerçek enlem/boylamı halka açık kanıta eklemeyin.
+In offline coordinate checks, Poor quality retained the last coordinate and increased
+age; Good recovered a fresh fix. Network Images remained zero. Review of any real
+screen or trace was optional and required removing private information before sharing.

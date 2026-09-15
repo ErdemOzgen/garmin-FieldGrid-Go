@@ -1,0 +1,82 @@
+{
+  "status": "PASS",
+  "target": "fr165",
+  "sdkVersion": "9.2.0",
+  "deviceVersion": "3d0fb192a2cf01699aefd0f384af3f527e5885bd",
+  "sourceSha256": "e28dc8e1ba43ed8034090e792feb572ccf77cc635759c25eaa24b08677885cef",
+  "sourceCommit": "b06f5313381a356b72b74f02712982fc50a2930e",
+  "watchSourcesDirty": true,
+  "artifactSha256": "a9df273ed1236664dc4ef881320a2de6bbeebc6b84ff8183cc1c539fa75a2ac7",
+  "unitTests": false,
+  "simulator": false,
+  "offline": true,
+  "networkEnabled": false,
+  "warnings": 0,
+  "measuredAtUtc": "2026-09-15T09:18:05.362225+00:00",
+  "artifactBytes": 124668,
+  "watchTests": {
+    "status": "PASS",
+    "passed": 23,
+    "rawSdkExitCode": 1,
+    "sourceSha256": "e28dc8e1ba43ed8034090e792feb572ccf77cc635759c25eaa24b08677885cef",
+    "artifactSha256": "db4a6fc351063891fbb1c9c6f05d686d4d15aa86c8316f538050774b86168fae"
+  },
+  "pythonTests": {
+    "passed": 92,
+    "failures": 0,
+    "legacyRendererCoveragePercent": 96
+  },
+  "syntheticOnly": true,
+  "physicalGridAndFitAcceptance": "NOT RUN",
+  "watchDeployment": "NOT RUN - recording retention choice pending",
+  "visualReview": {
+    "status": "PASS",
+    "target": "fr165",
+    "size": [
+      390,
+      390
+    ],
+    "checks": [
+      "English home, no fix, raw coordinates, day/night, stats, diagnostics",
+      "Pan both axes and follow, zoom",
+      "Native record/pause/save UI checked in preceding local run; native save/discard in current unit tests"
+    ],
+    "finalScreenshots": [
+      "final-synthetic-coordinates.png",
+      "final-synthetic-diagnostics.png",
+      "final-synthetic-grid-day.png",
+      "final-synthetic-grid-night.png",
+      "final-synthetic-stats.png"
+    ],
+    "earlierScreenshotSourceSha256": "e9764c25d2806e1f7e2aaac26afec08a68f5c2b47d2e2633ef6c2ef33332612a"
+  },
+  "resourceTests": {
+    "traceCapacity": 180,
+    "filterCapacity": 3,
+    "networkRequests": 0,
+    "mapImages": 0,
+    "applicationPersistentWrites": 0,
+    "stationary600FixesTracePoints": 1,
+    "stationaryTraceDistanceMeters": 0,
+    "repeatedTraceSessions": 30,
+    "repeatedTraceFixes": 30000,
+    "repeatedTracePeakHeapBytes": 59496,
+    "drawFrames": 1000,
+    "drawPeakHeapBytes": 62096,
+    "gpsLifecycleCycles": 40,
+    "gpsLifecycleFixes": 12000,
+    "postStopPeakHeapBytes": 42880,
+    "postWarmupAllowedGrowthBytes": 512,
+    "limits": "Heaps include test harness; native graphics/FIT storage and physical battery not measured."
+  },
+  "remaining": [
+    "Native FIT after-sync deletion API is unavailable; user preference pending",
+    "Physical FIT sync and activity type verification",
+    "Two-hour physical GPS/battery/storage/interruptions"
+  ],
+  "failuresResolved": [
+    "SDK temporary directory had been cleaned; official locked archive restored to /tmp after hash verification",
+    "Initial callback typings and old BufferedBitmap constructor in test harness corrected",
+    "Test helper annotation and missing test Math import corrected"
+  ]
+}

@@ -1,11 +1,9 @@
 import Toybox.Graphics;
+import Toybox.Position;
 import Toybox.Math;
 import Toybox.Lang;
 import Toybox.System;
 import Toybox.WatchUi;
-import Toybox.Position;
-
-function textResource(id) { return WatchUi.loadResource(id); }
 
 class FieldView extends WatchUi.View {
     var session as FieldSession;
@@ -13,274 +11,247 @@ class FieldView extends WatchUi.View {
     var selection = 0;
     var panAxis = 0;
     var menuItems as Array;
+    var smallFont = null;
+    var tinyFont = null;
+    var fontsReady = false;
+    var rawCoordinates = false;
 
     function initialize(s) {
         View.initialize(); session = s;
-        menuItems = [Rez.Strings.Follow, Rez.Strings.Browse, Rez.Strings.Theme,
-            Rez.Strings.Profile, Rez.Strings.Diagnostics, Rez.Strings.StorageTest,
-            Rez.Strings.Retry, Rez.Strings.Stop, Rez.Strings.Coordinates, Rez.Strings.MapCredits];
+        menuItems = ["Follow position", "Browse grid", "Live stats", "GPS coordinates",
+            "Day / night", "Diagnostics", "Retry GPS", "Pause / end"];
     }
-
+    function fonts() {
+        if (fontsReady) { return; } fontsReady = true;
+        try {
+            smallFont = Graphics.getVectorFont({:face => ["RobotoCondensedRegular", "RobotoRegular"], :size => 24});
+            tinyFont = Graphics.getVectorFont({:face => ["RobotoCondensedRegular", "RobotoRegular"], :size => 18});
+        } catch (e) {}
+        if (smallFont == null) { smallFont = Graphics.FONT_XTINY; }
+        if (tinyFont == null) { tinyFont = Graphics.FONT_XTINY; }
+    }
     function line(dc, y, text, color, font) {
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
         dc.drawText(195, y, font, text, Graphics.TEXT_JUSTIFY_CENTER);
     }
-
-    function menuFont(dc, label) {
-        return dc.getTextWidthInPixels(label, Graphics.FONT_SMALL) <= 264 ?
-            Graphics.FONT_SMALL : Graphics.FONT_XTINY;
+    function status() {
+        var g = session.gps;
+        if (!session.running) { return "PAUSED"; }
+        if (g.lat == null) { return "Waiting for GPS"; }
+        if (!g.usable(System.getTimer())) { return "GPS stale / weak"; }
+        return (g.quality == Position.QUALITY_GOOD ? "GOOD" : "USABLE") + " / " + g.filter.status;
     }
-
+    function coordinateValues() as Array {
+        var g = session.gps;
+        if (rawCoordinates) { return [g.lat, g.lon]; }
+        return g.xy == null ? [null, null] : Geo.inverse(g.xy[0], g.xy[1]);
+    }
     function onUpdate(dc as Graphics.Dc) as Void {
-        var m = session.map; var gps = session.gps;
-        var night = "night".equals(m.style);
-        var bg = night ? 0x102128 : 0xEAF0E9;
-        var ink = night ? 0xEEF4EE : 0x193E38;
+        fonts();
+        var g = session.gps; var m = session.grid;
+        var bg = m.night ? 0x102128 : 0xEDF3EE;
+        var ink = m.night ? 0xEDF5EF : 0x193E38;
         dc.setColor(ink, bg); dc.clear();
         if (page == :home) {
-            line(dc, 43, "FIELDMAP", ink, Graphics.FONT_SMALL);
-            line(dc, 96, "FORERUNNER 165 / G0", 0x63867A, Graphics.FONT_XTINY);
-            line(dc, 141, textResource(Rez.Strings.Consent1), ink, Graphics.FONT_XTINY);
-            line(dc, 173, textResource(Rez.Strings.Consent2), ink, Graphics.FONT_XTINY);
-            line(dc, 205, textResource(Rez.Strings.Consent3), ink, Graphics.FONT_XTINY);
-            line(dc, 237, textResource(Rez.Strings.Consent4), ink, Graphics.FONT_XTINY);
-            dc.setColor(0x187C69, Graphics.COLOR_TRANSPARENT);
-            dc.fillRoundedRectangle(83, 280, 224, 48, 24);
-            line(dc, 287, textResource(Rez.Strings.OpenMap), 0xFFFFFF, Graphics.FONT_XTINY);
-            line(dc, 335, "DOWN: GPS", ink, Graphics.FONT_XTINY);
+            line(dc, 43, "FIELDGRID", ink, Graphics.FONT_SMALL);
+            line(dc, 104, "OFFLINE GPS / G0", ink, smallFont);
+            line(dc, 155, "Nothing saved or shared", ink, smallFont);
+            line(dc, 211, "START: Open grid", ink, smallFont);
+            line(dc, 247, "DOWN: Coordinates", ink, smallFont);
+            line(dc, 290, session.lastResult == null ? "GPS starts on your action" : session.lastResult, ink, tinyFont);
+            line(dc, 323, session.error == null ? "BACK: Exit" : session.error, ink, tinyFont);
             return;
         }
         if (page == :menu) {
-            line(dc, 37, "FIELDMAP", ink, Graphics.FONT_SMALL);
+            line(dc, 40, "FIELDGRID", ink, Graphics.FONT_SMALL);
             var first = (selection / 4) * 4;
             for (var j = 0; j < 4; j++) {
                 var index = first + j;
                 if (index >= menuItems.size()) { break; }
-                var y = 94 + j * 48;
+                var y = 104 + j * 46;
                 if (index == selection) {
-                    dc.setColor(0x187C69, Graphics.COLOR_TRANSPARENT);
-                    dc.fillRoundedRectangle(53, y, 284, 45, 15);
+                    dc.setColor(0x187C69, Graphics.COLOR_TRANSPARENT); dc.fillRoundedRectangle(51, y - 5, 288, 42, 12);
                 }
-                var label = textResource(menuItems[index]);
-                var font = menuFont(dc, label);
-                line(dc, y + (45 - dc.getFontHeight(font)) / 2, label, index == selection ? 0xFFFFFF : ink, font);
+                line(dc, y, menuItems[index], index == selection ? 0xFFFFFF : ink, smallFont);
             }
-            line(dc, 305, (selection + 1).toString() + " / " + menuItems.size(), ink, Graphics.FONT_XTINY);
-            line(dc, 338, textResource(Rez.Strings.Back), ink, Graphics.FONT_XTINY);
-            return;
+            line(dc, 303, (selection + 1) + " / " + menuItems.size(), ink, smallFont);
+            line(dc, 338, "BACK: Grid", ink, tinyFont); return;
+        }
+        if (page == :finish) {
+            line(dc, 45, "SESSION PAUSED", ink, smallFont);
+            line(dc, 110, Geo.timeText(session.seconds()) + " / " + Geo.distanceText(session.distance()), ink, smallFont);
+            line(dc, 155, "End clears this session", ink, tinyFont);
+            var choices = ["Resume", "End session"];
+            for (var k = 0; k < choices.size(); k++) {
+                var yy = 209 + k * 47;
+                if (selection == k) { dc.setColor(0x187C69, Graphics.COLOR_TRANSPARENT); dc.fillRoundedRectangle(53, yy - 4, 284, 38, 10); }
+                line(dc, yy, choices[k], selection == k ? 0xFFFFFF : ink, smallFont);
+            }
+            line(dc, 334, "START: Select", ink, tinyFont); return;
         }
         if (page == :coordinates) {
-            line(dc, 42, "GPS POSITION", ink, Graphics.FONT_XTINY);
-            line(dc, 82, gps.usable(System.getTimer()) ? "Current fix" : (gps.lat == null ? "Waiting for GPS" : "Last known fix"), ink, Graphics.FONT_XTINY);
-            line(dc, 125, "Latitude", ink, Graphics.FONT_XTINY);
-            line(dc, 156, Geo.displayCoordinate(gps.lat), ink, Graphics.FONT_SMALL);
-            line(dc, 214, "Longitude", ink, Graphics.FONT_XTINY);
-            line(dc, 245, Geo.displayCoordinate(gps.lon), ink, Graphics.FONT_SMALL);
-            var age = gps.age(System.getTimer());
-            line(dc, 301, age == null ? "No fix yet" : "Age " + Geo.min(9999, age).toNumber() + "s / WGS84", ink, Graphics.FONT_XTINY);
-            line(dc, 337, "BACK to map", ink, Graphics.FONT_XTINY);
-            return;
+            var ll = coordinateValues();
+            line(dc, 40, rawCoordinates ? "RAW GPS / WGS84" : "FILTERED / WGS84", ink, smallFont);
+            line(dc, 80, status(), ink, smallFont);
+            line(dc, 123, "Latitude", ink, smallFont);
+            line(dc, 154, Geo.displayCoordinate(ll[0]), ink, Graphics.FONT_SMALL);
+            line(dc, 215, "Longitude", ink, smallFont);
+            line(dc, 246, Geo.displayCoordinate(ll[1]), ink, Graphics.FONT_SMALL);
+            var age = g.age(System.getTimer());
+            line(dc, 297, age == null ? "No fix yet" : (!rawCoordinates && g.xy == null ? "Polar limit: use Raw" :
+                "Fix age " + Geo.min(9999, age).toNumber() + "s"), ink, smallFont);
+            line(dc, 329, rawCoordinates ? "START: Filtered" : "START: Raw", ink, tinyFont);
+            line(dc, 353, "BACK: Grid", ink, tinyFont); return;
         }
-        if (page == :credits) {
-            line(dc, 56, "MAP CREDITS", ink, Graphics.FONT_XTINY);
-            line(dc, 105, "OpenFreeMap", ink, Graphics.FONT_SMALL);
-            line(dc, 161, "© OpenMapTiles", ink, Graphics.FONT_XTINY);
-            line(dc, 201, "© OpenStreetMap", ink, Graphics.FONT_XTINY);
-            line(dc, 241, "OSM contributors / ODbL", ink, Graphics.FONT_XTINY);
-            line(dc, 285, "openstreetmap.org", ink, Graphics.FONT_XTINY);
-            line(dc, 337, "BACK to map", ink, Graphics.FONT_XTINY);
-            return;
+        if (page == :stats) {
+            line(dc, 38, "LIVE STATS", ink, smallFont);
+            line(dc, 75, status(), ink, tinyFont);
+            line(dc, 103, Geo.timeText(session.seconds()), ink, Graphics.FONT_SMALL);
+            line(dc, 163, Geo.distanceText(session.distance()), ink, Graphics.FONT_SMALL);
+            var speed = session.speed();
+            line(dc, 222, speed == null ? "Speed --" : (speed * 3.6).format("%.1f") + " km/h", ink, smallFont);
+            var pace = speed != null && speed >= 0.3 ? Geo.timeText(1000 / speed) + " /km" : "-- /km";
+            line(dc, 257, pace, ink, smallFont);
+            line(dc, 303, "Filtered distance estimate", ink, tinyFont);
+            line(dc, 338, "BACK: Grid", ink, tinyFont); return;
         }
         if (page == :diagnostics) {
-            line(dc, 45, textResource(Rez.Strings.Diagnostics), ink, Graphics.FONT_XTINY);
+            line(dc, 42, "DIAGNOSTICS", ink, smallFont);
+            line(dc, 83, "v0.2.3 / fr165 / G0", ink, smallFont);
+            line(dc, 119, "Network OFF / Storage OFF", ink, smallFont);
             var stats = System.getSystemStats();
-            line(dc, 83, "v0.1.0 / G0", ink, Graphics.FONT_XTINY);
-            line(dc, 115, textResource(Rez.Strings.Phone) + ": " + textResource(System.getDeviceSettings().phoneConnected ? Rez.Strings.Yes : Rez.Strings.No), ink, Graphics.FONT_XTINY);
-            line(dc, 147, textResource(Rez.Strings.LastCode) + ": " + m.lastCode, ink, Graphics.FONT_XTINY);
-            line(dc, 179, "RAM " + (stats.usedMemory / 1024) + " / " + textResource(Rez.Strings.Peak) + " " + (session.peakMemory / 1024) + " KiB", ink, Graphics.FONT_XTINY);
-            line(dc, 211, textResource(Rez.Strings.Images) + " " + m.imageCount + " / " + m.lastDuration + " ms", ink, Graphics.FONT_XTINY);
-            line(dc, 243, textResource(Rez.Strings.Trace) + " " + gps.count + " / GPS " + session.updateCount, ink, Graphics.FONT_XTINY);
-            var store = "NOT RUN".equals(session.storageStatus) ? textResource(Rez.Strings.NotRun) :
-                ("WRITE FAILED".equals(session.storageStatus) ? textResource(Rez.Strings.WriteFailed) : session.storageStatus);
-            line(dc, 275, textResource(Rez.Strings.Store) + ": " + store, ink, Graphics.FONT_XTINY);
-            line(dc, 325, textResource(Rez.Strings.Back), ink, Graphics.FONT_XTINY);
-            return;
+            session.peakMemory = Geo.max(session.peakMemory, stats.usedMemory);
+            line(dc, 155, "RAM " + (stats.usedMemory / 1024) + " / peak " + (session.peakMemory / 1024) + " KiB", ink, smallFont);
+            line(dc, 191, "Trace " + g.count + "/180 / GPS " + session.updateCount, ink, smallFont);
+            line(dc, 227, "Filter " + g.filter.status, ink, smallFont);
+            line(dc, 263, "Motion " + session.motion.label(System.getTimer()), ink, smallFont);
+            line(dc, 301, session.error == null ? (session.motion.enabled ? "START: Motion off" : "START: Motion on") : session.error, ink, tinyFont);
+            line(dc, 338, "BACK: Grid", ink, tinyFont); return;
         }
-        if (m.center == null) {
-            var outsideMap = gps.lat != null && gps.xy == null;
-            line(dc, 154, outsideMap ? "Outside map coverage" : textResource(Rez.Strings.Waiting), ink, Graphics.FONT_XTINY);
-            line(dc, 205, outsideMap ? "Use GPS coordinates" : textResource(Rez.Strings.Outside), ink, Graphics.FONT_XTINY);
-            drawStatus(dc, ink, bg); return;
+        if (m.center == null || (g.lat != null && g.xy == null && m.follow)) {
+            line(dc, 156, g.lat != null && g.xy == null ? "Polar grid limit" : "Waiting for GPS", ink, smallFont);
+            line(dc, 199, g.lat != null ? "Coordinates in menu" : "Go outdoors for a fix", ink, smallFont);
+        } else {
+            drawGrid(dc, bg, ink);
         }
+        dc.setColor(bg, Graphics.COLOR_TRANSPARENT); dc.fillRectangle(42, 32, 306, 61);
+        line(dc, 36, page == :pan ? (panAxis == 0 ? "PAN EAST / WEST" : "PAN NORTH / SOUTH") : "GPS GRID / NORTH UP", ink, smallFont);
+        line(dc, 68, session.error == null ? status() : session.error, ink, tinyFont);
+        dc.setColor(bg, Graphics.COLOR_TRANSPARENT); dc.fillRectangle(40, 295, 310, 64);
+        if (m.center != null) {
+            var ll = Geo.inverse(m.center[0], m.center[1]);
+            line(dc, 298, "Center " + ll[0].format("%.5f") + " / " + ll[1].format("%.5f"), ink, tinyFont);
+        }
+        line(dc, 321, Geo.timeText(session.seconds()) + " / " + Geo.distanceText(session.distance()), ink, smallFont);
+        line(dc, 355, page == :pan ? "START Axis  BACK Follow" : "UP/DN Zoom  START Menu", ink, tinyFont);
+    }
+    function drawGrid(dc, bg, ink) {
+        var m = session.grid; var g = session.gps;
         var box = Geo.bounds(m.center[0], m.center[1], m.zoom);
-        var rasterVisible = false;
-        if (m.bitmap != null && m.metadata != null) {
-            // Display old raster in its original geographic frame until the new one commits.
-            var old = m.metadata["bounds3857"] as Array;
-            var topLeft = Geo.pixel(old[0], old[3], box, 390);
-            var width = (old[2] - old[0]) / (box[2] - box[0]) * 390;
-            if (topLeft[0] < 390 && topLeft[1] < 390 && topLeft[0] + width > 0 && topLeft[1] + width > 0) {
-                var transform = new Graphics.AffineTransform();
-                var raster = m.bitmap instanceof Graphics.BitmapReference ? m.bitmap.get() : m.bitmap;
-                var factor = width / raster.getWidth();
-                transform.scale(factor, factor);
-                dc.drawBitmap2(topLeft[0], topLeft[1], m.bitmap, {:transform => transform});
-                rasterVisible = true;
+        var c = Geo.inverse(m.center[0], m.center[1]);
+        var west = box[0] / Geo.R * 180 / Geo.PI; var east = box[2] / Geo.R * 180 / Geo.PI;
+        var south = Geo.inverse(0, Geo.max(-Geo.WORLD / 2, box[1]))[0];
+        var north = Geo.inverse(0, Geo.min(Geo.WORLD / 2, box[3]))[0];
+        var lonStep = Geo.gridStep((east - west) / 5);
+        var latStep = Geo.gridStep((north - south) / 5);
+        dc.setColor(m.night ? 0x365551 : 0xB7CDC0, Graphics.COLOR_TRANSPARENT);
+        var v = Math.ceil(west / lonStep) * lonStep;
+        for (var i = 0; i < 8 && v <= east; i++, v += lonStep) {
+            var x = (v * Geo.PI / 180 * Geo.R - box[0]) / Geo.resolution(m.zoom);
+            dc.setColor(m.night ? 0x365551 : 0xB7CDC0, Graphics.COLOR_TRANSPARENT);
+            dc.drawLine(x, 90, x, 294);
+            if (x > 80 && x < 310) {
+                var lon = v > 180 ? v - 360 : (v < -180 ? v + 360 : v);
+                dc.setColor(ink, Graphics.COLOR_TRANSPARENT);
+                dc.drawText(x, 96, tinyFont, lon.format("%.4f"), Graphics.TEXT_JUSTIFY_CENTER);
             }
         }
-        if (session.baseUrl.length() == 0 && session.networkEnabled) { drawGrid(dc, box, night); }
-        dc.setPenWidth(4);
-        dc.setColor(0xE29341, Graphics.COLOR_TRANSPARENT);
-        var previous = null as Array or Null;
-        for (var i = 0; i < gps.count; i++) {
-            var point = gps.point(i);
-            var p = Geo.pixel(point[0], point[1], box, 390);
-            if (previous != null && !point[3] && Geo.abs(p[0]) < 2000 && Geo.abs(p[1]) < 2000 &&
-                Geo.abs(previous[0]) < 2000 && Geo.abs(previous[1]) < 2000) {
-                dc.drawLine(previous[0], previous[1], p[0], p[1]);
-            }
-            previous = p;
+        v = Math.ceil(south / latStep) * latStep;
+        for (var j = 0; j < 8 && v <= north; j++, v += latStep) {
+            var y = (box[3] - Geo.project(v, 0)[1]) / Geo.resolution(m.zoom);
+            if (y < 120 || y > 275) { continue; }
+            dc.setColor(m.night ? 0x365551 : 0xB7CDC0, Graphics.COLOR_TRANSPARENT);
+            dc.drawLine(0, y, 390, y);
+            dc.setColor(ink, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(33, y + 2, tinyFont, v.format("%.4f"), Graphics.TEXT_JUSTIFY_LEFT);
+        }
+        dc.setClip(20, 117, 350, 164);
+        dc.setColor(0xDD863B, Graphics.COLOR_TRANSPARENT); dc.setPenWidth(3);
+        var prev = null as Array or Null;
+        for (var n = 0; n < g.count; n++) {
+            var p = g.point(n); var pixel = Geo.pixel(p[0], p[1], box, 390);
+            if (prev != null && !p[3] && Geo.abs(pixel[0]) < 4000 && Geo.abs(pixel[1]) < 4000 &&
+                Geo.abs(prev[0]) < 4000 && Geo.abs(prev[1]) < 4000) { dc.drawLine(prev[0], prev[1], pixel[0], pixel[1]); }
+            prev = pixel;
         }
         dc.setPenWidth(1);
-        if (gps.xy != null) {
-            var pos = Geo.pixel(gps.xy[0], gps.xy[1], box, 390);
-            if (pos[0] >= 0 && pos[0] <= 390 && pos[1] >= 0 && pos[1] <= 390) {
-                dc.setColor(0xFFFFFF, Graphics.COLOR_TRANSPARENT); dc.fillCircle(pos[0], pos[1], 13);
-                dc.setColor(gps.usable(System.getTimer()) ? 0x156DCE : 0x838B8C, Graphics.COLOR_TRANSPARENT);
-                dc.fillCircle(pos[0], pos[1], 9);
-                dc.setPenWidth(3); dc.drawCircle(pos[0], pos[1], 18); dc.setPenWidth(1);
-                if (gps.heading != null) {
-                    var sx = Math.sin(gps.heading); var sy = -Math.cos(gps.heading);
-                    dc.fillPolygon([[pos[0] + sx * 29, pos[1] + sy * 29],
-                        [pos[0] + sx * 18 - sy * 6, pos[1] + sy * 18 + sx * 6],
-                        [pos[0] + sx * 18 + sy * 6, pos[1] + sy * 18 - sx * 6]]);
-                }
+        // Crosshair is the exact center coordinate, independent of the filtered blue marker.
+        dc.setColor(ink, Graphics.COLOR_TRANSPARENT); dc.drawLine(188, 195, 202, 195); dc.drawLine(195, 188, 195, 202);
+        if (g.xy != null) {
+            var pos = Geo.pixel(g.xy[0], g.xy[1], box, 390);
+            if (pos[0] > 10 && pos[0] < 380 && pos[1] > 115 && pos[1] < 282) {
+                dc.setColor(bg, Graphics.COLOR_TRANSPARENT); dc.fillCircle(pos[0], pos[1], 12);
+                dc.setColor(g.usable(System.getTimer()) && !"REACQUIRE".equals(g.filter.status) ? 0x247BCD : 0x84928E, Graphics.COLOR_TRANSPARENT);
+                dc.fillCircle(pos[0], pos[1], 8); dc.drawCircle(pos[0], pos[1], 12);
             }
         }
-        // Ground scale includes latitude; raster dimensions do not alter the geographic box.
-        var ll = Geo.inverse(m.center[0], m.center[1]);
-        var meters = Geo.resolution(m.zoom) * Math.cos(ll[0] * Geo.PI / 180.0d) * 60;
-        // Readability must survive a theme change while the old raster is kept.
-        dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
-        dc.fillRoundedRectangle(104, 280, 182, 45, 8);
-        dc.setColor(ink, Graphics.COLOR_TRANSPARENT);
-        dc.setPenWidth(3); dc.drawLine(163, 287, 223, 287); dc.setPenWidth(1);
-        line(dc, 291, meters.format("%.0f") + " m / z" + m.zoom, ink, Graphics.FONT_XTINY);
-        drawStatus(dc, ink, bg);
-        if (page == :pan) {
-            dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
-            dc.fillRoundedRectangle(48, 233, 294, 35, 8);
-            line(dc, 237, textResource(panAxis == 0 ? Rez.Strings.NorthSouth : Rez.Strings.EastWest), ink, Graphics.FONT_XTINY);
-        } else if (session.baseUrl.length() != 0 && !rasterVisible && !m.busy) {
-            line(dc, 233, textResource(Rez.Strings.NoMap), ink, Graphics.FONT_XTINY);
-        }
-    }
-
-    function drawGrid(dc, box as Array, night) {
-        dc.setColor(night ? 0x314A4B : 0xC5D5CA, Graphics.COLOR_TRANSPARENT);
-        var step = session.map.zoom >= 15 ? 100 : 200;
-        var start = Math.ceil(box[0] / step).toNumber();
-        var end = Math.floor(box[2] / step).toNumber();
-        for (var x = start; x <= end; x++) {
-            var p = Geo.pixel(x * step, box[3], box, 390);
-            dc.drawLine(p[0], 0, p[0], 390);
-        }
-        start = Math.ceil(box[1] / step).toNumber(); end = Math.floor(box[3] / step).toNumber();
-        for (var y = start; y <= end; y++) {
-            var p2 = Geo.pixel(box[0], y * step, box, 390);
-            dc.drawLine(0, p2[1], 390, p2[1]);
-        }
-    }
-
-    function drawStatus(dc, ink, bg) {
-        var g = session.gps; var m = session.map;
-        var age = g.age(System.getTimer());
-        var status = textResource(Rez.Strings.Waiting);
-        if (age != null) {
-            status = age > 5 ? textResource(Rez.Strings.Stale) :
-                (g.quality == Position.QUALITY_GOOD ? textResource(Rez.Strings.Good) :
-                (g.quality == Position.QUALITY_USABLE ? textResource(Rez.Strings.Usable) : textResource(Rez.Strings.Weak)));
-            status += " / " + Geo.min(9999, age).toNumber() + "s";
-        }
-        dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
-        dc.fillRoundedRectangle(56, 34, 278, 45, 18);
-        line(dc, 42, status, ink, Graphics.FONT_XTINY);
-        dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
-        dc.fillRoundedRectangle(177, 79, 36, 30, 5);
-        line(dc, 82, "N", ink, Graphics.FONT_XTINY);
-        var network = textResource(Rez.Strings.Offline);
-        if (!session.networkEnabled) { network = "GPS only"; }
-        else if (session.lowMemory) { network = "Low memory"; }
-        else if (session.configError || m.permanent) { network = textResource(Rez.Strings.SettingsIssue); }
-        else if (m.lastCode != 0) { network = textResource(Rez.Strings.ServiceIssue); }
-        else if (session.baseUrl.length() != 0 && (m.busy || m.wanted)) { network = textResource(Rez.Strings.Loading); }
-        else if (session.baseUrl.length() != 0) {
-            network = m.metadata == null ? textResource(Rez.Strings.MapPending) : "Raster / " + m.size + " px";
-        }
-        dc.setColor(bg, Graphics.COLOR_TRANSPARENT); dc.fillRectangle(49, 326, 292, 29);
-        line(dc, 326, network, ink, Graphics.FONT_XTINY);
-        var realMap = m.metadata != null && !"synthetic-grid-v1".equals(m.metadata["mapDataVersion"]);
-        if (realMap) {
-            // Attribution stays visible on-map; full links are also in Map credits.
-            dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
-            dc.fillRoundedRectangle(60, 98, 270, 63, 8);
-            line(dc, 99, "© OpenMapTiles", ink, Graphics.FONT_XTINY);
-            line(dc, 129, "© OpenStreetMap", ink, Graphics.FONT_XTINY);
-        } else if (session.baseUrl.length() == 0 && session.networkEnabled) {
-            dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
-            dc.fillRoundedRectangle(25, 101, 340, 36, 8);
-            line(dc, 105, textResource(Rez.Strings.Synthetic), ink, Graphics.FONT_XTINY);
-        } else if (m.metadata != null) {
-            line(dc, 105, textResource(Rez.Strings.Synthetic), ink, Graphics.FONT_XTINY);
-        }
+        dc.clearClip();
+        dc.setColor(bg, Graphics.COLOR_TRANSPARENT); dc.fillRectangle(104, 265, 182, 30);
+        dc.setColor(ink, Graphics.COLOR_TRANSPARENT); dc.drawLine(165, 270, 225, 270);
+        var meters = Geo.resolution(m.zoom) * Math.cos(c[0] * Geo.PI / 180) * 60;
+        line(dc, 275, Geo.distanceText(meters) + " / z" + m.zoom, ink, tinyFont);
     }
 }
 
 class FieldDelegate extends WatchUi.BehaviorDelegate {
-    var view; var session as FieldSession;
+    var view as FieldView;
+    var session as FieldSession;
     function initialize(v, s) { BehaviorDelegate.initialize(); view = v; session = s; }
-    function redraw() { WatchUi.requestUpdate(); return true; }
-    function onSelect() {
-        if (view.page == :home) { session.networkEnabled = true; session.start(); view.page = :map; }
-        else if (view.page == :map) { view.page = :menu; }
-        else if (view.page == :pan) { view.panAxis = (view.panAxis + 1) % 2; }
-        else if (view.page == :menu) {
-            var n = view.selection; view.page = :map;
-            if (n == 0) { session.recenter(); }
-            else if (n == 1) { view.page = :pan; }
-            else if (n == 2) {
-                session.map.style = "day".equals(session.map.style) ? "night" : "day";
-                session.map.generation++; session.map.wanted = true; session.save();
-            } else if (n == 3) {
-                session.map.size = session.map.size == 390 ? 195 : (session.map.size == 195 ? 256 : 390);
-                session.map.generation++; session.map.wanted = true;
-            } else if (n == 4) { view.page = :diagnostics; }
-            else if (n == 5) { session.probeStorage(); view.page = :diagnostics; }
-            else if (n == 6) { session.map.permanent = false; session.map.wanted = true; session.map.nextAttempt = 0; }
-            else if (n == 7) { session.stop(); view.page = :home; }
-            else if (n == 8) { view.page = :coordinates; }
-            else if (n == 9) { view.page = :credits; }
-        } else { view.page = :map; }
-        return redraw();
-    }
-    function onNextPage() { return move(-1); }
-    function onPreviousPage() { return move(1); }
+    function refresh() { WatchUi.requestUpdate(); return true; }
+    function onNextPage() as Boolean { return move(1); }
+    function onPreviousPage() as Boolean { return move(-1); }
     function move(delta) {
-        if (view.page == :home && delta == -1) {
-            session.networkEnabled = false; session.start(); view.page = :coordinates;
-        }
-        else if (view.page == :menu) { view.selection = (view.selection - delta + view.menuItems.size()) % view.menuItems.size(); }
-        else if (view.page == :map) { session.map.changeZoom(delta); session.save(); }
-        else if (view.page == :pan) {
-            session.pan(view.panAxis == 1 ? delta : 0, view.panAxis == 0 ? delta : 0);
-        }
-        return redraw();
+        var p = view.page;
+        if (p == :home) {
+            if (delta > 0 && session.start()) { view.rawCoordinates = false; view.page = :coordinates; }
+        } else if (p == :menu) { view.selection = (view.selection + delta + 8) % 8; }
+        else if (p == :finish) { view.selection = (view.selection + delta + 2) % 2; }
+        else if (p == :pan) { session.grid.pan(view.panAxis == 0 ? delta * 65 : 0, view.panAxis == 1 ? -delta * 65 : 0); }
+        else if (p == :grid) { session.grid.changeZoom(-delta); }
+        return refresh();
     }
-    function onBack() {
-        if (view.page == :home) { return false; }
-        if (view.page == :map) { session.stop(); view.page = :home; }
-        else if (view.page == :pan) { session.recenter(); view.page = :map; }
-        else { view.page = :map; }
-        return redraw();
+    function onSelect() as Boolean {
+        var p = view.page;
+        if (p == :home) { if (session.start()) { view.rawCoordinates = false; view.page = :grid; } }
+        else if (p == :grid) { view.page = :menu; view.selection = 0; }
+        else if (p == :pan) { view.panAxis = 1 - view.panAxis; }
+        else if (p == :coordinates) { view.rawCoordinates = !view.rawCoordinates; }
+        else if (p == :diagnostics) { session.toggleMotion(); }
+        else if (p == :menu) {
+            var i = view.selection;
+            if (i == 0) { session.grid.recenter(session.gps.xy); view.page = :grid; }
+            if (i == 1) { session.grid.follow = false; view.page = :pan; }
+            if (i == 2) { view.page = :stats; }
+            if (i == 3) { view.page = :coordinates; }
+            if (i == 4) { session.grid.night = !session.grid.night; view.page = :grid; }
+            if (i == 5) { view.page = :diagnostics; }
+            if (i == 6) { session.enableGps(); view.page = :grid; }
+            if (i == 7) { finishPage(); }
+        } else if (p == :finish) {
+            if (view.selection == 0 && session.resume()) { view.page = :grid; }
+            else if (view.selection == 1) { session.stop(); view.page = :home; }
+        }
+        return refresh();
+    }
+    function finishPage() {
+        session.pause(); view.page = :finish; view.selection = 0;
+    }
+    function onBack() as Boolean {
+        var p = view.page;
+        if (p == :home) { return false; }
+        if (p == :grid) { finishPage(); }
+        else if (p == :finish) { if (session.resume()) { view.page = :grid; } }
+        else { if (p == :pan) { session.grid.recenter(session.gps.xy); } view.page = :grid; }
+        return refresh();
     }
 }

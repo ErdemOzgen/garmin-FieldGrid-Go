@@ -1,59 +1,52 @@
-# Geçici HTTPS simülatör deneyi
+# Historical temporary HTTPS simulator experiment
 
-Bu adım kullanıcı onayıyla çalıştırılır. Normal `make api` ve `make sim` hiçbir
-tünel açmaz. Fiziksel saat/iPhone kabulü bu deneyin kapsamına girmez.
+This plan belongs to the former raster application. FieldGrid needs no server or
+tunnel. Normal build/run commands open no public endpoint. Any new tunnel requires
+fresh, explicit authorization; this document is not permission to publish.
 
-## Gereken erişim
+## Access boundary
 
-`makeWebRequest` localhost üzerinde metadata alabiliyor. Ancak Garmin'in görüntü
-dönüştürme servisi görüntü URL'sini dışarıdan almalıdır. SDK 9.2.0/fr165 deneyinde
-localhost `makeImageRequest` sonucu HTTP 200 + null oldu; uygulama bunu -903
-olarak işledi ve GPS devam etti. [Garmin ekibinin açıklaması](https://forums.garmin.com/developer/connect-iq/f/discussion/256721/connect-mobile-4-40-makeimagerequest-localhost-error/1226813)
-bu ayrı görüntü işleme yolunu doğrular.
+The former makeWebRequest could retrieve localhost metadata, but Garmin's external
+image converter needed a reachable PNG URL. SDK 9.2.0/fr165 returned HTTP 200 with
+null for localhost images; the app reported -903 while GPS continued. The
+[Garmin explanation](https://forums.garmin.com/developer/connect-iq/f/discussion/256721/connect-mobile-4-40-makeimagerequest-localhost-error/1226813)
+describes that path.
 
-Önerilen deney: resmî Cloudflare `cloudflared` aracıyla yalnızca
-`http://127.0.0.1:8765` servisine yönlenen, rastgele `*.trycloudflare.com` HTTPS
-adresi. API kod/dosya sunmaz. Render oluşturmak rastgele cihaz tokenı ister;
-PNG erişimi 120 saniyelik HMAC imzası kullanır. Sağlık ve API şeması herkese
-açıktır. IP ve istek trafiği Cloudflare üzerinden geçer; Garmin dönüştürücüsü
-sentetik PNG'leri ve kısa ömürlü görüntü URL'lerini görür.
+The proposed official cloudflared Quick Tunnel forwarded only
+`http://127.0.0.1:8765` through a random `*.trycloudflare.com` HTTPS origin. The API
+served no source files. Rendering needed a random development token; PNG access
+used a 120 second HMAC grant. Health and schema were public. Cloudflare saw network
+traffic; Garmin saw synthetic PNGs and temporary image URLs.
 
-Yalnızca etiketli sentetik koordinatlar/haritalar kullanılacak. Test süresi en
-fazla 30 dakika; ardından tünel durdurulacak ve yerel URL ayarları geri yüklenecek.
-Hesap, DNS veya ücretli kaynak oluşturulmayacak. Araç `/tmp` içinde tutulacak;
-sistem paketi/servisi kurulmayacak. Anahtar ve tünel günlükleri Git'e alınmayacak.
+Only labeled synthetic maps and coordinates were authorized. Maximum duration was
+30 minutes, followed by shutdown and configuration restoration. No account, DNS,
+paid service or persistent system installation was created. Tools stayed in `/tmp`;
+keys and tunnel logs remained outside Git.
 
-## Uygulama sırası
+## Original sequence
 
-1. Kullanıcının bu somut erişime onayını al.
-2. `.env` ve `.local/watch.json` dosyalarını Git dışına 0600 izinle yedekle.
-3. `cloudflared tunnel --url http://127.0.0.1:8765 --no-autoupdate` çalıştır.
-4. Oluşan HTTPS origin'i iki yerel yapılandırmaya işle; servis/simülatörü yeniden başlat.
-5. Sentetik GPS ile 195/256/390 px, iki tema, üç zoom ve ağ kesilmesini dene.
-6. Ölçümleri/screenshotları kaydet; tüneli kapat; yerel yapılandırmayı geri yükle.
-7. Fiziksel PRG'yi yerel HTTP/token olmadan tekrar derle ve kaynak paketini yenile.
+1. Obtain approval for the concrete temporary exposure.
+2. Back up `.env` and `.local/watch.json` privately with permissions 0600.
+3. Start `cloudflared tunnel --url http://127.0.0.1:8765 --no-autoupdate`.
+4. Update both private origins and restart the former service/simulator.
+5. Test synthetic GPS, 195/256/390 px, two themes, three zooms and outage recovery.
+6. Record sanitized results, stop tunnel/API and restore local configuration.
+7. Rebuild the physical binary without local HTTP/test credentials and refresh the package.
 
-Bu deneme üretim barındırması değildir. [Cloudflare Quick Tunnels](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/)
-belgesi ücretsiz, geçici adresin herkese açık olduğunu ve SLA sağlamadığını
-belirtir; aynı sayfada hizmet koşulları ve gizlilik bağlantıları bulunur.
+Quick Tunnels were development exposure, not production hosting. The historical
+[Cloudflare documentation](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/)
+was consulted for its public temporary origin and lack of SLA.
 
-## Gerçekleşen deney
+## Recorded outcome
 
-Kullanıcı 14 Eylül 2026'da bu deneyi açıkça onayladı. 18:49:58–19:12:03 UTC
-arasında 1324,5 saniye çalıştı; tünel süreci çıkış kodu 0 ile kapandı. API de
-durduruldu, `.env` ve `.local/watch.json` özgün içerikleriyle 0600 izinle geri
-yüklendi; simülatörün cihaz HTTPS gerekliliği yeniden etkinleştirildi. Hesap/DNS
-veya kalıcı servis oluşturulmadı. Ayrıntılı sonuç [historical simulator record](evidence/previous-synthetic-simulator.json).
-Tekrar çalıştırma yeni, süreli yayın izni gerektirir.
+The user authorized the synthetic test on 14 September 2026. It ran from
+18:49:58 to 19:12:03 UTC, approximately 1324.5 seconds. The tunnel exited with code 0;
+the API stopped; both local files were restored with permissions 0600; simulator
+HTTPS requirements were reenabled. No permanent service/account/DNS was created.
+See the [historical record](evidence/previous-synthetic-simulator.json).
 
-## OpenFreeMap follow-up (new authorization required)
-
-The earlier synthetic-grid authorization has ended. For the requested real-map
-update, the converter and English/offline-GPS screens are implemented and tested
-locally. A separate, at-most-30-minute Cloudflare Quick Tunnel can verify the full
-Garmin PNG path with OpenFreeMap street maps. Only the fixed Utrecht sample and an
-explicitly generated GPX path will be sent; no real user GPS or phone data.
-Cloudflare sees renderer traffic; Garmin converts PNGs; OpenFreeMap receives only
-viewport tile requests. No paid service, account or permanent deployment. Preserve
-`.env` and `.local/watch.json`, restore them and stop the tunnel/API afterwards.
-The previous test's approval does not authorize this new run.
+A subsequent real OpenFreeMap test required separate authorization. Its proposal
+used only fixed Utrecht samples and a generated GPX path for at most 30 minutes.
+Cloudflare carried renderer traffic, Garmin converted PNGs, and OpenFreeMap received
+viewport tile requests. No personal GPS, paid resource or persistent publication was
+part of that proposal. Previous approval did not authorize another run.

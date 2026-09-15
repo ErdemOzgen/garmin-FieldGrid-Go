@@ -1,0 +1,73 @@
+{
+  "measuredAtUtc": "2026-09-15T12:31:30.951202+00:00",
+  "version": "0.2.3",
+  "automatedStatus": "PASS",
+  "pythonTests": 116,
+  "watchTests": 37,
+  "productionBuild": {
+    "status": "PASS",
+    "target": "fr165",
+    "sdkVersion": "9.2.0",
+    "deviceVersion": "3d0fb192a2cf01699aefd0f384af3f527e5885bd",
+    "sourceSha256": "6fa8087b2c620907ade388a154ef0ecad370137d1bc2168b9ba2734816dc05d8",
+    "sourceCommit": "b06f5313381a356b72b74f02712982fc50a2930e",
+    "watchSourcesDirty": true,
+    "artifactSha256": "0f78a2b64ff57b317962d1a99aa7c01471b2c0ed52ece3eef23f992ca003fda3",
+    "unitTests": false,
+    "simulator": false,
+    "offline": true,
+    "networkEnabled": false,
+    "activityRecording": false,
+    "dataRetention": "memory-only",
+    "warnings": 0
+  },
+  "watchTestArtifact": {
+    "status": "PASS",
+    "passed": 37,
+    "rawSdkExitCode": 1,
+    "sourceSha256": "6fa8087b2c620907ade388a154ef0ecad370137d1bc2168b9ba2734816dc05d8",
+    "artifactSha256": "6bc183cfd06c98de6c5932eaa841b75e70bb2889aab276fb8a448d8733a8a0e2"
+  },
+  "artifactBytes": 126620,
+  "sizeIncreaseBytes": 1360,
+  "baseline": {
+    "passed": 32,
+    "assertionErrors": 2,
+    "status": "FAIL"
+  },
+  "previousPhysicalVersion": "0.2.2",
+  "previousPhysicalStationary": "FAIL: user reports 7 to 11 m drift with slight arm motion",
+  "physicalInstallation": "PASS with identical readback",
+  "currentPhysicalWristMotion": "PASS by user report: stationary position holds and walking advances",
+  "fullG0G3": "NOT RUN",
+  "syntheticTestHeapPeaksBytes": [
+    69584,
+    72024,
+    50616,
+    51464
+  ],
+  "sensorBatches": 12000,
+  "sensorSamples": 300000,
+  "maximumRetainedGrowthAfterWarmupBytes": 512,
+  "permissions": [
+    "Positioning",
+    "Sensor"
+  ],
+  "networkCalls": false,
+  "activityRecording": false,
+  "applicationStorageWrites": false,
+  "newNativeScreenshots": "NOT RUN; existing layout render checks passed in both themes",
+  "physicalUserEvidence": "physical-user-check.json",
+  "publicationScans": {
+    "working": "PASS",
+    "staged": "PASS",
+    "reachableHistory": "PASS"
+  },
+  "freshSourceExtraction": {
+    "status": "PASS",
+    "pythonTests": 116,
+    "watchSourceSha256": "6fa8087b2c620907ade388a154ef0ecad370137d1bc2168b9ba2734816dc05d8",
+    "warnings": 0,
+    "independentSigningKey": true
+  }
+}

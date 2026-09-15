@@ -1,59 +1,47 @@
-> Historical synthetic-G0 review. Current extension review: [OpenFreeMap and offline position](openfreemap/review.md).
+# Critical findings
 
-# Teslim öncesi karşı inceleme
+None remaining in the historical synthetic G0 scope. This review is historical;
+use [the current grid review](wrist-motion/review.md) for the installed application.
+Trust boundaries, correctness/evidence and operational recovery were reviewed separately.
 
-İncelenen kapsam: G0 kaynakları, çalıştırma komutları ve tamamlanma iddiaları.
-Güven sınırları, doğruluk/kanıt ve işletim/toparlanma ayrı açılardan incelendi.
+# Important findings
 
-## Critical findings
+- Physical POC02/04/08 were NOT RUN at this point. Simulator GPS, transfers and
+  battery assumptions could not establish physical G0/G3 acceptance.
+- The initial renderer generated synthetic maps only. Real roads/paths required a
+  later licensed provider decision and integration; the README disclosed that limit.
 
-None. Mevcut G0 kapsamı için açık, doğrulanmış kritik kusur kalmadı.
+# Minor findings
 
-## Important findings
+- The SDK lived in a temporary directory. Doctor reported missing tools after cleanup;
+  a configured persistent SDK path was available without installing system packages.
+- Two upstream Python deprecation warnings remained for future lock maintenance.
+  They were not watch runtime failures.
 
-- **Kabul sınırı:** `docs/evidence/g0.md` POC02/04/08 NOT RUN. Fiziksel GPS,
-  Garmin/iPhone aktarımı ve pil sonucunu yerel testlerden çıkarmak yanlış olur.
-  Etki: G0/G3 kabulü. Düzeltme: fiziksel test listesini tamamlamadan aşama geçilmemesi.
-- **Ürün kapsamı:** `services/api/renderer.py` sadece sentetik raster üretir.
-  Etki: gerçek sokak/patika talebi henüz karşılanmaz. Düzeltme: G0 sonrası
-  lisanslı sağlayıcı kararı ve G2 adaptörü; README bu sınırı açıkça belirtiyor.
+# Open questions
 
-## Minor findings
+Physical firmware/iOS/GCM, graphics/heap cost, locked phone behavior, bitmap persistence
+and hosting/provider decisions needed evidence. They were not classified as proven bugs.
 
-- SDK geçici dizinde; temizlenince `make doctor` eksik aracı gösterir. Kalıcı SDK
-  yolu `docs/setup.md` ile yeniden verilebilir. Otomatik sistem kurulumu eklenmedi.
-- Python test bağımlılıklarının iki deprecation uyarısı var. Uygulama çalışma
-  zamanına ait hata değil; kilit güncellemesinde yeniden değerlendirilmeli.
+# Recommended corrections
 
-## Open questions
+Implemented with regressions: permanent 401 could not be retriggered by panning;
+invalid Unicode Authorization/signature returned controlled 401/403; oversized bodies
+were rejected before another buffer copy; stale callbacks could not release a new
+job; source and artifact hashes were checked together.
 
-Gerçek firmware/iOS/GCM sürümleri, cihaz heap/grafik maliyeti, H01 bağlantı sonucu,
-bitmap kalıcılığı ve barındırma/sağlayıcı kararı fiziksel kullanıcı kanıtı bekliyor.
-Bunlar doğrulanmış kod hatası olarak sınıflandırılmadı.
+A second pass reviewed String equality, unsupported graphics APIs, geographic image
+matching, publication boundaries and key leakage. One G0 test token was never
+presented as production identity or a hidden implementation of G2 pairing.
 
-## Recommended corrections
+The later simulator review covered 56 Python tests, 17 watch tests in two languages,
+six HTTPS raster transfers, outage recovery, GPS quality loss and a small Storage
+round trip. ADR 003 records coordinate precision, stale Properties, large Storage
+OOM, image counting, clipping and theme corrections. Historical FAIL results remain.
+The final English BACK label had separate source identity from the earlier network run.
 
-Uygulandı ve geri dönüş testi eklendi: kalıcı 401’in pan ile tekrar başlatılmaması;
-non-ASCII Authorization/signature girdisinin kontrollü 401/403 olması; aşırı
-gövdenin ilave tampon kopyasından önce reddi; stale callback’in yeni işi
-serbest bırakmaması; derleme raporunun kaynak/artefakt SHA256 eşleştirmesi.
-
-İkinci inceleme: String içerik eşitliği, modelde desteklenmeyen grafik çağrısı,
-coğrafi resim eşleşmesi, kamuya yayın ve anahtar sızıntısı tekrar kontrol edildi.
-G0 tek geliştirme tokenının üretim kimlik sistemine eşdeğer olduğu iddiası yoktur;
-G2 eşleme eksikliği bu aşamada gizlenmiş bir auth özelliği olarak sunulmaz.
-
-## Simülatör sonrası inceleme
-
-56 Python ve iki dilde 17 saat testi; altı gerçek HTTPS raster aktarımı, ağ
-kesintisi, GPS kalite kaybı ve küçük Storage işlemi kanıtları incelendi.
-Koordinat hassasiyeti, Properties gölgelemesi, büyük Storage OOM, yanlış görüntü
-sayacı, TR/EN kırpılma ve tema kontrastı düzeltildi; ADR 003 nedenleri kaydeder.
-İngilizce BACK etiketinin son değişikliği ağ deneyinden ayrılan kaynak kimliğiyle
-ve ayrı menü görüntüsüyle doğrulandı. Tarihsel FAIL sonuçları saklandı.
-
-Çevrimdışı PRG'de boş ConfigBaseUrl/ConfigDevToken Türkçe kaynak uyarıları beklenir;
-ağ yapılandırmasının kapalı olduğunu yansıtır. Aktif HTTPS PRG uyarısız derlendi.
-Depolama 1K PASS, toplam kapasite/bitmap/reboot PASS olarak sunulmaz. Tanılama
-RAM tepe değeri bir saniyede örneklenir; anlık tepe veya fiziksel bellek kanıtı değildir.
-Geçici tünel 30 dakika sınırından önce kapatıldı ve özel ayarlar geri yüklendi.
+Empty offline raster configuration caused expected resource warnings in that old
+binary; the active HTTPS binary compiled without warnings. A 1K storage pass did
+not prove total capacity, bitmap or reboot behavior. Peak heap was sampled once per
+second, not a physical instantaneous maximum. The authorized tunnel closed before
+30 minutes and private settings were restored.

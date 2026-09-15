@@ -1,34 +1,35 @@
-# ADR 002 — Konum, kamera ve ağ işlerinin ayrımı
+# ADR 002 — Separate GPS, camera and network state
 
-`GpsState` kullanılabilir GPS verisinin kalite, UTC zaman ve monoton alım yaşını
-doğrular. Null/bozuk/kutup dışı veri reddedilir; 0,0’a varsayılan dönüşüm yoktur.
-Garmin’in son bilinen veya kötü kaliteli konumu güncel fix sayılmaz. Hareket izi
-180 noktalı halkadır; 3 m hareket veya 5 s geçişinde nokta ekler ve kesintide segmenti
-ayırır. UTC saati geri giderse daha eski fix kullanılmaz. Monoton sayacın taşması
-taze konum gibi değerlendirilmez.
+Historical raster decision. Current grid behavior is defined by ADR 006 and ADR 007.
 
-`MapState` kamera, zoom, stil ve nesil numarasını yönetir. Tek mantıksal iş vardır.
-Yeni kamera hareketleri kuyruk oluşturmaz; istenen son alan tutulur. `MapJob`
-metaveri ve görüntüyü sırayla indirir, her callback’te oturum/iş kimliği ve nesil
-kontrol edilir. Kimliği/dönüşümü/boyutu doğrulanmayan görüntü etkinleşmez.
+`GpsState` checked quality, UTC timestamps and monotonic reception age. Invalid,
+missing and unsupported coordinates were rejected without a default zero location.
+Last Known or Poor GPS was not a fresh fix. The initial trace held 180 points,
+added points after movement of 3 m or elapsed time of 5 s, and split at gaps.
+Older UTC fixes and monotonic counter wrap were not mistaken for fresh data.
+The later grid filter removes timer driven stationary points.
 
-Mevcut raster, kendi coğrafi sınırlarında çizilir. Pan/zoom sırasında uygun
-coğrafi dönüşüm uygulanır; eski resim yeni alana aitmiş gibi yeniden etiketlenmez.
-G0 yerel ızgara, gerçek raster sağlayıcısı sayılmaz ve daima sentetik olarak görünür.
-İkinci bitmap cache’i eklenmedi; canlı görselin yanına gelen resim atomik geçiş için
-kısa süreli bulunur. Gerçek grafik maliyeti saha ölçümü bekler.
+`MapState` owned camera, zoom, style and generation. There was one logical job;
+new camera changes replaced the desired view instead of creating a queue.
+`MapJob` downloaded metadata and image in sequence. Every callback checked the
+session, job identity and generation. Image identity, transform and dimensions
+had to be valid before activation.
 
-İş başlangıçları arasında en az 5 s vardır. 25 s zaman aşımı ve 2/4/8/16/30 s +
-0–500 ms jitter geri çekilmesi uygulanır. 429 gövdesindeki `retryAfterSec` kullanılır.
-401/403/413/422 veya bozuk şema otomatik tekrar edilmez; hareket etmek bu hataları
-sıfırlamaz. Kullanıcı Retry service seçerek açıkça tekrar deneyebilir.
+A raster retained its own geographic bounds during pan and zoom. Old imagery was
+never relabeled as a new area. The local G0 grid image was explicitly synthetic.
+One incoming bitmap could briefly overlap the active bitmap for atomic replacement;
+physical graphics cost required field measurement.
 
-API, 2 KiB istek gövdesi, izinli üç zoom/üç boyut/iki stil ve 30 render/dakika ile
-sınırlıdır. G0 için tek geliştirme cihazı tokenı yeterlidir; G2 cihaz eşleme/yenileme
-ve iptal akışları henüz uygulanmamıştır. Görüntü erişimi ayrı, belirli render kimliğine
-bağlı HMAC ve 120 s süre içerir. Cihaz tokenı URL’ye konmaz. Cache en fazla 24 raster
-tutar, yalnız RAM’dedir; süre dolan girdiler yeni render sırasında temizlenir.
-Sunucu yeniden başlatılırsa URL’ler ve cache geçersiz olur; yeni render istenir.
+Request starts were at least 5 s apart. Timeout was 25 s; retry delays were
+2/4/8/16/30 s plus 0–500 ms jitter. A 429 response could supply `retryAfterSec`.
+401/403/413/422 and invalid schemas required explicit Retry service, not movement.
 
-G0 tek süreci bilinçli seçer. Birden fazla worker, bellekteki imza/cache durumunu
-paylaşmayacağı için desteklenmez. G2’de gerekirse paylaşılan depoya geçilir.
+The API bounded request bodies to 2 KiB, profiles to three zooms, three sizes and
+two themes, and renders to 30 per minute. The G0 development token was not production
+pairing, refresh or revocation. Image access used a separate HMAC bound to a render
+ID and 120 s expiry. The device token never appeared in an image URL.
+
+At most 24 rasters stayed in RAM; expired items were removed during new renders.
+Restart invalidated URLs and cache. Only one API process was supported because
+multiple workers would not share signing/cache state. Shared storage required a
+later measured need.

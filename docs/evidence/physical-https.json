@@ -1,0 +1,173 @@
+{
+  "recordedAtUtc": "2026-09-14T21:01:50.640626+00:00",
+  "state": "CLOSED",
+  "authorization": "Explicit user approval for up to 30 minutes of public HTTPS with real watch location.",
+  "startedAtUtc": "2026-09-14T20:58:42.718861+00:00",
+  "deadlineUtc": "2026-09-14T21:28:42.718858+00:00",
+  "localTests": {
+    "make test": "PASS: 89 tests, two upstream deprecation warnings, 96% API coverage",
+    "make test-watch": "PASS: 21 tests on fr165",
+    "make build-watch": {
+      "status": "PASS",
+      "target": "fr165",
+      "sdkVersion": "9.2.0",
+      "deviceVersion": "3d0fb192a2cf01699aefd0f384af3f527e5885bd",
+      "sourceSha256": "6eb1774efc350234d8f8f07736bf58e8717532b6b34530afd5c32b8bd6bae4e6",
+      "sourceCommit": "b06f5313381a356b72b74f02712982fc50a2930e",
+      "watchSourcesDirty": false,
+      "artifactSha256": "46d6b8bd9f5b8f69ca2f7fb99a36c976ca13ec8ed8068fd5e81639f9696baefe",
+      "unitTests": false,
+      "simulator": false,
+      "offline": false,
+      "warnings": 0
+    }
+  },
+  "httpsPreflight": {
+    "scope": "HTTPS preflight with fixed public Utrecht sample; not watch GPS",
+    "syntheticLocation": true,
+    "garminBridge": "NOT RUN",
+    "status": "PASS",
+    "httpsHealth": 200,
+    "unauthorized": 401,
+    "pngBytes": 16221,
+    "imageSize": [
+      256,
+      256
+    ],
+    "mapDataVersion": "openfreemap-20260906_080001_pt",
+    "elapsedMs": 2414
+  },
+  "physicalTransfer": {
+    "status": "PASS",
+    "destination": "GARMIN/Apps/FieldMap.prg",
+    "bytes": 127276,
+    "sha256": "46d6b8bd9f5b8f69ca2f7fb99a36c976ca13ec8ed8068fd5e81639f9696baefe",
+    "readback": "byte-for-byte match",
+    "verifiedAtUnix": 1789419648.595523
+  },
+  "physicalMapDisplay": "PASS after native-raster fix, by user report; initial failure retained in crash record",
+  "physicalIphoneBackground": {
+    "status": "PASS: short locked-phone refresh, user-reported",
+    "detail": "User explicitly confirms a map refresh while the iPhone was locked and successful UP/DOWN zoom actions. Exact locked duration, iOS/GCM versions and 30-minute continuous background endurance were not measured.",
+    "additionalRequests": {
+      "render:200": 4,
+      "image:200": 3
+    }
+  },
+  "g0Acceptance": "NOT RUN",
+  "privacy": "No coordinates, tokens, public origin, signed URLs or device identifiers in this record. Private counters contain only route category, status, bytes and timestamp.",
+  "physicalTransport": {
+    "status": "PARTIAL",
+    "evidence": "After fixed-sample preflight, server observed two additional successful metadata responses and two successful PNG fetches. Watch display failed; this is not end-to-end PASS.",
+    "successfulRenders": 2,
+    "successfulPngFetches": 2,
+    "pngBytesTotal": 62941
+  },
+  "physicalGps": "PARTIAL: user reports GPS fix, no independent accuracy/age evidence",
+  "crash": {
+    "status": "CONFIRMED",
+    "error": "Unhandled Exception",
+    "timeUtc": "2026-09-14T21:16:09Z",
+    "file": "apps/watch/source/FieldView.mc",
+    "lineInFailingSource": 127,
+    "function": "onUpdate",
+    "pc": "0x10001997",
+    "firmware": "29.05",
+    "connectIqRuntime": "6.0.2",
+    "operation": "drawBitmap2 with transform on downloaded paletted image",
+    "rawLog": "Private ignored file; not included"
+  },
+  "recovery": {
+    "status": "PASS: physical map display, user-reported",
+    "watchTests": "PASS: 22",
+    "pythonTests": "PASS: 89",
+    "initialTestCompile": "FAIL: missing WatchUi import in new test; corrected, subsequent suite PASS",
+    "build": {
+      "status": "PASS",
+      "target": "fr165",
+      "sdkVersion": "9.2.0",
+      "deviceVersion": "3d0fb192a2cf01699aefd0f384af3f527e5885bd",
+      "sourceSha256": "60cd2aa786a97f9b665c2d6fbb9703ec6a5710b2e92cecacfdaee23bc8c3fcf6",
+      "sourceCommit": "b06f5313381a356b72b74f02712982fc50a2930e",
+      "watchSourcesDirty": true,
+      "artifactSha256": "521a85e78ca14ad3db6760b1560dc9d3524e6bef4dd67b9d53d52d29995cf82c",
+      "unitTests": false,
+      "simulator": false,
+      "offline": false,
+      "warnings": 0
+    },
+    "transfer": {
+      "status": "PASS",
+      "bytes": 128012,
+      "sha256": "521a85e78ca14ad3db6760b1560dc9d3524e6bef4dd67b9d53d52d29995cf82c",
+      "readback": "byte-for-byte match",
+      "verifiedAtUnix": 1789420950.07987
+    },
+    "simulatorHeap": {
+      "postStopBytes": 46656,
+      "overlapPeakBytes": 65560,
+      "note": "native pool and physical heap not measured"
+    },
+    "design": "docs/decisions/005-fr165-native-raster.md",
+    "userReport": "The map appeared without a crash (translated user report)",
+    "reportedAtUtc": "2026-09-14T21:27:12.072293+00:00",
+    "requestsAfterFix": {
+      "render:200": 5,
+      "image:200": 4
+    }
+  },
+  "closure": {
+    "closedAtUtc": "2026-09-14T21:28:43.205958+00:00",
+    "elapsedSeconds": 1800.5,
+    "reason": "time limit",
+    "allProcessesStopped": true,
+    "restored": [
+      ".env",
+      ".local/watch.json"
+    ],
+    "restoreConflicts": [],
+    "configurationMatchesOriginal": true,
+    "portsClosed": {
+      "8765": true,
+      "49391": true
+    }
+  },
+  "finalCounters": {
+    "counts": {
+      "other:200": 1,
+      "render:401": 1,
+      "render:200": 13,
+      "image:200": 11
+    },
+    "imageBytes": 311153,
+    "updatedAtUnix": 1789421304.090635
+  },
+  "currentSourceSha256": "2964fd87f1b68dd1ae16733525d31471ef3600101ab46c3a303645f0f6d38026",
+  "currentWatchSourceSha256": "60cd2aa786a97f9b665c2d6fbb9703ec6a5710b2e92cecacfdaee23bc8c3fcf6",
+  "physicalZoomButtons": {
+    "status": "PASS: user-reported",
+    "buttons": [
+      "UP",
+      "DOWN"
+    ],
+    "scope": "Real watch during the short locked-phone map refresh test; latency not measured."
+  },
+  "diagnosticPhoto": {
+    "source": "User-supplied watch photo; original remains private and is not included in the repository.",
+    "captureTime": "Not independently established",
+    "phoneConnected": true,
+    "lastCode": -400,
+    "codeName": "INVALID_HTTP_BODY_IN_NETWORK_RESPONSE",
+    "codeMeaning": "Response body data is invalid for the request type.",
+    "appHeapDisplayedKiB": 27,
+    "sampledPeakDisplayedKiB": 27,
+    "imageCount": 0,
+    "lastImageDurationMs": 0,
+    "tracePoints": 11,
+    "gpsCallbackCount": 44,
+    "storageProbe": "NOT RUN",
+    "interpretation": "Phone connected and GPS callbacks observed despite a network error. Zero successful images in this session: this is not map-loaded memory or transfer evidence. Displayed heap is integer KiB, sampled peak excludes unobserved transient allocations and native graphics pool.",
+    "possibleCause": "The approved tunnel has closed; an unexpected gateway response is plausible, but the photo alone does not establish the cause or exact timing.",
+    "reference": "https://developer.garmin.com/connect-iq/api-docs/Toybox/Communications.html#INVALID_HTTP_BODY_IN_NETWORK_RESPONSE-const"
+  }
+}

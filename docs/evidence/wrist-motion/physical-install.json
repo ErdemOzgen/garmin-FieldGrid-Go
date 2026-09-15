@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "version": "0.2.3",
+  "measuredAtUtc": "2026-09-15T12:29:33.065229+00:00",
+  "device": "Forerunner 165",
+  "transport": "OpenMTP 3.3.0 Kalam",
+  "destination": "GARMIN/Apps/FieldMap.prg",
+  "bytes": 126620,
+  "sha256": "0f78a2b64ff57b317962d1a99aa7c01471b2c0ed52ece3eef23f992ca003fda3",
+  "readbackByteForByte": true,
+  "personalActivityFilesReadOrChanged": false,
+  "physicalWristMotionCheck": "PASS by subsequent user report; see physical-user-check.json"
+}

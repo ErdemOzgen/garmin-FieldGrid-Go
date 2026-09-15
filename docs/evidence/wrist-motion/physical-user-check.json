@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "version": "0.2.3",
+  "reportedAtUtc": "2026-09-15T12:35:07.495107+00:00",
+  "source": "User report after verified physical installation",
+  "artifactSha256": "0f78a2b64ff57b317962d1a99aa7c01471b2c0ed52ece3eef23f992ca003fda3",
+  "requestedProcedure": [
+    "Obtain GPS outdoors",
+    "Stand still and move the wrist slightly",
+    "Walk slowly and check position and distance response"
+  ],
+  "translatedUserResponse": "It stays still when stationary and moves when walking.",
+  "stationaryMarkerAndDistance": "PASS by user report",
+  "walkingResponse": "PASS by user report",
+  "motionDiagnosticLabel": "Not supplied",
+  "quantitativeAccuracy": "NOT MEASURED",
+  "batteryEndurance": "NOT RUN",
+  "fullG0G3": "NOT RUN",
+  "realCoordinatesOrSensorTracesCollected": false
+}

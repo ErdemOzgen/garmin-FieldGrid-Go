@@ -1,46 +1,75 @@
-# Güvenlik ve veri sınırları
+# Security and publication
 
-Bu sürüm kişisel **G0 testi** içindir. İnternete açık çok kullanıcılı hizmet veya
-üretim kimlik sistemi değildir. Gerçek harita sağlayıcısı OpenFreeMap seçildi; kalıcı barındırma
-henüz yapılandırılmadı. Süreli HTTPS deneyleri ayrı kullanıcı iznine tabidir.
+## Current watch application
 
-Konum kullanımı saatte START / Open map veya DOWN / GPS-only ile başlar; oturum sonunda GPS aboneliği,
-zamanlayıcı ve ağ işleri kapatılır. Çevrimiçi modda istenen alan Garmin Connect ve
-API üzerinden geçer. PNG ayrıca Garmin'in görüntü dönüştürme servisi tarafından
-URL'sinden alınır; bu nedenle salt yerel/LAN görüntü sunucusu yeterli değildir.
-Tam hareket izi sunucuya gönderilmez; iz saatin RAM’inde kalır.
-Konum/URL/token erişim logları devre dışıdır. API validation yanıtları kullanıcı
-girdilerini geri yansıtmaz. OpenFreeMap yalnız görünümle kesişen tile adreslerini alır; cihaz tokenı
-sağlayıcıya gönderilmez. DOWN GPS-only modunda hiçbir harita isteği yapılmaz. Hesap e-postası, aktivite kaydı veya kişisel rota tutulmaz.
+FieldGrid v0.2.3 processes location only after the user presses START or DOWN.
+Its permissions are Positioning and Sensor. It makes no network request, records no FIT
+activity, sends no session data to a phone and writes no new application data.
+Session coordinates, trace, motion summaries and live metrics are released on end
+or exit. The accelerometer and step count are processed in memory only; no daily
+step total or sensor trace is saved or transmitted.
 
-Fiziksel saatte yalnız geçerli HTTPS origin kabul edilir. HTTP sadece açıkça
-seçilmiş `127.0.0.1:8765` simülatör derlemesinde kullanılır. Sertifika doğrulaması
-kapatılmaz. Uygulama bir rastgele URL proxy’si değildir. JSON ek alanları reddeder.
+Only three obsolete app preference keys are removed during upgrade. Existing
+Garmin activities and the watch's independent health sync settings are untouched.
+Screenshots in the README use synthetic simulator locations.
 
-G0 özel cihaz tokenı `.env` ve `.local/watch.json` içinde, imzalama anahtarı
-`.local/keys` içinde saklanır. Dosyalar Git dışında ve 0600 iznindedir. Token
-üretim hesabına erişim vermez; servis sadece harita rasterlarını sunar. İptal etmek
-için bu tokenı iki uçta değiştirin ve servisi yeniden başlatın. G2’de kısa erişim
-tokenı, yenileme ve cihaz kaldırma ayrıca geliştirilecektir.
+## Private files
 
-Görüntü URL’si 120 s boyunca yalnız belirtilen render’a erişim sağlar. Ağ tekrarları
-için bu süre içinde yeniden alınabilir. Eski URL veya farklı render kimliği reddedilir.
-Reverse proxy kurulursa query string, gövde ve Authorization loglanmamalı;
-kamusal analitik eklenmemeli. Cache kalıcı değil, kapasite sınırına sahiptir.
+Keep signing keys in `.local/keys` and private evidence in
+`docs/evidence/private/`. `.env` and `.local/watch.json` belong only to the historical
+raster experiment. Current watch builds do not read or embed those credentials.
+No account or API key is needed for the grid application.
 
-`make check-secrets` bilinen sır biçimlerini, mevcut yerel tokenı ve Git’e girmemesi
-gereken dosyaları kontrol eder. Tüm olası sırları bulan bir DLP sistemi değildir.
-`make audit` sabitlenmiş çalışma zamanı bağımlılıklarını kontrol eder. GitHub’da
-secret scanning etkinleştirilebilir; özel saha verisini `docs/evidence/private/`
-altında tutun ve paylaşmadan önce kendiniz gözden geçirin.
+`.gitignore` excludes environment variants, credential files, key containers,
+SDKs, virtual environments, build outputs, archives, logs, databases, personal
+photos and device activity exports. `tests/fixtures/synthetic-walk.gpx` is the
+single reviewed GPX exception. `.env.example` contains placeholders only.
 
-Sorun raporuna token, görüntü URL’si veya gerçek koordinat eklemeyin. Proje henüz
-kamuya yayınlanmadığı için güvenlik iletişim kanalı repo sahibi tarafından yayın
-sırasında belirlenecektir.
+## Publication checks
 
-OpenFreeMap TileJSON adresi sabittir; içindeki tile şablonu yalnız
-`https://tiles.openfreemap.org/planet/<version>/{z}/{x}/{y}.pbf` biçiminde kabul edilir.
-Yönlendirme izlenmez, TLS doğrulanır, alınan/decompress edilen veri ve RAM cache
-boyutu sınırlıdır. Sağlayıcı hataları koordinat/URL yansıtmadan 503 döndürür.
-Kilit ayrıcalığı: yavaş dış istek sırasında mevcut PNG okuması bloke olmaz;
-yeni renderlar sınırsız kuyruğa alınmaz. Kalıcı konum, tile veya bitmap dosyası yoktur.
+- `make check-secrets` checks publishable working files against prohibited paths,
+  private key markers, common provider token formats, JWTs, credentials in URLs,
+  suspicious secret assignments and known values from private local configuration.
+- `make check-secrets-history` checks every reachable commit and tag, including
+  content later deleted. Existing Git history can leak data even if HEAD is clean.
+- `make install-hooks` enables repository hooks for this clone. The commit hook
+  scans the actual Git index, so a clean working copy cannot hide a staged secret.
+  The push hook checks working files and reachable history before transmission.
+- GitHub Actions repeats working file and full history checks. CI is a later
+  detection layer; it cannot prevent the first upload of a secret.
+- `make package` runs the publication guard before creating the source archive.
+  Symlinks and submodules are refused to avoid unaudited external content.
+
+Failures print paths and finding categories, never matched secret values. The
+reserved `user:pass` example at `maps.example` is an exact negative test fixture;
+other credentials or hosts are not exempt. Security tests generate dummy values
+inside temporary directories instead of committing realistic credential strings.
+
+Ignore rules do not remove files already tracked. They also do not apply to browser
+uploads. Use Git with the installed hooks, or extract the source archive and upload
+its contents. Do not upload the entire local working directory using a file picker.
+Hooks can be bypassed and custom scanners cannot recognize every possible secret.
+Review changes before publishing; no tool can promise that arbitrary credentials
+or private information will always be detected. No GitHub account setting, remote,
+store listing or public deployment is changed by these local checks.
+
+## If a secret is discovered
+
+Stop publication. Revoke or rotate an exposed credential with its provider. Remove
+it from current source and review whether reachable Git history also contains it.
+Do not assume that adding `.gitignore` or deleting the latest copy repairs history.
+History rewriting and remote cleanup require coordination with the repository owner.
+Never paste secrets, real GPS traces or private image URLs into a public issue.
+
+## Historical raster service
+
+The old Python renderer requires a reachable HTTPS origin for Garmin image
+conversion. A development token protects that service; it is not an OpenFreeMap
+API key. Its signed image grants expire after 120 seconds. Access logs exclude
+coordinates and credentials, input sizes and caches are bounded, TLS is verified,
+and arbitrary provider URLs are rejected. This service is unused by FieldGrid.
+Public tunnels, hosted services, paid providers and account changes require explicit
+authorization. Historical experiments do not authorize a new deployment.
+
+Dependencies are pinned. `make audit` checks the runtime lock. Security contact and
+any GitHub security reporting channel must be selected by the owner when publishing.

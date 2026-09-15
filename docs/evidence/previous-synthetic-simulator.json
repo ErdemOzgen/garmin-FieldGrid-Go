@@ -139,137 +139,156 @@
       "height": 390
     },
     {
-      "file": "screenshots/tr-diagnostics-before-outage.png",
       "sha256": "7ece13f56796eb46d6091666cb1f6958b8bec87c3c1b20b444e61fc5d351ef1c",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-diagnostics-before-outage.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-diagnostics-during-outage.png",
       "sha256": "9a1f30e13dc3b6720fa050125f031e31a30fbf8ceb33d54ac85d163fb0ef67d0",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-diagnostics-during-outage.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-diagnostics-recovered.png",
       "sha256": "635d783d5d1660e08e8d495cfb3ee9de2e3621220e26ded9e5776873a7139403",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-diagnostics-recovered.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-final-195-day.png",
       "sha256": "c525e373eac3c524ee4484e23ffd20174586984272f6abf84c3ae823a099d9a0",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-final-195-day.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-final-195-night.png",
       "sha256": "b2937c0dda301fa8254b94d8f7e3f80211daf8c73b9fad8061ac1fcf27a8a01c",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-final-195-night.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-final-256-day.png",
       "sha256": "7c75286133f9bbe7585f52342699030d4ffea3d19a7df513ddf5a041ba1f5bbf",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-final-256-day.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-final-256-night.png",
       "sha256": "946637ccadb6c38a42f4dff8b03a53de359c66ca7111b132facffae734ab2e77",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-final-256-night.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-final-390-day.png",
       "sha256": "d6cc5cbfda35bcb4e0cb74ed436101e3194ced31abfc7297d6bdd4a5f6387c03",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-final-390-day.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-final-390-night.png",
       "sha256": "ad0d1b6fbe15248bf132a34d9c209724042cb589caa0d9af1223142816e42eef",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-final-390-night.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-final-z14.png",
       "sha256": "c233d30ac460dbecad7447d34ff13479c6196e3d504094d035e8a2eef795e9f8",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-final-z14.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-final-z16.png",
       "sha256": "dabe928a95d8a00e42d502b494bf07bc1cc369b396018d98c43562ea2fc78d33",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-final-z16.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-follow-recentered.png",
       "sha256": "8fe66c4a4759fb6c2d6d06c8f8486e2c5af29cd7ba0d02c086e088850c35f73a",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-follow-recentered.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-gps-poor-stale.png",
       "sha256": "995d1382dc6a141a08295aaa12a6b44c301d3276c026d62764b951f14320db88",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-gps-poor-stale.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-gps-restored.png",
       "sha256": "f4dd1bce05d24008bf5d8b83c01a5d54b7a632e08c287ed6d2512aa984a54844",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-gps-restored.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-home-session-stopped.png",
       "sha256": "37ed9a3ed3fb761dc692b9a762e1a5adac260916e5b7345eaca51e4b873c4422",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-home-session-stopped.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-network-outage-gps-live.png",
       "sha256": "55c1d333d4b2bc635c232c1ccd6d582f7bfd1b5e99bb456a153ada8109314525",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-network-outage-gps-live.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-network-recovered.png",
       "sha256": "d75925a711cff6e6046c7d17979c34015e3e5111c8265fa474f0a67b0cff7cc1",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-network-recovered.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-pan-east-west.png",
       "sha256": "8155e445c181d831ede5cb0b5987cf4751dd4bf5cb78e392b82b53f516426ba9",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-pan-east-west.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     },
     {
-      "file": "screenshots/tr-storage-1k-pass.png",
       "sha256": "27d66ed215fae5a03536379e9fcf9cc2c7c67c66fb140e3d7c49770aaceca447",
       "watchSourceSha256": "e43185aec6cfa1be7e7931b0becf09cc85582c5f8eca08272211bc6c2715ae4b",
       "width": 390,
-      "height": 390
+      "height": 390,
+      "originalFile": "screenshots/tr-storage-1k-pass.png",
+      "publicationStatus": "Original Turkish screenshot retained privately; omitted from the current English source package. Historical measurement unchanged."
     }
   ],
   "unitTests": {

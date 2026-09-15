@@ -1,8 +1,8 @@
 {
-  "measuredAtUtc": "2026-09-14T20:00:03.715560+00:00",
+  "measuredAtUtc": "2026-09-15T10:08:20.421599+00:00",
   "environment": {
     "os": "Darwin",
-    "osVersion": "26.6.2",
+    "osVersion": "27.0",
     "architecture": "arm64",
     "python": "3.14.7",
     "venvPresent": true,
@@ -21,7 +21,7 @@
     "physicalIOS": "NOT MEASURED",
     "physicalGCM": "NOT MEASURED"
   },
-  "sourceSha256": "fe81fc97f1cb363997c1695c7972c46fece9577de33ca8518aee0f7fe4658d7d",
+  "sourceSha256": "5101ec10dd68b5ddcfa0305e16ddf5e7439970698ea028167ac4cd80defa3d95",
   "physicalTests": "NOT RUN",
   "visualReview": {
     "status": "PASS",
@@ -30,23 +30,23 @@
   },
   "FieldMap.prg": {
     "status": "PASS",
-    "bytes": 127196,
-    "sha256": "cd089ada317a618b73913c03177d854c014d625cf30749b8ff8490897fb24f55"
+    "bytes": 119084,
+    "sha256": "e3f29827ddae900b2ab56dd6a9f1c9b8671a25351d04624ed8418075b37d8fc1"
   },
   "FieldMap-tests.prg": {
     "status": "PASS",
-    "bytes": 148108,
-    "sha256": "98ff5f68ce3c9bd6cd4d8120bea5d0a23b1d11ab0c915a9102884eef4555b869"
+    "bytes": 137740,
+    "sha256": "1c458838f228b7034912c1fa4ce9a0f54ba18e14a7a23244e85bb6fc421131cc"
   },
   "pythonTests": {
-    "tests": 89,
+    "tests": 116,
     "errors": 0,
     "failures": 0,
     "skipped": 0
   },
   "watchTests": {
     "status": "PASS",
-    "passed": 21
+    "passed": 20
   },
   "http-smoke.json": {
     "measuredAtUtc": "2026-09-14T19:59:01.832789+00:00",
@@ -218,5 +218,11 @@
     ],
     "fixes": []
   },
-  "gitCommitAtMeasurement": "e133c0c9559e6ed674690bb1f5650311ba853aad"
+  "gitCommitAtMeasurement": "b06f5313381a356b72b74f02712982fc50a2930e",
+  "knownPhysicalEvidence": {
+    "usbReadback": "PASS",
+    "gridLaunch": "PASS - user report",
+    "record": "docs/evidence/grid-only/physical-user-check.json",
+    "fullAcceptance": "NOT RUN"
+  }
 }

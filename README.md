@@ -1,121 +1,179 @@
-# FieldMap · Forerunner 165
+<div align="center">
 
-English Connect IQ watch app with GPS coordinates, a bounded movement trace and
-OpenStreetMap street/path maps supplied by **OpenFreeMap**. GPS works without a
-phone or internet; downloading new map images needs Garmin Connect and internet.
+# FieldGrid
 
-**G0 prototype, simulator-tested; physical Forerunner 165 / iPhone acceptance is
-still NOT RUN.** The user requested the real-map integration before physical G0
-acceptance. This does not mark G0/G3 passed or claim field-tested navigation.
+### Your position. A simple grid. Nothing uploaded.
 
-## Start with offline GPS
+An offline GPS companion for **Garmin Forerunner 165**.
 
-Python 3.12–3.14, Java 11+ and Garmin SDK 9.2.0 / `fr165` device package:
+**English interface · Live coordinates · Bounded memory · No account**
 
-```sh
-make setup                  # Packages only inside project .venv
-make doctor
-make test
-make build-watch            # build/FieldMap.prg
-make test-watch
-make sim-offline
-```
+<img src="docs/evidence/grid-only/synthetic-grid-day.png" width="250" alt="Day grid with geographic coordinate lines and a filtered position marker">
+<img src="docs/evidence/grid-only/synthetic-grid-night.png" width="250" alt="Night grid with the current position and a short breadcrumb trail">
+<img src="docs/evidence/grid-only/synthetic-stats.png" width="250" alt="Live elapsed time, distance, GPS speed and pace">
 
-See [setup](docs/setup.md). On this Mac, `.venv` and the SDK configuration already
-exist. Press **DOWN on the home screen for GPS only**. Latitude and longitude use
-six decimal places in WGS84, with fix age and Current/Last known status. No fix is
-shown as `--`. Displayed decimal places are not a GPS accuracy guarantee. The
-GPS-only session makes no map/network requests and does not save location history.
+*Screenshots are from the Forerunner 165 simulator. All shown locations and movement are synthetic test data. Grid and stats images show the unchanged v0.2.1 layout; coordinates and diagnostics below show v0.2.2. Coordinate screenshots show the waiting state.*
 
-In the simulator, explicitly load a synthetic GPX through Simulation → Activity
-Data; [instructions](docs/field-test.md). The physical watch uses its own GPS,
-never the test fixture. START opens a normal map session instead.
+</div>
 
-![English offline coordinates — synthetic simulator GPS](docs/evidence/screenshots/en-offline-no-phone-coordinates-final.png)
+## What it does
 
-## Free real maps: what the URL and token mean
+FieldGrid turns the watch GPS into a geographic grid you can explore while walking.
+See your position, a recent trail and live movement information without downloading
+maps or connecting your phone. The grid contains coordinate lines, not roads or terrain.
 
-[OpenFreeMap](https://openfreemap.org/) is free, with no registration, API key or
-request/view quota. Its public service has no SLA. It provides **vector tiles,
-not PNGs** ([upstream limitations](https://github.com/hyperknot/openfreemap#limitations-of-this-project)).
-Our Python service converts only the visible area into a small 16-color PNG for
-the watch. The watch does not download a vector database or city map package.
+| Feature | Experience |
+| :--- | :--- |
+| Geographic grid | North up view, WGS84 coordinate labels and a scale in meters |
+| Position and trail | Filtered position marker with up to 180 recent trace points |
+| Explore the area | Zoom from level 10 to 19, pan both axes and return to your position |
+| Coordinates | Filtered latitude and longitude, with a labeled raw view on START |
+| Motion assistance | Accelerometer stillness and Garmin step evidence support the GPS filter |
+| Live information | Elapsed time, estimated distance, GPS speed and pace |
+| Day and night | Two clear themes designed for the round 390 × 390 display |
+| Session control | Start, pause, resume and end; nothing is saved or shared |
 
-```dotenv
-FR165_MAP_PROVIDER=openfreemap
-FR165_PUBLIC_BASE_URL=http://127.0.0.1:8765
-```
+## Start a session
 
-`FR165_PUBLIC_BASE_URL` is the address of **your raster converter**, not OpenFreeMap.
-`127.0.0.1` means this Mac only. Local HTTP is useful for API development, but the
-Garmin image converter cannot fetch a localhost PNG. A reachable **HTTPS renderer**
-is required for online maps on the watch. Changing the URL to `openfreemap.org`
-will not work because it is a different API.
+1. Open **FieldGrid G0** on the watch.
+2. Press **START** to open the grid, or **DOWN** for coordinates.
+3. Wait outdoors for a usable GPS fix. The app never invents a location.
+4. Press **START** from the grid to open live stats, coordinates and other options.
+5. Press **BACK** from the grid to pause. Select **End session** to clear the session.
 
-`FR165_DEV_TOKEN` protects your own renderer; it is not a map-provider API key,
-subscription or charge. The provider receives no such token. Local rendering is
-limited to 30 jobs/minute to prevent resource abuse; this is an application guard,
-not an OpenFreeMap account quota. The watch starts at most one job per five seconds.
+Opening the home screen does not start GPS. No iPhone, Garmin Connect, internet,
+API token or server is needed. This app creates no Garmin Connect activity.
 
-```sh
-make dev-config             # First setup only; existing private files are preserved
-make api                    # Terminal 1: local renderer
-make sim                    # Terminal 2: configured watch build
-```
+<div align="center">
+<img src="docs/evidence/grid-only/synthetic-home.png" width="240" alt="Home screen explaining that nothing is saved or shared">
+<img src="docs/evidence/grid-only/synthetic-paused.png" width="240" alt="Paused session offering Resume or End session">
+<img src="docs/evidence/stationary-filter/synthetic-diagnostics-on.png" width="240" alt="Version 0.2.2 diagnostics with local motion assistance and network and storage disabled">
+</div>
 
-OpenFreeMap is the default provider. Set `FR165_MAP_PROVIDER=synthetic` explicitly
-for test grids. Provider failures preserve the last map and GPS; they never replace
-real maps with a synthetic grid. `make sim-offline` is an explicit local test mode.
-
-A tunnel is temporary development access: the Mac must stay awake and online.
-Permanent hosting is a separate choice; no paid account or permanent deployment
-has been created. [HTTPS test plan](docs/https-simulator-test.md).
+<div align="center">
+<img src="docs/evidence/stationary-filter/synthetic-coordinates-filtered.png" width="240" alt="Filtered WGS84 coordinates with a clearly labeled raw toggle">
+<img src="docs/evidence/stationary-filter/synthetic-coordinates-raw.png" width="240" alt="Raw GPS coordinates with a clearly labeled filtered toggle">
+</div>
 
 ## Controls
 
-| Action | Button |
-|---|---|
-| Home: start offline GPS coordinates | DOWN |
-| Home: start map session | START |
-| Map: menu | START |
-| Map: zoom z14 / z15 / z16 | UP / DOWN |
-| Menu: move / select | UP / DOWN, then START |
-| Browse: choose north–south / east–west axis | START |
-| Browse: pan / return to following | UP / DOWN, BACK |
-| Coordinates, credits or menu: return to map | BACK |
-| Map: stop session, clear trace and release image | BACK |
+| Screen | Button | Action |
+| :--- | :--- | :--- |
+| Home | START / DOWN | Start the grid / coordinates |
+| Home | BACK | Exit |
+| Grid | UP / DOWN | Zoom in / out |
+| Grid | START | Open the menu |
+| Grid | BACK | Pause the session |
+| Menu | UP / DOWN, then START | Choose an option |
+| Browse grid | UP / DOWN | Pan along the selected axis |
+| Browse grid | START / BACK | Change axis / follow your position |
+| Coordinates | START | Toggle Filtered / Raw |
+| Diagnostics | START | Toggle motion assistance for this session |
+| Stats, coordinates, diagnostics | BACK | Return to the grid |
+| Paused session | UP / DOWN, then START | Resume or end the session |
+| Paused session | BACK | Resume |
 
-Menu includes theme, 195/256/390 image size, diagnostics, a safe 1K storage probe,
-GPS coordinates and map credits. UI remains English regardless of watch language.
+## Privacy and resource use
 
-## Bounded resource use
+**Session information stays in watch memory.** The application has only
+Positioning and Sensor permissions. It has no network calls, phone integration, activity
+recorder, saved FIT files, persistent trace, map cache or analytics.
 
-- Watch: 180 trace points; one active image plus at most one incoming image;
-  16-color conversion, single network job and timeout/backoff. GPS continues while
-  new maps are paused for low memory. No persistent map cache or GPS history.
-- Preferences: one small key, rewritten only when values change. Storage probe
-  writes, compares and removes 1024 ASCII characters; it is not a capacity test.
-- Renderer: at most 9 visible-area tiles per view; 1 MiB each, 16 cached tiles AND
-  8 MiB total compressed cache, one decoded tile at a time, one render at a time,
-  18-second deadline, at most 64 KiB PNG, 24 short-lived output images. No disk tiles.
+The display trail holds at most **180 points**, and the position filter holds
+**three samples** plus fixed summary anchors. Motion input uses one second batches
+of 25 accelerometer samples per axis, discarded after calculating scalar summaries.
+One timer updates the display once per second. The v0.2.3 executable is
+**126,620 bytes**, about **124 KiB**. Ending the session or exiting stops GPS, motion
+sampling and the timer, then releases the session data.
 
-[Measured results and limits](docs/evidence/g0.md) distinguish accelerated event
-stress from real elapsed-time, physical RAM and battery testing.
+Garmin's separate health and activity features keep their own behavior. FieldGrid
+does not change those settings or delete existing activities. The app executable
+itself occupies storage; the privacy promise concerns session data.
 
-## Delivery
+Fresh stillness or unconfirmed wrist movement holds the marker even if GPS reports
+movement. Repeated gait peaks or multiple native steps provide movement evidence;
+no daily total is saved or uploaded. Diagnostics shows STILL or VERIFY while holding,
+GAIT or STEPS for confirmed evidence, and WAIT, UNAVAILABLE or OFF for GPS fallback. START toggles this
+assistance. Disable it if a steady wrist causes legitimate motion to be suppressed.
+Missing sensor data falls back to GPS filtering. This is a custom display filter,
+not Garmin's native activity algorithm.
+
+The filter reduces stationary jitter and rejects isolated jumps. Slow movement can
+appear after a short delay, and sustained GPS drift can still resemble movement.
+Distance is a filtered estimate, not Garmin's native activity distance. Six decimal
+places describe display precision, not guaranteed GPS accuracy. Weak or stale fixes
+are labeled. Raw coordinates remain available beyond the grid's Mercator latitude
+limit of approximately ±85.05113°.
+
+If the system hides the app, GPS, motion sampling and the timer stop. An active session resumes when
+the app returns to the foreground, with a gap in the trail. Elapsed time can continue
+during that interruption; missing movement is never estimated.
+
+## Build locally
+
+Requirements: **Python 3.12–3.14**, **Java 11 or later**, **Garmin SDK 9.2.0**, and
+its **Forerunner 165** device package. The verified build target is `fr165`.
 
 ```sh
-make audit                  # Online dependency vulnerability check
-make contracts              # Regenerate OpenAPI
-make evidence               # Current artifacts + observed tests, never physical PASS
-make package                # Shareable source ZIP
+make setup
+make install-hooks
+make doctor
+make test
+make build-watch
+make test-watch
+make sim
 ```
 
-[Progress](docs/progress.md) · [Architecture decision](docs/decisions/004-openfreemap-and-offline-position.md)
-· [Requirements traceability](docs/traceability.md) · [Security](SECURITY.md)
+Python dependencies install only inside `.venv`. SDK files remain outside this
+repository. The first build creates a private signing key under `.local/keys`;
+existing keys are preserved. See [setup instructions](docs/setup.md) for paths and
+simulator details. Simulator GPS data must be explicitly enabled for testing.
 
-Source ZIP: `dist/FieldMap-G0-source.zip`. Watch file: `build/FieldMap.prg`.
-Git ignores `.venv`, `.local`, `.env`, SDK/build outputs and private logs. Do not
-upload the whole folder through an interface that ignores `.gitignore`; use Git or
-the source ZIP. No GitHub push or Connect IQ Store publication is performed here.
-No source-code license has been chosen; map-data attribution/licenses still apply.
+To install, copy `build/FieldMap.prg` to the watch's `GARMIN/Apps` folder using MTP.
+Disconnect the cable and open **FieldGrid G0**. The filename and app identifier are
+retained from FieldMap so upgrades replace the earlier application. This is a local
+installation; the app has not been published in the Connect IQ Store.
+
+## Verification
+
+| Check | Result |
+| :--- | :--- |
+| Python tests, including publication guards | 116 passed |
+| Monkey C tests on the `fr165` simulator | 37 passed |
+| Production build | Zero warnings |
+| Previous physical tests | v0.2.1 and v0.2.2 stationary drift failed by user report |
+| Current v0.2.3 physical test | USB readback PASS; stationary hold and walking response PASS by user report |
+| English layout | Reviewed on the native 390 × 390 simulator display |
+| Long duration physical battery and GPS accuracy | Not yet measured |
+
+Memory tests cover **30,000 synthetic fixes**, **1,000 redraws**, and **40 GPS start
+and stop cycles** with another **12,000 fixes**. The production simulator diagnostics
+snapshot for the previous v0.2.1 build showed **25 KiB** used memory. Sensor tests
+add **300,000 synthetic acceleration samples** and **20 sensor lifecycle loops**,
+with no progressive retained heap growth beyond the 512 byte assertion bound. Simulator measurements do not establish
+physical battery life. This remains a **G0 prototype**, with full physical acceptance
+still pending. See the [latest evidence](docs/evidence/wrist-motion/README.md) and
+[field checklist](docs/grid-field-test.md).
+
+
+## Repository guide
+
+| Path | Purpose |
+| :--- | :--- |
+| `apps/watch/` | Monkey C application, resources and tests |
+| `scripts/` | Build, validation, packaging and publication checks |
+| `tests/` | Python tests and synthetic fixtures |
+| `docs/decisions/` | Architecture and scope decisions |
+| `docs/evidence/` | Measured results with explicit test boundaries |
+| `docs/archive/` | Historical map experiments |
+| `services/`, `contracts/`, `web/` | Earlier raster experiment, unused by FieldGrid |
+
+The legacy renderer is retained for reference. `FR165_PUBLIC_BASE_URL`, `.env`,
+`make api` and `make dev-config` apply only to that experiment. Current watch builds
+and simulator runs start no service and read no map credentials.
+
+[Current requirements](requirements.md) · [Latest decision](docs/decisions/009-wrist-motion-rejection.md) · [Progress](docs/progress.md)
+
+FieldGrid is an independent project and is not an official Garmin application.
+
+Licensed under the [Apache License 2.0](LICENSE).

@@ -1,14 +1,12 @@
 import Toybox.Application;
-import Toybox.Communications;
-import Toybox.Graphics;
-import Toybox.Lang;
-import Toybox.Math;
+import Toybox.ActivityMonitor;
+import Toybox.Sensor;
 import Toybox.Position;
-import Toybox.PersistedContent;
 import Toybox.System;
 import Toybox.Time;
 import Toybox.Timer;
 import Toybox.WatchUi;
+import Toybox.Lang;
 
 class FieldMapApp extends Application.AppBase {
     var session as FieldSession;
@@ -17,246 +15,144 @@ class FieldMapApp extends Application.AppBase {
         var view = new FieldView(session);
         return [view, new FieldDelegate(view, session)];
     }
-    function onStart(state) {}
     function onStop(state) { session.stop(); }
-    function onInactive(state) { session.pause(); }
-    function onActive(state) { session.resume(); }
+    function onInactive(state) { session.inactive(); }
+    function onActive(state) { session.active(); }
 }
 
+// Ephemeral session only: no activity recorder, persistence writer or phone API.
 class FieldSession {
     var gps as GpsState;
-    var map as MapState;
+    var grid as GridState;
+    var opened = false;
     var running = false;
     var subscribed = false;
-    var ticker;
-    var epoch = 0;
-    var job = null;
-    var baseUrl = "";
-    var token = "";
-    var configError = false;
-    var storageStatus = "NOT RUN";
+    var ticker = null;
+    var startedMs = null;
+    var elapsed = 0;
     var peakMemory = 0;
     var updateCount = 0;
-    var networkEnabled = true;
-    var lowMemory = false;
-    var lastSavedZoom = null;
-    var lastSavedStyle = null;
+    var error = null;
+    var lastResult = null;
+    var motion as MotionState;
+    var sensorSubscribed = false;
 
     function initialize() {
-        gps = new GpsState(); map = new MapState(); ticker = new Timer.Timer();
+        gps = new GpsState(); grid = new GridState(); motion = new MotionState();
+        // Upgrade cleanup touches only our three known obsolete keys, never activities.
         try {
-            var saved = Application.Storage.getValue("preferences-v1");
-            if (saved instanceof Dictionary) {
-                if (saved["zoom"] == 14 || saved["zoom"] == 15 || saved["zoom"] == 16) { map.zoom = saved["zoom"]; }
-                if ("day".equals(saved["style"]) || "night".equals(saved["style"])) { map.style = saved["style"]; }
+            var keys = ["grid-preferences-v1", "preferences-v1", "g0-probe"];
+            for (var i = 0; i < keys.size(); i++) {
+                if (Application.Storage.getValue(keys[i]) != null) { Application.Storage.deleteValue(keys[i]); }
             }
-            lastSavedZoom = map.zoom; lastSavedStyle = map.style;
-            baseUrl = WatchUi.loadResource(Rez.Strings.ConfigBaseUrl);
-            token = WatchUi.loadResource(Rez.Strings.ConfigDevToken);
-            if ("DISABLED".equals(baseUrl)) { baseUrl = ""; }
-            if ("DISABLED".equals(token)) { token = ""; }
-            var allowLocal = "true".equals(WatchUi.loadResource(Rez.Strings.ConfigAllowLocalHttp));
-            if (!(baseUrl instanceof String) || !(token instanceof String)) {
-                baseUrl = ""; token = ""; configError = true;
-            }
-            if (baseUrl.length() != 0 && baseUrl.find("https://") != 0 &&
-                !(allowLocal == true && "http://127.0.0.1:8765".equals(baseUrl))) {
-                baseUrl = ""; configError = true;
-            }
-        } catch (e) { configError = true; }
+        } catch (e) { error = "Old settings cleanup failed"; }
     }
-
-    function save() {
-        if (lastSavedZoom == map.zoom && map.style.equals(lastSavedStyle)) { return; }
-        try {
-            Application.Storage.setValue("preferences-v1", {"zoom" => map.zoom, "style" => map.style});
-            lastSavedZoom = map.zoom; lastSavedStyle = map.style;
-        } catch (e) { storageStatus = "WRITE FAILED"; }
-    }
-
     function start() {
-        if (running) { return; }
-        running = true; gps = new GpsState(); map.metadata = null; map.bitmap = null;
-        map.center = null; map.follow = true; map.generation++; map.failures = 0;
-        map.nextAttempt = 0; map.permanent = false; map.lastCode = 0;
-        map.lastStart = -5000; map.requestCount = 0; map.imageCount = 0; map.lastDuration = 0;
-        map.wanted = false; lowMemory = false; updateCount = 0; peakMemory = 0;
-        resume();
+        if (opened) { return false; }
+        gps = new GpsState(); grid.center = null; grid.follow = true;
+        elapsed = 0; updateCount = 0; lastResult = null; error = null;
+        opened = true;
+        return resume();
     }
-
-    function resume() {
+    function enableGps() {
         if (!running || subscribed) { return; }
-        gps.quality = Position.QUALITY_NOT_AVAILABLE; gps.gap = true;
-        map.active = true;
-        if (map.center != null) { map.wanted = true; }
-        subscribed = true;
-        Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, method(:onPosition));
-        ticker.start(method(:tick), 1000, true);
+        try {
+            Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, method(:onPosition));
+            subscribed = true; error = null;
+        } catch (e) { error = "GPS unavailable - retry"; }
     }
-
-    function pause() {
+    function disableGps() {
         if (subscribed) {
-            subscribed = false;
             Position.enableLocationEvents(Position.LOCATION_DISABLE, method(:onPosition));
+            subscribed = false;
         }
-        ticker.stop(); epoch++; job = null;
-        map.active = false; map.busy = false; gps.gap = true;
-        Communications.cancelAllRequests();
+        gps.gap = true;
     }
-
+    function startTicker() {
+        if (ticker == null && running) {
+            ticker = new Timer.Timer(); ticker.start(method(:tick), 1000, true);
+        }
+    }
+    function stopTicker() { if (ticker != null) { ticker.stop(); ticker = null; } }
+    function enableMotion() {
+        if (!running || !motion.enabled || sensorSubscribed) { return; }
+        motion.clear();
+        try {
+            Sensor.registerSensorDataListener(method(:onMotion), {
+                :period => 1, :accelerometer => {:enabled => true, :sampleRate => 25}
+            });
+            sensorSubscribed = true;
+        } catch (e) { motion.unavailable = true; }
+        readSteps();
+    }
+    function disableMotion() {
+        if (sensorSubscribed) {
+            Sensor.unregisterSensorDataListener(); sensorSubscribed = false;
+        }
+        motion.clear(); gps.motionHint = null;
+    }
+    function toggleMotion() {
+        disableMotion(); motion.enabled = !motion.enabled;
+        if (motion.enabled && running && subscribed) { enableMotion(); }
+    }
+    function readSteps() {
+        if (!running || !motion.enabled) { return; }
+        try { motion.steps(ActivityMonitor.getInfo().steps, System.getTimer()); }
+        catch (e) { motion.steps(null, System.getTimer()); }
+    }
+    function onMotion(data as Sensor.SensorData) as Void {
+        if (!running || !sensorSubscribed) { return; }
+        var a = data.accelerometerData;
+        if (a == null) { motion.sample(null, null, null, System.getTimer()); return; }
+        motion.sample(a.x, a.y, a.z, System.getTimer());
+    }
+    function inactive() {
+        // Garmin restricts GPS while hidden; resume with a gap, never invent a path.
+        disableMotion(); disableGps(); stopTicker();
+    }
+    function active() { if (running) { enableGps(); enableMotion(); startTicker(); } }
+    function seconds() {
+        return elapsed + (startedMs == null ? 0 : Geo.max(0, System.getTimer() - startedMs) / 1000);
+    }
+    function distance() { return gps.distance; }
+    function speed() {
+        if (!running || !gps.usable(System.getTimer()) || "REACQUIRE".equals(gps.filter.status)) { return null; }
+        return gps.filter.moving ? gps.speed : 0;
+    }
+    function pause() {
+        if (!running) { return; }
+        elapsed = seconds(); startedMs = null; running = false;
+        disableMotion(); disableGps(); stopTicker();
+    }
+    function resume() {
+        if (!opened) { return false; }
+        if (running) { return true; }
+        running = true; startedMs = System.getTimer();
+        enableGps(); enableMotion(); startTicker(); return true;
+    }
     function stop() {
-        running = false; pause(); save();
-        gps = new GpsState(); map.bitmap = null; map.metadata = null; map.center = null;
+        running = false; opened = false; startedMs = null; elapsed = 0;
+        disableMotion(); disableGps(); stopTicker();
+        motion = new MotionState();
+        gps = new GpsState(); grid.center = null; updateCount = 0;
+        lastResult = "Session cleared";
     }
-
     function onPosition(info as Position.Info) as Void {
         if (!running || !subscribed) { return; }
+        updateCount++;
         if (info.position == null || info.when == null) {
-            gps.quality = Position.QUALITY_NOT_AVAILABLE; gps.gap = true;
-        } else {
-            var degrees = info.position.toDegrees();
-            if (gps.accept(degrees[0], degrees[1], info.when.value(), info.accuracy,
-                info.heading, Time.now().value(), System.getTimer())) {
-                if (gps.xy != null) { map.track(gps.xy[0], gps.xy[1]); }
-                maybeRequest();
-            }
+            gps.quality = Position.QUALITY_NOT_AVAILABLE; gps.gap = true; return;
         }
-        // Marker refresh never waits for a raster response.
-        updateCount++; WatchUi.requestUpdate();
+        var ll = info.position.toDegrees();
+        gps.motionHint = motion.hint(System.getTimer());
+        gps.accept(ll[0], ll[1], info.when.value(), info.accuracy, info.speed, Time.now().value(), System.getTimer());
+        grid.track(gps.xy);
+        // One timer owns repaint cadence; GPS callbacks only update bounded state.
     }
-
-    function tick() {
-        if (!subscribed) { return; }
-        var now = System.getTimer();
-        if (map.busy && now - map.lastStart >= 25000) {
-            epoch++; job = null; Communications.cancelAllRequests();
-            map.fail(-901, now, null);
-        }
-        maybeRequest();
-        var memory = System.getSystemStats().usedMemory;
-        if (memory > peakMemory) { peakMemory = memory; }
+    function tick() as Void {
+        if (!running) { return; }
+        readSteps();
+        peakMemory = Geo.max(peakMemory, System.getSystemStats().usedMemory);
         WatchUi.requestUpdate();
-    }
-
-    function maybeRequest() {
-        if (!networkEnabled || baseUrl.length() == 0 || !map.canStart(System.getTimer())) { return; }
-        // Reserve space for incoming metadata/bitmap without dropping the live GPS trace.
-        var stats = System.getSystemStats();
-        lowMemory = stats.freeMemory < 96 * 1024;
-        if (lowMemory) { return; }
-        map.start(System.getTimer()); epoch++;
-        job = new MapJob(self, epoch, map.generation);
-        job.start();
-    }
-
-    function current(id) { return subscribed && map.active && id == epoch; }
-
-    function pan(dx, dy) {
-        if (map.center == null) { return; }
-        map.follow = false;
-        var step = Geo.resolution(map.zoom) * 70;
-        var x = map.center[0] + dx * step;
-        var y = map.center[1] + dy * step;
-        y = Geo.max(-Geo.WORLD / 2, Geo.min(Geo.WORLD / 2, y));
-        if (x > Geo.WORLD / 2) { x -= Geo.WORLD; }
-        if (x < -Geo.WORLD / 2) { x += Geo.WORLD; }
-        map.camera(x, y);
-    }
-
-    function recenter() {
-        map.follow = true;
-        if (gps.xy != null) { map.camera(gps.xy[0], gps.xy[1]); }
-    }
-
-    function probeStorage() {
-        // A boundary-sized setValue caused an uncatchable SDK OOM. Keep the live
-        // session probe small; this verifies round-trip behavior, not capacity.
-        var s = "0123456789abcdef";
-        while (s.length() < 1024) { s += s; }
-        try {
-            Application.Storage.setValue("g0-probe", s);
-            var read = Application.Storage.getValue("g0-probe");
-            storageStatus = read instanceof String && s.equals(read) ? "1K OK" : "1K BAD";
-        } catch (e) { storageStatus = "WRITE FAILED"; }
-        try { Application.Storage.deleteValue("g0-probe"); }
-        catch (e) { storageStatus = "WRITE FAILED"; }
-    }
-}
-
-class MapJob {
-    var owner as FieldSession; var id; var gen; var pending as Dictionary or Null = null;
-    function initialize(session, number, generation) { owner = session; id = number; gen = generation; }
-    function start() {
-        var m = owner.map;
-        var ll = Geo.inverse(m.center[0], m.center[1]);
-        var headers = {"Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON};
-        if (owner.token.length() != 0) { headers["Authorization"] = "Bearer " + owner.token; }
-        try {
-            Communications.makeWebRequest(owner.baseUrl + "/v1/map-renders",
-                {"schemaVersion" => 1, "requestGeneration" => gen, "latDeg" => Geo.coordinateText(ll[0]),
-                 "lonDeg" => Geo.coordinateText(ll[1]), "zoom" => m.zoom, "style" => m.style, "imageSize" => m.size},
-                {:method => Communications.HTTP_REQUEST_METHOD_POST, :headers => headers,
-                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON}, method(:onMetadata));
-        } catch (e) { fail(-902, null); }
-    }
-
-    function obsolete() {
-        if (!owner.current(id)) { return true; }
-        if (owner.map.generation != gen) {
-            owner.map.busy = false; owner.map.wanted = true; owner.job = null;
-            return true;
-        }
-        return false;
-    }
-
-    function fail(code, data) {
-        if (obsolete()) { return; }
-        var retry = null;
-        if (data instanceof Dictionary && Geo.finite(data["retryAfterSec"])) {
-            retry = Geo.max(0, Geo.min(3600, data["retryAfterSec"]));
-        }
-        owner.map.fail(code, System.getTimer(), retry); owner.job = null;
-        WatchUi.requestUpdate();
-    }
-
-    function onMetadata(code as Number, data as Dictionary or String or PersistedContent.Iterator or Null) as Void {
-        if (obsolete()) { return; }
-        if (code != 200) { fail(code, data); return; }
-        if (!(data instanceof Dictionary)) { fail(-900, null); return; }
-        if (!owner.map.validate(data, gen, owner.baseUrl)) {
-            System.println("G0 rejected metadata: " + owner.map.validationIssue);
-            fail(-900, null); return;
-        }
-        if (data["expiresAt"] <= Time.now().value()) {
-            System.println("G0 rejected metadata: expired");
-            fail(-900, null); return;
-        }
-        pending = data;
-        try {
-            Communications.makeImageRequest(data["imageUrl"], null,
-                {:maxWidth => owner.map.size, :maxHeight => owner.map.size,
-                 :dithering => Communications.IMAGE_DITHERING_NONE, :palette => palette()}, method(:onImage));
-        } catch (e) { fail(-902, null); }
-    }
-
-    function palette() {
-        if ("night".equals(owner.map.style)) {
-            return [0x15232A,0x243C32,0x315344,0x264B68,0x384248,0x4B535A,0x77838A,0x746249,
-                0xA18F62,0xAA7960,0xC99B64,0x779AA3,0xEEF4EE,0x8A9A8D,0x705C78,0x555555];
-        }
-        return [0xF2F0E7,0xDDE7CE,0xBBD6A4,0x96CADA,0xD8D3C9,0xB2AAA0,0xFFFFFF,0xCDAF82,
-            0xE5CB8C,0xE7A872,0x946E45,0x6E858A,0x203830,0x788174,0xD6C2D8,0xBBBBBB];
-    }
-
-    function onImage(code as Number, data as Graphics.BitmapReference or WatchUi.BitmapResource or Null) as Void {
-        if (obsolete()) { return; }
-        if (code != 200 || data == null) { fail(code == 200 ? -903 : code, null); return; }
-        var bitmap = data instanceof Graphics.BitmapReference ? data.get() : data;
-        if (bitmap.getWidth() != pending["imageWidth"] || bitmap.getHeight() != pending["imageHeight"]) {
-            System.println("G0 rejected bitmap dimensions");
-            fail(-900, null); return;
-        }
-        owner.map.commit(pending, data, gen, System.getTimer());
-        owner.job = null; WatchUi.requestUpdate();
     }
 }

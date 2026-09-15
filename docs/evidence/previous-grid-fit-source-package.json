@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "tests": 92,
+  "target": "fr165",
+  "warnings": 0,
+  "watchSourceSha256": "e28dc8e1ba43ed8034090e792feb572ccf77cc635759c25eaa24b08677885cef",
+  "sdkVersion": "9.2.0",
+  "method": "Source ZIP extracted under /tmp. Tests reuse existing project .venv; clean watch build creates its own signing key in temporary checkout. No new dependencies or private configuration copied. Final archive may add evidence only; watch code hash validated."
+}

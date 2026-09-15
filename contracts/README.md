@@ -1,23 +1,22 @@
-# G0 protokolü
+# Historical G0 raster protocol
 
-`openapi.json`, `make contracts` ile çalışan Pydantic modellerinden üretilir.
-Örnekler yapay 52°N / 5°E kontrol noktasıdır; kullanıcıdan alınmış konum değildir.
+These contracts belong to the earlier raster service, not the current offline watch
+app. `make contracts` generates `openapi.json` from the Pydantic models. Examples
+use synthetic 52°N / 5°E coordinates, never the user's location.
 
-`POST /v1/map-renders` gövdesinde şema sürümü, istek nesli, koordinat, zoom, boyut
-ve stil vardır. Görsel, konum işareti ve iz içermez. Coğrafi sınırlar piksel
-**kenarlarını** belirtir: `[minX, minY, maxX, maxY]`, EPSG:3857, metre.
-Üç raster boyutu aynı 390 ekran pikseline karşılık gelen coğrafi alanı kapsar.
-Üst-sol piksel sınırı `(minX,maxY)`; piksel merkezleri yarım piksel içeridedir.
+`POST /v1/map-renders` includes schema version, request generation, coordinates,
+zoom, size and style. Images contain no position marker or personal trail. Bounds
+represent pixel edges in EPSG:3857 meters: `[minX, minY, maxX, maxY]`. All three
+raster sizes cover the same geographic area at 390 screen pixels. The upper left
+edge is `(minX, maxY)`; pixel centers sit half a pixel inside.
 
-Harita tanımı `renderId` ve iki dakika geçerli `imageUrl` döndürür. `GET` görüntü
-ucunda başka render kimliğine ait imza çalışmaz. Yanıttaki `X-Render-Id` HTTP testinde
-kontrol edilir; Garmin görüntü callback’i başlık sağlamadığı için saat kimliği
-doğrulanmış URL + nesil + bekleyen metaveri + boyut kontrolüyle atomik geçiş yapar.
+Metadata returns `renderId` and an `imageUrl` valid for two minutes. A signature for
+another render cannot fetch the image. HTTP tests verify `X-Render-Id`. Garmin image
+callbacks expose no headers, so the former watch checked the validated URL,
+generation, pending metadata and dimensions before atomic activation.
 
-400 ailesi / 429 hataları `code`, `retryable`, `retryAfterSec`, `requestId` taşır;
-validation girdi değerlerini yansıtmaz. Varsayılan loopback servisinde token
-zorunlu değildir; `make dev-config` bunu yerelde de etkinleştirir. Uzak HTTPS
-origin ayarlanırsa token olmadan servis açılmaz. Hesap tokenı URL’ye konmaz.
-
-Eşleme, config, rota ve cihaz kaldırma uçları G2/R1’e aittir; sahte başarılı
-yanıtlar veren stub uçlar eklenmedi.
+Client errors and 429 responses provide `code`, `retryable`, `retryAfterSec` and
+`requestId`, without reflecting input values. Default loopback service requires no
+token; `make dev-config` enables one locally. A remote HTTPS origin requires a token.
+The device token is not placed in the URL. Pairing, configuration, route and device
+removal endpoints were later proposals; no fake success stubs were added.

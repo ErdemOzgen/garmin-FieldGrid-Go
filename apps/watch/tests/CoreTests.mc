@@ -4,354 +4,414 @@ import Toybox.Math;
 import Toybox.Position;
 import Toybox.Graphics;
 import Toybox.System;
-import Toybox.Time;
+import Toybox.Lang;
 
 (:test)
-function decimalCoordinateWirePrecision(logger) {
-    Test.assert("52.00002000".equals(Geo.coordinateText(52.00002d)));
-    Test.assert("5.00003000".equals(Geo.coordinateText(5.00003d)));
-    Test.assert("-179.99999999".equals(Geo.coordinateText(-179.99999999d)));
-    return true;
+module Synthetic {
+function fix(g, meters, t, speed) {
+    return g.accept(52.0d + meters / 111319.49d, 5.0d, 100 + t, Position.QUALITY_GOOD, speed, 100 + t, t * 1000);
+}
 }
 
 (:test)
-function smallStorageProbeRoundTrip(logger) {
-    var s = new FieldSession();
-    s.probeStorage();
-    Test.assert("1K OK".equals(s.storageStatus));
-    Test.assert(Application.Storage.getValue("g0-probe") == null);
-    return true;
-}
-
-(:test)
-function projectionControlPoints(logger) {
-    var p = Geo.project(45.0d, 90.0d);
-    Test.assert(Geo.abs(p[0] - 10018754.171394622d) < 0.1);
-    Test.assert(Geo.abs(p[1] - 5621521.486192066d) < 0.1);
-    var zero = Geo.project(0.0d, 0.0d);
-    Test.assert(Geo.abs(zero[0]) < 0.01 && Geo.abs(zero[1]) < 0.01);
-    return true;
-}
-
-(:test)
-function projectionHemispheres(logger) {
-    var inputs = [[52.0d, 5.0d], [50.85d, 4.35d], [-33.0d, 18.0d], [0.0d, -1.0d]];
+function projectionAndDateLine(logger) {
+    var inputs = [[52.0d, 5.0d], [-33.0d, 18.0d], [0.0d, 179.999d], [85.0d, -179.99d]];
     for (var i = 0; i < inputs.size(); i++) {
-        var p = Geo.project(inputs[i][0], inputs[i][1]);
-        var ll = Geo.inverse(p[0], p[1]);
+        var p = Geo.project(inputs[i][0], inputs[i][1]); var ll = Geo.inverse(p[0], p[1]);
         Test.assert(Geo.abs(ll[0] - inputs[i][0]) < 0.000001d);
         Test.assert(Geo.abs(ll[1] - inputs[i][1]) < 0.000001d);
-        var pixel = Geo.pixel(p[0], p[1], Geo.bounds(p[0], p[1], 15), 390);
-        Test.assert(Geo.abs(pixel[0] - 195) < 0.01 && Geo.abs(pixel[1] - 195) < 0.01);
+        var pixel = Geo.pixel(p[0], p[1], Geo.bounds(p[0], p[1], 17), 390);
+        Test.assert(Geo.abs(pixel[0] - 195) < 0.001);
     }
+    Test.assert(Geo.distance(Geo.project(0, 179.999d), Geo.project(0, -179.999d), 0) < 223);
+    Test.assert("-179.999999".equals(Geo.displayCoordinate(-179.999999d)));
+    Test.assert(!Geo.validGps(null, 5) && !Geo.validGps(91, 0) && !Geo.validGps(0, 181));
     return true;
 }
 
 (:test)
-function antimeridianAndBadCoordinates(logger) {
-    var c = Geo.project(0, 179.999d); var p = Geo.project(0, -179.999d);
-    var xy = Geo.pixel(p[0], p[1], Geo.bounds(c[0], c[1], 14), 390);
-    Test.assert(xy[0] > 195 && xy[0] < 250);
-    Test.assert(!Geo.valid(null, 0)); Test.assert(!Geo.valid(86, 0));
-    Test.assert(!Geo.valid(0, 181)); Test.assert(!Geo.valid("52", 5));
+function gpsFreshnessQualityAndPolar(logger) {
+    var g = new GpsState();
+    Test.assert(!g.accept(null, 5, 100, Position.QUALITY_GOOD, null, 100, 0));
+    Test.assert(!g.accept(52, 5, 120, Position.QUALITY_GOOD, null, 100, 0));
+    Test.assert(!g.accept(52, 5, 90, Position.QUALITY_GOOD, null, 100, 0));
+    Test.assert(Synthetic.fix(g, 0, 0, null));
+    Test.assert(g.usable(5000) && !g.usable(5001));
+    Test.assert(!g.accept(0, 0, 99, Position.QUALITY_GOOD, null, 101, 1000));
+    Test.assert(g.lat == 52);
+    Test.assert(!g.accept(52, 5, 101, Position.QUALITY_POOR, null, 101, 1000));
+    Test.assert(!g.usable(1000));
+    Test.assert(g.accept(89, -170, 102, Position.QUALITY_GOOD, null, 102, 2000));
+    Test.assert(g.lat == 89 && g.lon == -170 && g.xy == null);
+    Test.assert(g.usable(2000));
+    Test.assert(!g.usable(-1));
     return true;
 }
 
 (:test)
-function gpsAgesAndInvalidSamples(logger) {
-    var gps = new GpsState();
-    Test.assert(!gps.accept(null, 5, 100, Position.QUALITY_GOOD, null, 100, 0));
-    Test.assert(gps.xy == null);
-    Test.assert(!gps.accept(52, 5, null, Position.QUALITY_GOOD, null, 100, 0));
-    Test.assert(!gps.accept(52, 5, 110, Position.QUALITY_GOOD, null, 100, 0));
-    Test.assert(!gps.accept(52, 5, 90, Position.QUALITY_GOOD, null, 100, 0));
-    Test.assert(gps.accept(52, 5, 100, Position.QUALITY_GOOD, null, 100, 0));
-    Test.assert(gps.usable(5000)); Test.assert(!gps.usable(5001));
-    Test.assert(!gps.accept(0, 0, 99, Position.QUALITY_GOOD, null, 101, 1000));
-    Test.assert(gps.lat == 52);
-    Test.assert(!gps.accept(52, 5, 102, Position.QUALITY_LAST_KNOWN, null, 102, 2000));
-    Test.assert(!gps.usable(2000));
+function stationaryNoiseDoesNotGrowTrace(logger) {
+    var g = new GpsState(); Synthetic.fix(g, 0, 0, 0.0);
+    for (var i = 1; i < 600; i++) { Synthetic.fix(g, (i % 7) - 3, i, 0.0); }
+    Test.assert(g.count == 1 && g.distance == 0);
+    Test.assert(Geo.distance(g.xy, Geo.project(52, 5), 52) < 0.01);
+    Test.assert(!g.filter.moving);
+    logger.debug("SYNTHETIC: 600 stationary fixes, +/-3 m: 1 point / 0 m trace");
     return true;
 }
 
 (:test)
-function boundedTraceAndGaps(logger) {
-    var gps = new GpsState();
-    for (var i = 0; i < 1000; i++) {
-        Test.assert(gps.accept(52.0d + i * 0.0001d, 5, 100 + i, Position.QUALITY_GOOD, null, 100 + i, i * 1000));
+function stationaryWideDriftCannotOverrideLowSpeed(logger) {
+    var g = new GpsState(); Synthetic.fix(g, 0, 0, 0.0);
+    for (var i = 1; i <= 600; i++) {
+        // User reported stationary drift in the 12 to 34 meter range.
+        // Synthetic ramp, plateau and reverse drift; these are not a real GPS log.
+        var offset = i < 200 ? i * 0.17 : (i < 400 ? 34 : 34 - (i - 400) * 0.17);
+        Synthetic.fix(g, offset, i, (i % 7) * 0.03);
     }
-    Test.assert(gps.count == 180);
-    Test.assert(gps.accept(52.2d, 5, 1110, Position.QUALITY_GOOD, null, 1110, 1010000));
-    Test.assert(gps.point(179)[3]);
+    Test.assert(g.count == 1 && g.distance == 0 && !g.filter.moving);
+    Test.assert(Geo.distance(g.xy, Geo.project(52, 5), 52) < 0.01);
+    logger.debug("SYNTHETIC 600 fixes / 34 m stationary drift: marker held, zero distance");
     return true;
 }
 
 (:test)
-function traceSimplifiesStationaryFixes(logger) {
-    var gps = new GpsState();
-    for (var i = 0; i < 20; i++) {
-        gps.accept(52, 5, 100 + i, Position.QUALITY_GOOD, null, 100 + i, i * 1000);
+function stoppedWalkDoesNotConsumeStationaryDrift(logger) {
+    var g = new GpsState();
+    for (var i = 0; i < 60; i++) { Synthetic.fix(g, i * 1.4, i, 1.4); }
+    for (var j = 60; j < 70; j++) { Synthetic.fix(g, 59 * 1.4, j, 0.0); }
+    var distance = g.distance; var point = [g.xy[0], g.xy[1]]; var count = g.count;
+    for (var k = 70; k < 670; k++) {
+        var drift = ((k - 70) % 200) * 0.17;
+        Synthetic.fix(g, 59 * 1.4 + drift, k, 0.05);
     }
-    Test.assert(gps.count == 4);
+    Test.assert(g.distance == distance && g.count == count);
+    Test.assert(Geo.distance(g.xy, point, 52) < 0.01);
     return true;
 }
 
 (:test)
-function requestCoalescingAndBackoff(logger) {
-    var state = new MapState(); state.active = true; state.camera(0, 0);
-    Test.assert(state.canStart(0)); state.start(0);
-    state.changeZoom(1); state.changeZoom(-1); state.changeZoom(-1);
-    Test.assert(!state.canStart(6000));
-    state.fail(503, 1000, null);
-    Test.assert(!state.canStart(4999)); Test.assert(state.canStart(6000));
-    state.start(6000); state.fail(429, 6500, 60);
-    Test.assert(!state.canStart(66000)); Test.assert(state.canStart(68000));
-    state.start(68000); state.fail(401, 69000, null);
-    Test.assert(!state.canStart(1000000));
-    state.camera(100, 100);
-    Test.assert(!state.canStart(1000000));
-    return true;
-}
-
-(:test)
-function oldCallbackCannotReleaseNewJob(logger) {
-    var s = new FieldSession(); s.subscribed = true; s.map.active = true;
-    s.map.busy = true; s.epoch = 10;
-    var job = new MapJob(s, 9, s.map.generation);
-    job.onMetadata(503, null); job.onImage(200, null);
-    Test.assert(s.map.busy && s.map.lastCode == 0);
-    s.subscribed = false;
-    return true;
-}
-
-(:test)
-function renderEveryScreenAndRaster(logger) {
-    var canvas = Graphics.createBufferedBitmap({:width => 390, :height => 390});
-    var dc = canvas.get().getDc();
-    var s = new FieldSession();
-    Test.assert(!s.running && !s.subscribed);
-    var view = new FieldView(s);
-    Test.assert(view.page == :home);
-    view.onUpdate(dc);
-    view.page = :map; view.onUpdate(dc);
-    var now = Time.now().value();
-    s.gps.accept(52.0d, 5.0d, now, Position.QUALITY_GOOD, 1.0, now, System.getTimer());
-    s.map.track(s.gps.xy[0], s.gps.xy[1]);
-    view.onUpdate(dc);
-    s.baseUrl = ""; view.onUpdate(dc);
-    s.map.style = "night"; view.onUpdate(dc);
-    var raster = Graphics.createBufferedBitmap({:width => 195, :height => 195});
-    s.map.bitmap = raster;
-    s.map.metadata = {"bounds3857" => Geo.bounds(s.map.center[0], s.map.center[1], 15)};
-    view.onUpdate(dc);
-    view.page = :pan; view.onUpdate(dc);
-    view.page = :menu;
-    for (var i = 0; i < view.menuItems.size(); i++) { view.selection = i; view.onUpdate(dc); }
-    view.page = :diagnostics; view.onUpdate(dc);
-    logger.debug("390px canvas rendered. FONT_SMALL=" + dc.getFontHeight(Graphics.FONT_SMALL) +
-        "px; FONT_XTINY=" + dc.getFontHeight(Graphics.FONT_XTINY) + "px");
-    return true;
-}
-
-(:test)
-function criticalLabelsFitRoundScreen(logger) {
-    var canvas = Graphics.createBufferedBitmap({:width => 390, :height => 390});
-    var dc = canvas.get().getDc();
-    var labels = [
-        [textResource(Rez.Strings.Waiting), 42],
-        [textResource(Rez.Strings.Good) + " / 0s", 42],
-        [textResource(Rez.Strings.Stale) + " / 9999s", 42],
-        [textResource(Rez.Strings.Usable) + " / 9999s", 42],
-        [textResource(Rez.Strings.ServiceIssue), 326],
-        [textResource(Rez.Strings.SettingsIssue), 326],
-        [textResource(Rez.Strings.Offline), 326],
-        [textResource(Rez.Strings.MapPending), 326],
-        [textResource(Rez.Strings.Loading), 326],
-        [textResource(Rez.Strings.Back), 338],
-        [textResource(Rez.Strings.Synthetic), 105],
-        [textResource(Rez.Strings.Consent1), 141],
-        [textResource(Rez.Strings.Consent2), 173],
-        [textResource(Rez.Strings.Consent3), 205],
-        [textResource(Rez.Strings.Consent4), 237]
-    ];
-    for (var i = 0; i < labels.size(); i++) {
-        var label = labels[i];
-        var height = dc.getFontHeight(Graphics.FONT_XTINY);
-        var edge = Geo.max(Geo.abs(label[1] - 195), Geo.abs(label[1] + height - 195));
-        var allowed = 2 * Math.sqrt(195 * 195 - edge * edge) - 12;
-        var width = dc.getTextWidthInPixels(label[0], Graphics.FONT_XTINY);
-        logger.debug("Label width " + width + " / safe " + allowed.format("%.0f"));
-        Test.assert(width <= allowed);
+function stationaryDriftRejectsIsolatedSpeedSpikes(logger) {
+    var g = new GpsState();
+    for (var i = 0; i < 600; i++) {
+        var offset = (i % 200) * 0.17;
+        // A speed spike, missing speed and USABLE quality must not unlock drift.
+        var speed = i % 17 == 0 ? null : (i % 9 == 0 ? 1.6 : 0.05);
+        g.accept(52.0d + offset / 111319.49d, 5.0d, 100 + i,
+            Position.QUALITY_USABLE, speed, 100 + i, i * 1000);
     }
-    var view = new FieldView(new FieldSession());
-    for (var n = 0; n < view.menuItems.size(); n++) {
-        var label = textResource(view.menuItems[n]);
-        Test.assert(dc.getTextWidthInPixels(label, view.menuFont(dc, label)) <= 264);
+    Test.assert(g.count == 1 && g.distance == 0 && !g.filter.moving);
+    return true;
+}
+
+(:test)
+function unknownSpeedSlowDriftDoesNotIntegrateForever(logger) {
+    var g = new GpsState();
+    for (var i = 0; i < 600; i++) { Synthetic.fix(g, Geo.min(i, 283) * 0.12, i, null); }
+    Test.assert(g.count == 1 && g.distance == 0);
+    return true;
+}
+
+(:test)
+function walkingAfterDriftDoesNotCountHeldOffset(logger) {
+    var g = new GpsState();
+    for (var i = 0; i < 200; i++) { Synthetic.fix(g, i * 0.17, i, 0.05); }
+    Test.assert(g.distance == 0);
+    for (var j = 200; j < 260; j++) { Synthetic.fix(g, 34 + (j - 200) * 1.4, j, 1.4); }
+    Test.assert(g.filter.moving && g.distance > 70 && g.distance < 85);
+    Test.assert(g.point(1)[3]);
+    Test.assert(Geo.distance(g.xy, Geo.project(52.0d + (34 + 59 * 1.4) / 111319.49d, 5), 52) < 4.3);
+    logger.debug("SYNTHETIC resumed walking: 34 m held GPS offset excluded from distance");
+    return true;
+}
+
+(:test)
+function slowWalkingWithUsableQualityAndSparseFixes(logger) {
+    var g = new GpsState();
+    for (var i = 0; i <= 120; i += 2) {
+        g.accept(52.0d + i * 0.35 / 111319.49d, 5.0d, 100 + i,
+            Position.QUALITY_USABLE, 0.35, 100 + i, i * 1000);
     }
+    Test.assert(g.filter.moving && g.distance > 35 && g.distance < 43);
+    Test.assert(Geo.distance(g.xy, Geo.project(52.0d + 42 / 111319.49d, 5), 52) < 3);
     return true;
 }
 
 (:test)
-function malformedMetadataPreservesActiveMap(logger) {
-    var s = new FieldSession(); s.subscribed = true; s.map.active = true; s.epoch = 2;
-    s.map.camera(0, 0); s.map.busy = true;
-    s.map.metadata = {"renderId" => "previous"};
-    var job = new MapJob(s, 2, s.map.generation);
-    job.onMetadata(200, {"schemaVersion" => 2});
-    Test.assert(!s.map.busy && s.map.permanent && s.map.lastCode == -900);
-    Test.assert("previous".equals(s.map.metadata["renderId"]));
-    s.subscribed = false;
-    return true;
-}
-
-(:test)
-function menuAndFollowControls(logger) {
-    var s = new FieldSession(); var view = new FieldView(s); var delegate = new FieldDelegate(view, s);
-    Test.assert(!s.subscribed); Test.assert(!delegate.onBack());
-    view.page = :map; s.map.camera(0, 0);
-    delegate.onSelect(); Test.assert(view.page == :menu);
-    view.selection = 1; delegate.onSelect(); Test.assert(view.page == :pan);
-    delegate.onPreviousPage(); Test.assert(!s.map.follow);
-    var y = s.map.center[1]; delegate.onSelect(); delegate.onPreviousPage();
-    Test.assert(s.map.center[0] != 0 && s.map.center[1] == y);
-    delegate.onBack(); Test.assert(view.page == :map && s.map.follow);
-    return true;
-}
-
-(:test)
-function staleRasterCannotReplaceNewCamera(logger) {
-    var state = new MapState(); state.active = true; state.camera(0, 0);
-    var old = state.generation; state.changeZoom(1);
-    Test.assert(!state.commit({"renderId" => "old"}, null, old, 100));
-    Test.assert(state.metadata == null && state.zoom == 16);
-    Test.assert(state.commit({"renderId" => "new"}, null, state.generation, 200));
-    Test.assert(state.imageCount == 1);
-    state.active = false;
-    Test.assert(!state.commit({"renderId" => "late"}, null, state.generation, 300));
-    Test.assert("new".equals(state.metadata["renderId"]));
-    return true;
-}
-
-(:test)
-function browseKeepsCamera(logger) {
-    var state = new MapState(); state.camera(0, 0); state.follow = false;
-    state.track(1000, 1000); Test.assert(state.center[0] == 0);
-    state.follow = true; state.track(1000, 1000);
-    Test.assert(state.center[0] == 1000);
-    return true;
-}
-
-(:test)
-function metadataValidation(logger) {
-    var state = new MapState(); state.camera(0, 0);
-    var id = "0123456789abcdef0123456789abcdef";
-    var data = {"schemaVersion" => 1, "requestGeneration" => state.generation,
-        "projection" => "EPSG:3857", "imageWidth" => 390, "imageHeight" => 390,
-        "zoom" => 15, "styleVersion" => "day-v1", "mapDataVersion" => "synthetic-grid-v1",
-        "attribution" => "SYNTHETIC TEST MAP", "renderId" => id,
-        "imageUrl" => "https://example.com/v1/images/" + id + "?sig=test",
-        "expiresAt" => 200, "bounds3857" => Geo.bounds(0, 0, 15)};
-    Test.assert(state.validate(data, state.generation, "https://example.com"));
-    data["imageWidth"] = 256;
-    Test.assert(!state.validate(data, state.generation, "https://example.com"));
-    data["imageWidth"] = 390; data["bounds3857"] = [0, 0, 1, 1];
-    Test.assert(!state.validate(data, state.generation, "https://example.com"));
-    return true;
-}
-
-(:test)
-function coordinatesWithoutInternetAndAtPoles(logger) {
+function filteredCoordinatesAndRawToggleStayLocal(logger) {
     var s = new FieldSession(); var v = new FieldView(s); var d = new FieldDelegate(v, s);
-    // Home DOWN is an explicit GPS-only action, and must never start a network job.
-    d.onNextPage();
-    Test.assert(s.running && s.subscribed && !s.networkEnabled && v.page == :coordinates);
-    var now = Time.now().value();
-    Test.assert(s.gps.accept(-33.123456d, -179.999999d, now, Position.QUALITY_GOOD, null, now, System.getTimer()));
-    s.map.track(s.gps.xy[0], s.gps.xy[1]); s.maybeRequest();
-    Test.assert(s.job == null && s.map.requestCount == 0);
-    Test.assert("-33.123456".equals(Geo.displayCoordinate(s.gps.lat)));
-    Test.assert("-179.999999".equals(Geo.displayCoordinate(s.gps.lon)));
-    Test.assert("--".equals(Geo.displayCoordinate(null)));
-    var gps = new GpsState();
-    Test.assert(gps.accept(90.0d, 180.0d, now, Position.QUALITY_GOOD, null, now, 0));
-    Test.assert(gps.lat == 90 && gps.xy == null && gps.usable(1000));
-    Test.assert(!gps.usable(6000));
-    Test.assert("90.000000".equals(Geo.displayCoordinate(gps.lat)));
+    Test.assert(v.coordinateValues()[0] == null);
+    d.onNextPage(); Test.assert(s.running && v.page == :coordinates && !v.rawCoordinates);
+    for (var i = 0; i < 200; i++) { Synthetic.fix(s.gps, i * 0.17, i, 0.05); }
+    Test.assert(Geo.abs(v.coordinateValues()[0] - 52.0d) < 0.000001d);
+    var timer = s.ticker; var count = s.gps.count;
+    d.onSelect(); Test.assert(v.rawCoordinates && v.coordinateValues()[0] == s.gps.lat);
+    Test.assert(s.gps.lat > 52.0002d && s.ticker == timer && s.gps.count == count);
+    d.onSelect(); Test.assert(!v.rawCoordinates && Geo.abs(v.coordinateValues()[0] - 52.0d) < 0.000001d);
+    s.gps.accept(89, -170, 400, Position.QUALITY_GOOD, 0.0, 400, 300000);
+    Test.assert(v.coordinateValues()[0] == null);
+    d.onSelect(); Test.assert(v.coordinateValues()[0] == 89 && v.coordinateValues()[1] == -170);
+    d.onBack(); d.onBack(); d.onNextPage(); d.onSelect(); d.onNextPage();
+    Test.assert(v.page == :coordinates && !v.rawCoordinates && v.coordinateValues()[0] == null);
     s.stop();
-    Test.assert(!s.running && !s.subscribed && s.job == null && s.map.bitmap == null);
-    Test.assert(s.gps.lat == null && s.gps.count == 0);
     return true;
 }
 
 (:test)
-function coordinatesAndCreditsFitRoundScreen(logger) {
-    var canvas = Graphics.createBufferedBitmap({:width => 390, :height => 390});
-    var dc = canvas.get().getDc();
-    var labels = [["-90.000000",156,Graphics.FONT_SMALL], ["-180.000000",245,Graphics.FONT_SMALL],
-        ["Age 9999s / WGS84",301,Graphics.FONT_XTINY], ["DOWN: GPS",335,Graphics.FONT_XTINY],
-        ["Current fix",82,Graphics.FONT_XTINY], ["Last known fix",82,Graphics.FONT_XTINY],
-        ["© OpenMapTiles",99,Graphics.FONT_XTINY], ["© OpenStreetMap",129,Graphics.FONT_XTINY],
-        ["openstreetmap.org",285,Graphics.FONT_XTINY], ["GPS only",326,Graphics.FONT_XTINY],
-        ["Low memory",326,Graphics.FONT_XTINY]];
-    for (var i=0; i<labels.size(); i++) {
-        var item=labels[i]; var height=dc.getFontHeight(item[2]);
-        var edge=Geo.max(Geo.abs(item[1]-195),Geo.abs(item[1]+height-195));
-        var allowed=2*Math.sqrt(195*195-edge*edge)-12;
-        logger.debug("Coordinate/credit width " + dc.getTextWidthInPixels(item[0],item[2]) + " / " + allowed);
-        Test.assert(dc.getTextWidthInPixels(item[0],item[2]) <= allowed);
+function walkingAndSlowWalkingRemainResponsive(logger) {
+    var speeds = [0.35, 1.4, 4.0, 12.0];
+    for (var n = 0; n < speeds.size(); n++) {
+        var g = new GpsState(); var speed = speeds[n];
+        for (var i = 0; i <= 120; i++) { Synthetic.fix(g, i * speed, i, speed); }
+        var lag = Geo.distance(g.xy, Geo.project(52.0d + 120 * speed / 111319.49d, 5), 52);
+        Test.assert(lag < Geo.max(5, 3 * speed));
+        Test.assert(g.distance > 120 * speed * 0.85);
+        Test.assert(g.distance < 120 * speed * 1.02);
     }
-    var s = new FieldSession(); var v = new FieldView(s);
-    v.page=:coordinates; v.onUpdate(dc);
-    s.gps.lat=-90.0d; s.gps.lon=-180.0d; s.gps.receivedMs=System.getTimer();
-    v.onUpdate(dc); v.page=:credits; v.onUpdate(dc);
     return true;
 }
 
 (:test)
-function repeatedSessionsAndTwoHourGpsStream(logger) {
-    var s = new FieldSession(); s.networkEnabled=false;
-    var baseline=0; var peak=0; var bitmapPeak=0;
-    for (var cycle=0; cycle<40; cycle++) {
-        s.start();
-        var now=Time.now().value();
-        // First cycle exercises 2 hours of one-second events; subsequent cycles churn sessions.
-        var length=cycle==0 ? 7200 : 200;
-        for (var i=0; i<length; i++) {
-            var utc=now+i;
-            s.gps.accept(52.0d+(i%200)*0.0001d,5.0d,utc,Position.QUALITY_GOOD,null,utc,i*1000);
-        }
-        Test.assert(s.gps.count==180 && s.gps.trace.size()==180);
-        // Native bitmap allocation/replacement with an explicitly bounded palette.
-        for (var j=0; j<4; j++) {
-            var size=cycle%3==0 ? 195 : (cycle%3==1 ? 256 : 390);
-            var pal=new MapJob(s,0,0).palette();
-            var bmp=Graphics.createBufferedBitmap({:width=>size,:height=>size,:palette=>pal});
-            // Measure while BOTH old and incoming native bitmap references are alive.
-            var live=System.getSystemStats();
-            if (live.usedMemory>bitmapPeak) { bitmapPeak=live.usedMemory; }
-            Test.assert(live.usedMemory < live.totalMemory*0.8);
-            s.map.bitmap=bmp;
-            bmp=null;
-        }
+function unknownSpeedStillWalks(logger) {
+    var g = new GpsState();
+    for (var i = 0; i <= 60; i++) { Synthetic.fix(g, i * 0.5, i, null); }
+    Test.assert(g.distance > 25 && g.distance < 31);
+    return true;
+}
+
+(:test)
+function isolatedAndPersistentJumps(logger) {
+    var g = new GpsState();
+    for (var i = 0; i < 10; i++) { Synthetic.fix(g, 0, i, 0.0); }
+    Synthetic.fix(g, 500, 10, 0.0); Synthetic.fix(g, 0, 11, 0.0); Synthetic.fix(g, 0, 12, 0.0);
+    Test.assert(g.count == 1 && g.distance == 0);
+    for (var j = 13; j < 18; j++) { Synthetic.fix(g, 500, j, 0.0); }
+    Test.assert(g.count == 2 && g.point(1)[3]);
+    Test.assert(g.distance == 0);
+    Test.assert(Geo.distance(g.xy, Geo.project(52.0d + 500 / 111319.49d, 5), 52) < 1);
+    return true;
+}
+
+(:test)
+function ordinarySpikeMedianRejection(logger) {
+    var g = new GpsState();
+    for (var i = 0; i < 10; i++) { Synthetic.fix(g, 0, i, 0.0); }
+    Synthetic.fix(g, 25, 10, 0.0); Synthetic.fix(g, 0, 11, 0.0); Synthetic.fix(g, 0, 12, 0.0);
+    Test.assert(g.count == 1 && g.distance == 0);
+    return true;
+}
+
+(:test)
+function gapsDoNotAccumulateTeleportDistance(logger) {
+    var g = new GpsState();
+    for (var i = 0; i < 20; i++) { Synthetic.fix(g, i * 2, i, 2.0); }
+    var distance = g.distance;
+    Synthetic.fix(g, 500, 40, 0.0);
+    Test.assert(g.point(g.count - 1)[3] && g.distance == distance);
+    g.gap = true; Synthetic.fix(g, 1000, 41, 0.0);
+    Test.assert(g.point(g.count - 1)[3] && g.distance == distance);
+    return true;
+}
+
+(:test)
+function movementAcrossDateLine(logger) {
+    var g = new GpsState();
+    for (var i = 0; i < 30; i++) {
+        var lon = 179.9999d + i * 0.00002d;
+        if (lon > 180) { lon -= 360; }
+        g.accept(0.0d, lon, 100 + i, Position.QUALITY_GOOD, 2.2, 100 + i, i * 1000);
+    }
+    Test.assert(g.distance > 50 && g.distance < 70);
+    Test.assert(g.filter.outliers == 0);
+    return true;
+}
+
+(:test)
+function stopThenResumeMoving(logger) {
+    var g = new GpsState();
+    for (var i = 0; i < 30; i++) { Synthetic.fix(g, i, i, 1.0); }
+    for (var j = 30; j < 70; j++) { Synthetic.fix(g, 29, j, 0.0); }
+    var points = g.count; var distance = g.distance;
+    for (var k = 70; k < 130; k++) { Synthetic.fix(g, 29 + (k % 3) - 1, k, 0.0); }
+    Test.assert(g.count == points && Geo.abs(g.distance - distance) < 0.1);
+    for (var n = 130; n < 160; n++) { Synthetic.fix(g, 29 + (n - 130), n, 1.0); }
+    Test.assert(g.distance > distance + 20);
+    return true;
+}
+
+(:test)
+function gridZoomPanAndLimits(logger) {
+    var m = new GridState();
+    m.recenter(Geo.project(52, 5));
+    for (var i = 0; i < 30; i++) { m.changeZoom(-1); }
+    Test.assert(m.zoom == 10);
+    for (var j = 0; j < 30; j++) { m.changeZoom(1); }
+    Test.assert(m.zoom == 19);
+    m.pan(65, 65); var x = m.center[0];
+    m.track(Geo.project(0, 0)); Test.assert(m.center[0] == x && !m.follow);
+    m.recenter(Geo.project(0, 179.999d)); m.pan(10000, 100000000);
+    Test.assert(m.center[0] >= -Geo.WORLD / 2 && m.center[0] <= Geo.WORLD / 2);
+    Test.assert(m.center[1] == Geo.WORLD / 2);
+    for (var span = 0.00001d; span < 10; span *= 2) {
+        var step = Geo.gridStep(span / 5); Test.assert(span / step <= 5.01);
+    }
+    return true;
+}
+
+(:test)
+function boundedLongTraceAndRepeatedSessions(logger) {
+    var maximum = 0; var afterWarmup = 0;
+    for (var run = 0; run < 30; run++) {
+        var g = new GpsState();
+        for (var i = 0; i < 1000; i++) { Synthetic.fix(g, i * 2, i, 2.0); }
+        Test.assert(g.count == 180 && g.head < 180);
+        var memory = System.getSystemStats().usedMemory;
+        maximum = Geo.max(maximum, memory);
+        if (run == 3) { afterWarmup = memory; }
+        if (run > 3) { Test.assert(memory <= afterWarmup + 1024); }
+    }
+    logger.debug("SYNTHETIC 30 sessions / 30000 fixes; peak measured heap bytes: " + maximum);
+    return true;
+}
+
+(:test)
+function homeDoesNotStartGpsAndStopReleases(logger) {
+    var s = new FieldSession();
+    Test.assert(!s.running && !s.subscribed && s.ticker == null);
+    Test.assert(s.start());
+    s.stop();
+    Test.assert(!s.running && !s.subscribed && s.ticker == null && s.gps.count == 0 && s.grid.center == null);
+    s.active(); Test.assert(!s.subscribed && s.ticker == null);
+    return true;
+}
+
+(:test)
+function englishTextAndRoundScreenFit(logger) {
+    var s = new FieldSession(); var v = new FieldView(s); v.fonts();
+    var bitmap = Graphics.createBufferedBitmap({:width => 390, :height => 390}); var dc = bitmap.get().getDc();
+    Test.assert(dc.getTextWidthInPixels("-179.999999", Graphics.FONT_SMALL) < 335);
+    Test.assert(dc.getTextWidthInPixels("Center -85.05113 / -179.99999", v.tinyFont) < 313);
+    Test.assert(dc.getTextWidthInPixels("UP/DN Zoom  START Menu", v.tinyFont) < 218);
+    Test.assert(dc.getTextWidthInPixels("Nothing saved or shared", v.tinyFont) < 285);
+    Test.assert(dc.getTextWidthInPixels("FILTERED / WGS84", v.smallFont) < 270);
+    Test.assert(dc.getTextWidthInPixels("START: Filtered", v.tinyFont) < 218);
+    Test.assert(dc.getTextWidthInPixels("Polar limit: use Raw", v.smallFont) < 290);
+    Test.assert(dc.getTextWidthInPixels("Network OFF / Storage OFF", v.smallFont) < 355);
+    Test.assert(dc.getTextWidthInPixels("Motion UNAVAILABLE", v.smallFont) < 335);
+    Test.assert(dc.getTextWidthInPixels("START: Motion off", v.tinyFont) < 290);
+    var pages = [:home, :menu, :coordinates, :stats, :diagnostics, :finish, :grid, :pan];
+    Synthetic.fix(s.gps, 0, 0, 0.0); s.grid.recenter(s.gps.xy);
+    for (var theme = 0; theme < 2; theme++) {
+        s.grid.night = theme == 1;
+        for (var i = 0; i < pages.size(); i++) { v.page = pages[i]; v.onUpdate(dc); }
+        v.page = :coordinates; v.rawCoordinates = true; v.onUpdate(dc); v.rawCoordinates = false;
+    }
+    logger.debug("All English pages rendered, both themes; screenshot review separate");
+    return true;
+}
+
+(:test)
+function redrawStressAndSharpTurn(logger) {
+    var s = new FieldSession(); var v = new FieldView(s); v.page = :grid;
+    var bitmap = Graphics.createBufferedBitmap({:width => 390, :height => 390}); var dc = bitmap.get().getDc();
+    var warmed = 0; var peak = 0;
+    for (var i = 0; i < 1000; i++) {
+        var north = Geo.min(i, 400) * 1.4 / 111319.49d;
+        var east = Geo.max(0, i - 400) * 1.4 / (111319.49d * Math.cos(52 * Geo.PI / 180));
+        s.gps.accept(52.0d + north, 5.0d + east, 100 + i, Position.QUALITY_GOOD, 1.4, 100 + i, i * 1000);
+        s.grid.track(s.gps.xy); v.onUpdate(dc);
+        var memory = System.getSystemStats().usedMemory; peak = Geo.max(peak, memory);
+        if (i == 600) { warmed = memory; }
+        if (i > 600) { Test.assert(memory < warmed + 1024); }
+    }
+    Test.assert(s.gps.distance > 1370 && s.gps.distance < 1410);
+    Test.assert(s.gps.count == 180);
+    logger.debug("SYNTHETIC 1000 redraws + 90-degree turn; heap peak bytes: " + peak);
+    return true;
+}
+
+(:test)
+function noPersistentPreferencesOrGpsData(logger) {
+    Application.Storage.setValue("grid-preferences-v1", {"zoom" => 12});
+    Application.Storage.setValue("preferences-v1", {"zoom" => 15});
+    Application.Storage.setValue("g0-probe", "test");
+    var s = new FieldSession();
+    Test.assert(Application.Storage.getValue("grid-preferences-v1") == null);
+    Test.assert(Application.Storage.getValue("preferences-v1") == null);
+    Test.assert(Application.Storage.getValue("g0-probe") == null);
+    Test.assert(s.start()); s.grid.zoom = 12; s.stop();
+    Test.assert(Application.Storage.getValue("grid-preferences-v1") == null);
+    var next = new FieldSession(); Test.assert(next.grid.zoom == 17);
+    Test.assert(next.gps.count == 0 && next.gps.lat == null);
+    logger.debug("No application persistence: old keys removed; grid-only session creates no preferences/GPS history");
+    return true;
+}
+
+(:test)
+function repeatedGpsLifecycleDoesNotRetainTrace(logger) {
+    var s = new FieldSession(); var warmed = 0; var peakAfterStop = 0;
+    for (var run = 0; run < 40; run++) {
+        Test.assert(s.start());
+        for (var i = 0; i < 300; i++) { Synthetic.fix(s.gps, i * 2, i, 2.0); }
         s.stop();
-        Test.assert(s.gps.count==0 && s.gps.lat==null && s.map.bitmap==null && s.map.metadata==null);
-        Test.assert(!s.subscribed && !s.running && s.job==null && !s.map.busy);
-        var used=System.getSystemStats().usedMemory;
-        if (cycle==5) { baseline=used; }
-        if (used>peak) { peak=used; }
-        if (cycle>5) { Test.assert(used <= baseline+16384); }
+        Test.assert(s.gps.count == 0 && !s.subscribed && s.ticker == null);
+        var memory = System.getSystemStats().usedMemory;
+        peakAfterStop = Geo.max(memory, peakAfterStop);
+        if (run == 5) { warmed = memory; }
+        if (run > 5) { Test.assert(memory <= warmed + 512); }
     }
-    logger.debug("40 sessions / 15000 GPS events / 160 bitmap replacements; baseline="+baseline+", peak="+peak+", end="+System.getSystemStats().usedMemory+", bitmap overlap peak="+bitmapPeak);
-    Test.assert(Application.Storage.getValue("g0-probe")==null);
+    logger.debug("40 GPS start/stop cycles / 12000 fixes; peak post-stop heap bytes: " + peakAfterStop);
     return true;
 }
 
 (:test)
-function realProviderMetadataIsAuthenticatedAndAtomic(logger) {
-    var state = new MapState(); state.camera(0,0);
-    var data={"mapDataVersion"=>"openfreemap-test-v1","attribution"=>"OpenFreeMap | (c) OpenMapTiles | Data from OpenStreetMap"};
-    Test.assert(state.validProvider(data));
-    data["attribution"]="Wrong source"; Test.assert(!state.validProvider(data));
-    data["mapDataVersion"]="other-provider"; Test.assert(!state.validProvider(data));
+function pauseResumeAndExitStayEphemeral(logger) {
+    var s = new FieldSession();
+    Test.assert(!s.resume()); Test.assert(s.start());
+    var timer = s.ticker;
+    Test.assert(!s.start() && s.resume() && s.ticker == timer);
+    Synthetic.fix(s.gps, 0, 0, 0.0);
+    s.startedMs = System.getTimer() - 5000;
+    s.pause();
+    Test.assert(!s.running && s.opened && !s.subscribed && s.ticker == null);
+    Test.assert(s.seconds() >= 5 && s.seconds() < 6 && s.gps.count == 1);
+    var pausedTime = s.seconds();
+    s.pause(); s.active();
+    Test.assert(s.seconds() == pausedTime && s.ticker == null && !s.subscribed);
+    Test.assert(s.resume() && s.gps.gap);
+    s.inactive(); Test.assert(s.running && !s.subscribed && s.ticker == null);
+    s.active(); Test.assert(s.running && s.subscribed && s.ticker != null);
+    s.stop(); s.active(); s.stop();
+    Test.assert(!s.opened && !s.running && !s.subscribed && s.ticker == null);
+    Test.assert(s.gps.lat == null && s.gps.count == 0 && s.distance() == 0 && s.seconds() == 0);
+    return true;
+}
+
+(:test)
+function buttonFlowHasOnlyLocalSessions(logger) {
+    var s = new FieldSession(); var v = new FieldView(s); var d = new FieldDelegate(v, s);
+    d.onPreviousPage(); Test.assert(!s.opened && v.page == :home);
+    d.onSelect(); Test.assert(s.running && v.page == :grid);
+    d.onBack(); Test.assert(!s.running && v.page == :finish && v.selection == 0);
+    d.onSelect(); Test.assert(s.running && v.page == :grid);
+    d.onBack(); d.onNextPage(); d.onSelect();
+    Test.assert(v.page == :home && !s.opened && s.gps.count == 0);
+    d.onNextPage(); Test.assert(v.page == :coordinates && s.running);
+    d.onBack(); d.onBack(); d.onNextPage(); d.onSelect();
+    Test.assert(!s.opened && v.page == :home && !d.onBack());
+    return true;
+}
+
+(:test)
+function liveSpeedRequiresFreshFilteredPosition(logger) {
+    var s = new FieldSession(); Test.assert(s.start());
+    Test.assert(s.speed() == null);
+    Synthetic.fix(s.gps, 0, 0, 0.0); s.gps.receivedMs = System.getTimer();
+    Test.assert(s.speed() == 0);
+    s.gps.filter.moving = true; s.gps.speed = 1.4;
+    Test.assert(s.speed() == 1.4);
+    s.gps.filter.status = "REACQUIRE"; Test.assert(s.speed() == null);
+    s.gps.filter.status = "MOVING"; s.gps.quality = Position.QUALITY_POOR;
+    Test.assert(s.speed() == null);
+    s.pause(); Test.assert(s.speed() == null); s.stop();
     return true;
 }

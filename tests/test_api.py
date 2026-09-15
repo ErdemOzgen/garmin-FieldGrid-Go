@@ -193,7 +193,7 @@ def test_non_ascii_credentials_fail_closed(clock):
     )
     assert response.status_code == 401
     response = client.get(
-        "/v1/images/" + "a" * 32, params={"expires": int(clock[0]) + 60, "sig": "ü" * 64}
+        "/v1/images/" + "a" * 32, params={"expires": int(clock[0]) + 60, "sig": "\u00fc" * 64}
     )
     assert response.status_code == 403
 

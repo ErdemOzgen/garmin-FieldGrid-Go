@@ -11,7 +11,6 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from xml.sax.saxutils import escape
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCAL = ROOT / ".local"
@@ -87,44 +86,6 @@ def doctor():
     return report
 
 
-def configure_resources(simulator=False, offline=False):
-    directory = LOCAL / "watch-resources"
-    directory.mkdir(parents=True, exist_ok=True)
-    configuration = LOCAL / "watch.json"
-    data = json.loads(configuration.read_text()) if configuration.exists() else {}
-    base_url = data.get("baseUrl", "").rstrip("/")
-    token = data.get("devToken", "")
-    allow_local = data.get("allowLocalHttp", False)
-    if offline or (allow_local and not simulator):
-        # A simulator loopback origin must never leak into the physical-watch build.
-        base_url, token, allow_local = "", "", False
-    from urllib.parse import urlsplit
-
-    parts = urlsplit(base_url)
-    if base_url and (
-        (parts.scheme != "https" and not (allow_local and base_url == "http://127.0.0.1:8765"))
-        or not parts.hostname
-        or parts.username
-        or parts.password
-        or parts.query
-        or parts.fragment
-        or parts.path not in {"", "/"}
-    ):
-        raise SystemExit("Invalid watch origin. Use HTTPS, or explicit local simulator HTTP.")
-    resources = (
-        "<strings>\n"
-        f'<string id="ConfigBaseUrl">{escape(base_url or "DISABLED")}</string>\n'
-        f'<string id="ConfigDevToken">{escape(token or "DISABLED")}</string>\n'
-        f'<string id="ConfigAllowLocalHttp">{str(bool(allow_local)).lower()}</string>\n'
-        "</strings>\n"
-    )
-    # Compile-time resources cannot be shadowed by old simulator Properties.
-    (directory / "properties.xml").unlink(missing_ok=True)
-    path = directory / "configuration.xml"
-    path.write_text(resources)
-    path.chmod(0o600)
-
-
 def build(unit_tests=False, simulator=False, offline=False):
     sdk = sdk_path()
     java = java_path()
@@ -139,7 +100,6 @@ def build(unit_tests=False, simulator=False, offline=False):
         raise SystemExit(
             "SDK/device version differs from toolchain.lock.json. Review the update first."
         )
-    configure_resources(simulator=simulator, offline=offline)
     BUILD.mkdir(exist_ok=True)
     key = Path(os.getenv("CIQ_DEVELOPER_KEY", str(LOCAL / "keys/developer.der")))
     if not key.exists():
@@ -207,7 +167,10 @@ def build(unit_tests=False, simulator=False, offline=False):
         "artifactSha256": hashlib.sha256(output.read_bytes()).hexdigest(),
         "unitTests": unit_tests,
         "simulator": simulator,
-        "offline": offline,
+        "offline": True,
+        "networkEnabled": False,
+        "activityRecording": False,
+        "dataRetention": "memory-only",
         "warnings": log.count("WARNING:"),
     }
     output.with_suffix(output.suffix + ".json").write_text(json.dumps(record, indent=2) + "\n")

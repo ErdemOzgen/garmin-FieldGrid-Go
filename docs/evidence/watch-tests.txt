@@ -1,121 +1,93 @@
 ------------------------------------------------------------------------------
-Executing test decimalCoordinateWirePrecision...
+Executing test projectionAndDateLine...
 PASS
 ------------------------------------------------------------------------------
-Executing test smallStorageProbeRoundTrip...
+Executing test gpsFreshnessQualityAndPolar...
 PASS
 ------------------------------------------------------------------------------
-Executing test projectionControlPoints...
+Executing test stationaryNoiseDoesNotGrowTrace...
+DEBUG (12:07): SYNTHETIC: 600 stationary fixes, +/-3 m: 1 point / 0 m trace
 PASS
 ------------------------------------------------------------------------------
-Executing test projectionHemispheres...
+Executing test walkingAndSlowWalkingRemainResponsive...
 PASS
 ------------------------------------------------------------------------------
-Executing test antimeridianAndBadCoordinates...
+Executing test unknownSpeedStillWalks...
 PASS
 ------------------------------------------------------------------------------
-Executing test gpsAgesAndInvalidSamples...
+Executing test isolatedAndPersistentJumps...
 PASS
 ------------------------------------------------------------------------------
-Executing test boundedTraceAndGaps...
+Executing test ordinarySpikeMedianRejection...
 PASS
 ------------------------------------------------------------------------------
-Executing test traceSimplifiesStationaryFixes...
+Executing test gapsDoNotAccumulateTeleportDistance...
 PASS
 ------------------------------------------------------------------------------
-Executing test requestCoalescingAndBackoff...
+Executing test movementAcrossDateLine...
 PASS
 ------------------------------------------------------------------------------
-Executing test oldCallbackCannotReleaseNewJob...
+Executing test stopThenResumeMoving...
 PASS
 ------------------------------------------------------------------------------
-Executing test renderEveryScreenAndRaster...
-DEBUG (21:46): 390px canvas rendered. FONT_SMALL=45px; FONT_XTINY=30px
+Executing test gridZoomPanAndLimits...
 PASS
 ------------------------------------------------------------------------------
-Executing test criticalLabelsFitRoundScreen...
-DEBUG (21:46): Label width 181 / safe 230
-DEBUG (21:46): Label width 166 / safe 230
-DEBUG (21:46): Label width 169 / safe 230
-DEBUG (21:46): Label width 227 / safe 230
-DEBUG (21:46): Label width 207 / safe 208
-DEBUG (21:46): Label width 184 / safe 208
-DEBUG (21:46): Label width 165 / safe 208
-DEBUG (21:46): Label width 151 / safe 208
-DEBUG (21:46): Label width 151 / safe 208
-DEBUG (21:46): Label width 154 / safe 168
-DEBUG (21:46): Label width 270 / safe 334
-DEBUG (21:46): Label width 320 / safe 363
-DEBUG (21:46): Label width 305 / safe 376
-DEBUG (21:46): Label width 280 / safe 370
-DEBUG (21:46): Label width 265 / safe 350
+Executing test boundedLongTraceAndRepeatedSessions...
+DEBUG (12:07): SYNTHETIC 30 sessions / 30000 fixes; peak measured heap bytes: 54728
 PASS
 ------------------------------------------------------------------------------
-Executing test malformedMetadataPreservesActiveMap...
-G0 rejected metadata: schema
+Executing test homeDoesNotStartGpsAndStopReleases...
 PASS
 ------------------------------------------------------------------------------
-Executing test menuAndFollowControls...
+Executing test englishTextAndRoundScreenFit...
+DEBUG (12:07): All English pages rendered, both themes; screenshot review separate
 PASS
 ------------------------------------------------------------------------------
-Executing test staleRasterCannotReplaceNewCamera...
+Executing test redrawStressAndSharpTurn...
+DEBUG (12:07): SYNTHETIC 1000 redraws + 90-degree turn; heap peak bytes: 56816
 PASS
 ------------------------------------------------------------------------------
-Executing test browseKeepsCamera...
+Executing test noPersistentPreferencesOrGpsData...
+DEBUG (12:07): No application persistence: old keys removed; grid-only session creates no preferences/GPS history
 PASS
 ------------------------------------------------------------------------------
-Executing test metadataValidation...
-G0 bounds residual meters: 931.576282
+Executing test repeatedGpsLifecycleDoesNotRetainTrace...
+DEBUG (12:07): 40 GPS start/stop cycles / 12000 fixes; peak post-stop heap bytes: 35464
 PASS
 ------------------------------------------------------------------------------
-Executing test coordinatesWithoutInternetAndAtPoles...
+Executing test pauseResumeAndExitStayEphemeral...
 PASS
 ------------------------------------------------------------------------------
-Executing test coordinatesAndCreditsFitRoundScreen...
-DEBUG (21:46): Coordinate/credit width 188 / 370.120392
-DEBUG (21:46): Coordinate/credit width 209 / 328.587738
-DEBUG (21:46): Coordinate/credit width 234 / 267.492401
-DEBUG (21:46): Coordinate/credit width 138 / 179.049728
-DEBUG (21:46): Coordinate/credit width 120 / 305.842743
-DEBUG (21:46): Coordinate/credit width 166 / 305.842743
-DEBUG (21:46): Coordinate/credit width 194 / 327.464294
-DEBUG (21:46): Coordinate/credit width 209 / 354.982300
-DEBUG (21:46): Coordinate/credit width 224 / 295.408508
-DEBUG (21:46): Coordinate/credit width 102 / 208.036362
-DEBUG (21:46): Coordinate/credit width 151 / 208.036362
+Executing test buttonFlowHasOnlyLocalSessions...
 PASS
 ------------------------------------------------------------------------------
-Executing test repeatedSessionsAndTwoHourGpsStream...
-DEBUG (21:46): 40 sessions / 15000 GPS events / 160 bitmap replacements; baseline=45064, peak=45064, end=45176, bitmap overlap peak=63576
-PASS
-------------------------------------------------------------------------------
-Executing test realProviderMetadataIsAuthenticatedAndAtomic...
+Executing test liveSpeedRequiresFreshFilteredPosition...
 PASS
 
 ==============================================================================
 RESULTS
-Test:                                        Status:
-decimalCoordinateWirePrecision               PASS
-smallStorageProbeRoundTrip                   PASS
-projectionControlPoints                      PASS
-projectionHemispheres                        PASS
-antimeridianAndBadCoordinates                PASS
-gpsAgesAndInvalidSamples                     PASS
-boundedTraceAndGaps                          PASS
-traceSimplifiesStationaryFixes               PASS
-requestCoalescingAndBackoff                  PASS
-oldCallbackCannotReleaseNewJob               PASS
-renderEveryScreenAndRaster                   PASS
-criticalLabelsFitRoundScreen                 PASS
-malformedMetadataPreservesActiveMap          PASS
-menuAndFollowControls                        PASS
-staleRasterCannotReplaceNewCamera            PASS
-browseKeepsCamera                            PASS
-metadataValidation                           PASS
-coordinatesWithoutInternetAndAtPoles         PASS
-coordinatesAndCreditsFitRoundScreen          PASS
-repeatedSessionsAndTwoHourGpsStream          PASS
-realProviderMetadataIsAuthenticatedAndAtomic PASS
-Ran 21 tests
+Test:                                  Status:
+projectionAndDateLine                  PASS
+gpsFreshnessQualityAndPolar            PASS
+stationaryNoiseDoesNotGrowTrace        PASS
+walkingAndSlowWalkingRemainResponsive  PASS
+unknownSpeedStillWalks                 PASS
+isolatedAndPersistentJumps             PASS
+ordinarySpikeMedianRejection           PASS
+gapsDoNotAccumulateTeleportDistance    PASS
+movementAcrossDateLine                 PASS
+stopThenResumeMoving                   PASS
+gridZoomPanAndLimits                   PASS
+boundedLongTraceAndRepeatedSessions    PASS
+homeDoesNotStartGpsAndStopReleases     PASS
+englishTextAndRoundScreenFit           PASS
+redrawStressAndSharpTurn               PASS
+noPersistentPreferencesOrGpsData       PASS
+repeatedGpsLifecycleDoesNotRetainTrace PASS
+pauseResumeAndExitStayEphemeral        PASS
+buttonFlowHasOnlyLocalSessions         PASS
+liveSpeedRequiresFreshFilteredPosition PASS
+Ran 20 tests
 
-PASSED (passed=21, failed=0, errors=0)
+PASSED (passed=20, failed=0, errors=0)

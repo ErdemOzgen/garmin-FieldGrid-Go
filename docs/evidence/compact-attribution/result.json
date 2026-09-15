@@ -1,0 +1,77 @@
+{
+  "recordedAtUtc": "2026-09-14T21:42:57.943029+00:00",
+  "status": "PASS: local UI and automated checks",
+  "physicalInstallation": "NOT RUN for compact attribution; watch retains native-raster crash fix with larger credits and expired test origin",
+  "watchSourceSha256": "878cb2f96bbd4f3658712b9f504051170be4890c0844c78de647517ad3db9f7a",
+  "sourceSha256": "661dec1f61afb4343b8ec1ef152e481c0db2eb7598374fb05a63b7f10ff01226",
+  "pythonTests": {
+    "status": "PASS",
+    "count": 89,
+    "apiLineCoveragePercent": 96,
+    "warnings": "Two existing upstream deprecations"
+  },
+  "watchTests": {
+    "status": "PASS",
+    "passed": 22,
+    "rawSdkExitCode": 1,
+    "sourceSha256": "878cb2f96bbd4f3658712b9f504051170be4890c0844c78de647517ad3db9f7a",
+    "artifactSha256": "2ebb8c900d9f2b93ec982d19ef15f8687dea4b01144aed457459bfb0411f0e60"
+  },
+  "build": {
+    "status": "PASS",
+    "target": "fr165",
+    "sdkVersion": "9.2.0",
+    "deviceVersion": "3d0fb192a2cf01699aefd0f384af3f527e5885bd",
+    "sourceSha256": "878cb2f96bbd4f3658712b9f504051170be4890c0844c78de647517ad3db9f7a",
+    "sourceCommit": "b06f5313381a356b72b74f02712982fc50a2930e",
+    "watchSourcesDirty": true,
+    "artifactSha256": "fc7e7800777efaf4dd0dd4686191d2a5996474da5bd107dcb0a855f25c49fd45",
+    "unitTests": false,
+    "simulator": false,
+    "offline": false,
+    "warnings": 0
+  },
+  "buildBytes": 128700,
+  "attribution": {
+    "font": "Device-native RobotoCondensedRegular, cached once per view",
+    "measuredTextWidthPx": 213,
+    "measuredTextHeightPx": 18,
+    "bandWidthPx": 225,
+    "bandHeightPx": 24,
+    "previousBandWidthPx": 270,
+    "previousBandHeightPx": 63,
+    "addedFontAssets": 0,
+    "fallback": "Built-in readable two-line attribution if vector font is unavailable",
+    "fullCredits": "Map credits includes OpenMapTiles.org and openstreetmap.org/copyright"
+  },
+  "visualReview": {
+    "status": "PASS",
+    "target": "fr165 / 390x390",
+    "screens": [
+      "day map",
+      "night map",
+      "day credits",
+      "night credits"
+    ],
+    "method": "Private local fixture loads previously rendered fixed public Utrecht sample PNGs, copies current FieldView unchanged, uses a separate app ID, starts no GPS subscription and no network. Map screens explicitly label SYNTHETIC GPS. This does not retest Garmin delivery.",
+    "privateFixtureWarnings": 3,
+    "privateFixtureWarningDetail": "Type inference on fixture GPS/map array accesses; product build and tests have zero warnings."
+  },
+  "simulatorHeap": {
+    "postStopBytes": 47384,
+    "overlapPeakBytes": 66288,
+    "logAllocationAfterSampleBytes": 112,
+    "scope": "22-test suite / 40 sessions / 15000 GPS events / 160 converted raster replacements; not physical/native graphics pool"
+  },
+  "limitations": [
+    "Initial sandbox make test-watch compiled but macOS open failed with -10827; full local simulator access rerun PASS.",
+    "No public tunnel was reopened.",
+    "27 KiB physical photo is a no-image sample; see physical-https.json."
+  ],
+  "screenshots": {
+    "simulator-credits-day.png": "cfda9f376772098a4424475e56abf722a2d92b2980e72a91eca6720c3b23648f",
+    "simulator-credits-night.png": "4c33d14ee1143d719ac032e34746eb5d04c7add552d1f088a460cee9006af512",
+    "simulator-synthetic-day.png": "bbb7ae4e75d6df6fc50ae270be76722055da674efd1d3ecc53be8b68523487f1",
+    "simulator-synthetic-night.png": "7958ed93994218558cbb3b2dd46dd1296a43dab65a3785557d8adc52a72323af"
+  }
+}

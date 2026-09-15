@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "scope": "USB sideload and byte-for-byte readback only",
+  "timestamp": "2026-09-15T09:41:55.583005+00:00",
+  "appName": "FieldGrid G0",
+  "version": "0.2.1",
+  "device": "Forerunner 165",
+  "destination": "GARMIN/Apps/FieldMap.prg",
+  "transferTool": "OpenMTP 3.3.0 arm64, Kalam mode",
+  "usbProductId": "0x5150",
+  "previousFieldMapPrgPresent": false,
+  "artifactBytes": 119084,
+  "artifactSha256": "e3f29827ddae900b2ab56dd6a9f1c9b8671a25351d04624ed8418075b37d8fc1",
+  "watchSourceSha256": "e43b2a7cea2605e3d09b52bca9ec33f7db30bf614c5f7842509fac824c1109a1",
+  "readbackEqual": true,
+  "deviceFreeSpaceObserved": "2.63 GB of 3.45 GB (rounded UI value)",
+  "personalActivityFilesAccessed": false,
+  "physicalBatteryEndurance": "NOT RUN",
+  "notes": [
+    "Only the app executable was copied to the watch. No activity files were read or changed.",
+    "This is the local-only build: Positioning permission only, no FIT recording or Communications.",
+    "Physical installation is not full G0/G3 acceptance."
+  ],
+  "physicalLaunchAndGrid": "PASS - subsequent user report",
+  "physicalUserCheck": "physical-user-check.json",
+  "physicalGpsAccuracy": "NOT RUN"
+}

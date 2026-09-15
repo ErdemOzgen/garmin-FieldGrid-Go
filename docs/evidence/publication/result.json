@@ -1,0 +1,62 @@
+{
+  "measuredAtUtc": "2026-09-15T10:12:58.776965+00:00",
+  "status": "PASS",
+  "scope": "English repository documentation and GitHub publication safeguards",
+  "scans": {
+    "working": {
+      "status": "PASS",
+      "entries": 172
+    },
+    "staged": {
+      "status": "PASS",
+      "entries": 135
+    },
+    "history": {
+      "status": "PASS",
+      "entries": 197
+    }
+  },
+  "pythonTests": 116,
+  "publicationRegressionTests": 23,
+  "watchTests": 20,
+  "watchBuildWarnings": 0,
+  "watchSourceSha256": "e43b2a7cea2605e3d09b52bca9ec33f7db30bf614c5f7842509fac824c1109a1",
+  "watchArtifactSha256": "e3f29827ddae900b2ab56dd6a9f1c9b8671a25351d04624ed8418075b37d8fc1",
+  "installedArtifactUnchanged": true,
+  "hooks": {
+    "path": ".githooks",
+    "commit": "Actual staged blobs",
+    "push": "Working files and reachable Git history"
+  },
+  "documentation": {
+    "englishTextFilesReviewed": 129,
+    "readmeImages": 6,
+    "readmeLocalLinks": 7,
+    "readmeProseHyphenCompounds": 0,
+    "historicalTurkishImagesRetainedPrivately": 19,
+    "originalDocumentsBackedUpPrivately": true,
+    "sourceImagesVisuallyReviewed": true,
+    "browserPreview": "NOT RUN - local file URL blocked by browser security policy; no workaround used",
+    "originalSpecification": "English edition preserves IDs, targets and caveats while consolidating repeated explanations; current scope is in requirements.md.",
+    "allLocalMarkdownLinksAndImages": 101
+  },
+  "failuresResolved": [
+    "Reserved user:pass URL at maps.example was a negative test fixture; exact exemption added and tested without exempting other credentials or hosts.",
+    "Sandboxed simulator launch failed with macOS -10827; same command passed with local execution permission.",
+    "Broken README LICENSE link removed; no distribution license selected on behalf of the owner."
+  ],
+  "limits": [
+    "No custom scanner can recognize every arbitrary secret. Hooks can be bypassed and must be installed for each clone.",
+    "Browser uploads ignore .gitignore; use the extracted source archive.",
+    "Git history was scanned for secrets, not rewritten or translated.",
+    "Full physical accuracy and battery acceptance remain NOT RUN."
+  ],
+  "externalChanges": "No GitHub push, remote change, account setting, public deployment or store publication.",
+  "sourcePackageValidation": {
+    "status": "PASS",
+    "tests": 116,
+    "watchBuild": "PASS",
+    "warnings": 0,
+    "record": "docs/evidence/source-package.json"
+  }
+}

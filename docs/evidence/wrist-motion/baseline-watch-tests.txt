@@ -1,0 +1,171 @@
+------------------------------------------------------------------------------
+Executing test projectionAndDateLine...
+PASS
+------------------------------------------------------------------------------
+Executing test gpsFreshnessQualityAndPolar...
+PASS
+------------------------------------------------------------------------------
+Executing test stationaryNoiseDoesNotGrowTrace...
+DEBUG (14:23): SYNTHETIC: 600 stationary fixes, +/-3 m: 1 point / 0 m trace
+PASS
+------------------------------------------------------------------------------
+Executing test stationaryWideDriftCannotOverrideLowSpeed...
+DEBUG (14:23): SYNTHETIC 600 fixes / 34 m stationary drift: marker held, zero distance
+PASS
+------------------------------------------------------------------------------
+Executing test stoppedWalkDoesNotConsumeStationaryDrift...
+PASS
+------------------------------------------------------------------------------
+Executing test stationaryDriftRejectsIsolatedSpeedSpikes...
+PASS
+------------------------------------------------------------------------------
+Executing test unknownSpeedSlowDriftDoesNotIntegrateForever...
+PASS
+------------------------------------------------------------------------------
+Executing test walkingAfterDriftDoesNotCountHeldOffset...
+DEBUG (14:23): SYNTHETIC resumed walking: 34 m held GPS offset excluded from distance
+PASS
+------------------------------------------------------------------------------
+Executing test slowWalkingWithUsableQualityAndSparseFixes...
+PASS
+------------------------------------------------------------------------------
+Executing test filteredCoordinatesAndRawToggleStayLocal...
+PASS
+------------------------------------------------------------------------------
+Executing test walkingAndSlowWalkingRemainResponsive...
+PASS
+------------------------------------------------------------------------------
+Executing test unknownSpeedStillWalks...
+PASS
+------------------------------------------------------------------------------
+Executing test isolatedAndPersistentJumps...
+PASS
+------------------------------------------------------------------------------
+Executing test ordinarySpikeMedianRejection...
+PASS
+------------------------------------------------------------------------------
+Executing test gapsDoNotAccumulateTeleportDistance...
+PASS
+------------------------------------------------------------------------------
+Executing test movementAcrossDateLine...
+PASS
+------------------------------------------------------------------------------
+Executing test stopThenResumeMoving...
+PASS
+------------------------------------------------------------------------------
+Executing test gridZoomPanAndLimits...
+PASS
+------------------------------------------------------------------------------
+Executing test boundedLongTraceAndRepeatedSessions...
+DEBUG (14:23): SYNTHETIC 30 sessions / 30000 fixes; peak measured heap bytes: 67168
+PASS
+------------------------------------------------------------------------------
+Executing test homeDoesNotStartGpsAndStopReleases...
+PASS
+------------------------------------------------------------------------------
+Executing test englishTextAndRoundScreenFit...
+DEBUG (14:23): All English pages rendered, both themes; screenshot review separate
+PASS
+------------------------------------------------------------------------------
+Executing test redrawStressAndSharpTurn...
+DEBUG (14:23): SYNTHETIC 1000 redraws + 90-degree turn; heap peak bytes: 69520
+PASS
+------------------------------------------------------------------------------
+Executing test noPersistentPreferencesOrGpsData...
+DEBUG (14:23): No application persistence: old keys removed; grid-only session creates no preferences/GPS history
+PASS
+------------------------------------------------------------------------------
+Executing test repeatedGpsLifecycleDoesNotRetainTrace...
+DEBUG (14:23): 40 GPS start/stop cycles / 12000 fixes; peak post-stop heap bytes: 48112
+PASS
+------------------------------------------------------------------------------
+Executing test pauseResumeAndExitStayEphemeral...
+PASS
+------------------------------------------------------------------------------
+Executing test buttonFlowHasOnlyLocalSessions...
+PASS
+------------------------------------------------------------------------------
+Executing test liveSpeedRequiresFreshFilteredPosition...
+PASS
+------------------------------------------------------------------------------
+Executing test smallWristMotionCannotReleaseStationaryGps...
+
+Error: Unhandled Exception
+Exception: ASSERTION FAILED
+Stack:
+  - API code 0x30000203
+  - API code 0x30000174
+  - smallWristMotionCannotReleaseStationaryGps() at $PROJECT/apps/watch/tests/MotionTests.mc:43 0x10002ee5
+  - evaluate_test_entries_0_to_30() at $PROJECT/build/gen/006-B4432-00/source/UnitTests.mcgen:135 0x10006271
+  - runTest() at $PROJECT/build/gen/006-B4432-00/source/UnitTests.mcgen:176 0x1000654e
+ERROR
+------------------------------------------------------------------------------
+Executing test isolatedStepCounterNoiseCannotReleaseHold...
+
+Error: Unhandled Exception
+Exception: ASSERTION FAILED
+Stack:
+  - API code 0x30000203
+  - API code 0x30000174
+  - isolatedStepCounterNoiseCannotReleaseHold() at $PROJECT/apps/watch/tests/MotionTests.mc:59 0x10000a03
+  - evaluate_test_entries_0_to_30() at $PROJECT/build/gen/006-B4432-00/source/UnitTests.mcgen:137 0x1000628c
+  - runTest() at $PROJECT/build/gen/006-B4432-00/source/UnitTests.mcgen:176 0x1000654e
+ERROR
+------------------------------------------------------------------------------
+Executing test accelerometerStationarityRejectsMisleadingGpsSpeed...
+DEBUG (14:23): SYNTHETIC: fresh still acceleration rejects 34 m drift even with GPS speed 1.4 m/s; stale sensor falls back
+PASS
+------------------------------------------------------------------------------
+Executing test motionAssistedSlowWalkAndStop...
+PASS
+------------------------------------------------------------------------------
+Executing test stepEvidenceExpiresAndHandlesMidnight...
+PASS
+------------------------------------------------------------------------------
+Executing test invalidAndInterruptedAccelerationIsUnknown...
+PASS
+------------------------------------------------------------------------------
+Executing test motionSensorLifecycleIsBoundedAndOptional...
+DEBUG (14:23): SYNTHETIC 12000 acceleration batches / 300000 samples, 20 sensor lifecycle loops; peak post-stop heap: 48960
+PASS
+
+==============================================================================
+RESULTS
+Test:                                              Status:
+projectionAndDateLine                              PASS
+gpsFreshnessQualityAndPolar                        PASS
+stationaryNoiseDoesNotGrowTrace                    PASS
+stationaryWideDriftCannotOverrideLowSpeed          PASS
+stoppedWalkDoesNotConsumeStationaryDrift           PASS
+stationaryDriftRejectsIsolatedSpeedSpikes          PASS
+unknownSpeedSlowDriftDoesNotIntegrateForever       PASS
+walkingAfterDriftDoesNotCountHeldOffset            PASS
+slowWalkingWithUsableQualityAndSparseFixes         PASS
+filteredCoordinatesAndRawToggleStayLocal           PASS
+walkingAndSlowWalkingRemainResponsive              PASS
+unknownSpeedStillWalks                             PASS
+isolatedAndPersistentJumps                         PASS
+ordinarySpikeMedianRejection                       PASS
+gapsDoNotAccumulateTeleportDistance                PASS
+movementAcrossDateLine                             PASS
+stopThenResumeMoving                               PASS
+gridZoomPanAndLimits                               PASS
+boundedLongTraceAndRepeatedSessions                PASS
+homeDoesNotStartGpsAndStopReleases                 PASS
+englishTextAndRoundScreenFit                       PASS
+redrawStressAndSharpTurn                           PASS
+noPersistentPreferencesOrGpsData                   PASS
+repeatedGpsLifecycleDoesNotRetainTrace             PASS
+pauseResumeAndExitStayEphemeral                    PASS
+buttonFlowHasOnlyLocalSessions                     PASS
+liveSpeedRequiresFreshFilteredPosition             PASS
+smallWristMotionCannotReleaseStationaryGps         ERROR
+isolatedStepCounterNoiseCannotReleaseHold          ERROR
+accelerometerStationarityRejectsMisleadingGpsSpeed PASS
+motionAssistedSlowWalkAndStop                      PASS
+stepEvidenceExpiresAndHandlesMidnight              PASS
+invalidAndInterruptedAccelerationIsUnknown         PASS
+motionSensorLifecycleIsBoundedAndOptional          PASS
+Ran 34 tests
+
+FAILED (passed=32, failed=0, errors=2)

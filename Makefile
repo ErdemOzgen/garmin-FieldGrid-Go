@@ -1,7 +1,7 @@
 PYTHON ?= python3
 VENV := .venv/bin/python
 
-.PHONY: setup doctor test lint format build-watch test-watch sim sim-offline api evidence audit check-secrets contracts fixtures dev-config package
+.PHONY: setup doctor test lint format build-watch test-watch sim sim-offline api evidence audit check-secrets check-secrets-history install-hooks contracts fixtures dev-config package
 
 setup:
 	$(PYTHON) -c 'import sys; sys.exit(0 if (3, 12) <= sys.version_info[:2] < (3, 15) else "Python 3.12-3.14 required. Use make setup PYTHON=/path/to/python3.14")'
@@ -55,6 +55,13 @@ audit:
 
 check-secrets:
 	$(PYTHON) scripts/check_secrets.py
+
+check-secrets-history:
+	$(PYTHON) scripts/check_secrets.py --history
+
+install-hooks:
+	git config --local core.hooksPath .githooks
+	chmod +x .githooks/pre-commit .githooks/pre-push
 
 package:
 	$(VENV) scripts/package.py

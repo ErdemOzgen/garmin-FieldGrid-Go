@@ -1,0 +1,93 @@
+------------------------------------------------------------------------------
+Executing test projectionAndDateLine...
+PASS
+------------------------------------------------------------------------------
+Executing test gpsFreshnessQualityAndPolar...
+PASS
+------------------------------------------------------------------------------
+Executing test stationaryNoiseDoesNotGrowTrace...
+DEBUG (11:29): SYNTHETIC: 600 stationary fixes, +/-3 m: 1 point / 0 m trace
+PASS
+------------------------------------------------------------------------------
+Executing test walkingAndSlowWalkingRemainResponsive...
+PASS
+------------------------------------------------------------------------------
+Executing test unknownSpeedStillWalks...
+PASS
+------------------------------------------------------------------------------
+Executing test isolatedAndPersistentJumps...
+PASS
+------------------------------------------------------------------------------
+Executing test ordinarySpikeMedianRejection...
+PASS
+------------------------------------------------------------------------------
+Executing test gapsDoNotAccumulateTeleportDistance...
+PASS
+------------------------------------------------------------------------------
+Executing test movementAcrossDateLine...
+PASS
+------------------------------------------------------------------------------
+Executing test stopThenResumeMoving...
+PASS
+------------------------------------------------------------------------------
+Executing test gridZoomPanAndLimits...
+PASS
+------------------------------------------------------------------------------
+Executing test boundedLongTraceAndRepeatedSessions...
+DEBUG (11:29): SYNTHETIC 30 sessions / 30000 fixes; peak measured heap bytes: 54728
+PASS
+------------------------------------------------------------------------------
+Executing test homeDoesNotStartGpsAndStopReleases...
+PASS
+------------------------------------------------------------------------------
+Executing test englishTextAndRoundScreenFit...
+DEBUG (11:29): All English pages rendered, both themes; screenshot review separate
+PASS
+------------------------------------------------------------------------------
+Executing test redrawStressAndSharpTurn...
+DEBUG (11:29): SYNTHETIC 1000 redraws + 90-degree turn; heap peak bytes: 56816
+PASS
+------------------------------------------------------------------------------
+Executing test noPersistentPreferencesOrGpsData...
+DEBUG (11:29): No application persistence: old keys removed; grid-only session creates no preferences/GPS history
+PASS
+------------------------------------------------------------------------------
+Executing test repeatedGpsLifecycleDoesNotRetainTrace...
+DEBUG (11:29): 40 GPS start/stop cycles / 12000 fixes; peak post-stop heap bytes: 35464
+PASS
+------------------------------------------------------------------------------
+Executing test pauseResumeAndExitStayEphemeral...
+PASS
+------------------------------------------------------------------------------
+Executing test buttonFlowHasOnlyLocalSessions...
+PASS
+------------------------------------------------------------------------------
+Executing test liveSpeedRequiresFreshFilteredPosition...
+PASS
+
+==============================================================================
+RESULTS
+Test:                                  Status:
+projectionAndDateLine                  PASS
+gpsFreshnessQualityAndPolar            PASS
+stationaryNoiseDoesNotGrowTrace        PASS
+walkingAndSlowWalkingRemainResponsive  PASS
+unknownSpeedStillWalks                 PASS
+isolatedAndPersistentJumps             PASS
+ordinarySpikeMedianRejection           PASS
+gapsDoNotAccumulateTeleportDistance    PASS
+movementAcrossDateLine                 PASS
+stopThenResumeMoving                   PASS
+gridZoomPanAndLimits                   PASS
+boundedLongTraceAndRepeatedSessions    PASS
+homeDoesNotStartGpsAndStopReleases     PASS
+englishTextAndRoundScreenFit           PASS
+redrawStressAndSharpTurn               PASS
+noPersistentPreferencesOrGpsData       PASS
+repeatedGpsLifecycleDoesNotRetainTrace PASS
+pauseResumeAndExitStayEphemeral        PASS
+buttonFlowHasOnlyLocalSessions         PASS
+liveSpeedRequiresFreshFilteredPosition PASS
+Ran 20 tests
+
+PASSED (passed=20, failed=0, errors=0)

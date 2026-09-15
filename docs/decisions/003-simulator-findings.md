@@ -1,38 +1,36 @@
-# ADR 003 — Simülatörde doğrulanan aktarım ve depolama sınırları
+# ADR 003 — Simulator transfer and storage findings
 
-14 Eylül 2026. Yerel uygulama kararı; fiziksel G0 kabulü değildir.
+14 September 2026. Historical local findings, not physical G0 acceptance.
 
-- CIQ JSON sözlüğündeki ondalıklı koordinatlarla 3,609287 m sınır sapması görüldü.
-  `Geo.coordinateText` koordinatları sekiz ondalıklı metin olarak gönderir; API
-  sabit ondalık metni veya JSON sayısını doğrulayarak float'a çevirir. NaN,
-  Infinity, boolean, metin üstel gösterimi ve aralık dışı değer reddedilir.
-  İki metre raster sınır kontrolü gevşetilmedi. Sonraki HTTPS rasterları bu
-  kontrolü geçerek ekrana yerleşti; hassasiyet regresyonu iki tarafta test edilir.
-- Garmin dönüştürücüsü localhost PNG'sini alamadı: HTTP 200 + null, uygulama -903.
-  Kullanıcı onayıyla geçici Cloudflare HTTPS adresi kullanıldı. Gerçek GPS veya
-  gerçek harita sağlayıcısı kullanılmadı. Tünel 22 dakika sonra, 19:12:03 UTC'de kapatıldı; yerel ayarlar geri alındı.
-  [Garmin ekip açıklaması](https://forums.garmin.com/developer/connect-iq/f/discussion/256721/connect-mobile-4-40-makeimagerequest-localhost-error/1226813)
-  görüntü dönüştürmenin harici servisten geçtiğini doğrular.
-- SDK macOS Anahtar Zinciri yanıtını beklerken ana UI iş parçacığı bloke oldu;
-  kullanıcı izin penceresini tamamladı. Parola okunmadı veya kaydedilmedi.
-- Eski Application.Properties değerleri yeni derlemenin varsayılanını
-  gölgeleyebildi. Yerel servis yapılandırması artık Git dışındaki derleme kaynak
-  dizisinde; dil kaynaklarında da aynı değerler derlenir. Çevrimdışı simülatör
-  ayrı dosya üretir ve ağ servisi kullanmaz.
-- Büyük Object Store sınır denemesi `Storage.setValue` içinde yakalanamayan OOM
-  ile çöktü. Hangi büyük değerde oluştuğu ölçülmedi; 32 KB kapasite PASS değildir.
-  Canlı menüde yalnız 1024 ASCII karakter yaz/oku/içerik karşılaştır/sil testi
-  kalır. Büyük kapasite/bitmap/reboot ayrı ve henüz yapılmamış deneylerdir.
-- Türkçe BACK metni yuvarlak alanda kırpılıyordu. Kısaltıldı; uzun menü öğeleri
-  küçük fonta geçer. Tema değişiminde eski raster korunurken etiket/ölçek
-  kontrastı kendi arka planıyla korunur. Başarılı görüntü sayısı deneme sayısından
-  ayrıldı; henüz raster yokken yüklenmiş gibi boyut etiketi gösterilmez.
+- Decimal coordinates in a CIQ JSON dictionary caused a 3.609287 m boundary error.
+  `Geo.coordinateText` sent eight decimal places as text. The API accepted fixed
+  decimal text or JSON numbers and rejected NaN, Infinity, booleans, exponent text
+  and invalid ranges. The 2 m bound check was preserved. Later HTTPS rasters passed;
+  both sides received precision regression tests.
+- Garmin could not fetch a localhost PNG: HTTP 200 with null image became app error
+  -903 while GPS continued. An explicitly authorized temporary Cloudflare HTTPS
+  tunnel used only synthetic maps and coordinates. It closed after about 22 minutes
+  at 19:12:03 UTC, and local settings were restored. The [Garmin explanation](https://forums.garmin.com/developer/connect-iq/f/discussion/256721/connect-mobile-4-40-makeimagerequest-localhost-error/1226813)
+  documents the external image conversion path.
+- The SDK UI blocked while waiting for macOS Keychain. The user completed the prompt;
+  no password was read or stored.
+- Old `Application.Properties` could override new build defaults. Raster configuration
+  moved to ignored private build resources, including matching language resources.
+  An offline simulator binary used no network. Current FieldGrid removes these
+  private resources entirely.
+- A large `Storage.setValue` experiment caused an uncaught OOM. Its exact input size
+  was not measured; a 32 KB capacity pass was not claimed. Only a 1024 character
+  write/read/compare/delete probe remained. Large storage, bitmap and reboot tests
+  stayed NOT RUN. Current FieldGrid removes the probe and performs no new writes.
+- The original Turkish BACK label clipped on the round display. It was shortened,
+  long menu items used a smaller font, and theme changes preserved label contrast
+  over retained rasters. Successful images were counted separately from attempts;
+  dimensions were not shown as loaded before an image existed.
 
-Etkileşimli simülatör 90 saniyede kesilmez. İlk bağlantı için en fazla üç deneme
-vardır. Otomatik test 90 saniye sınırını korur; başarısız yeni test eski PASS
-sonucunu kullanamaz. Bu değişiklikler sistem Python'una veya shell ayarlarına
-kurulum yapmaz.
+Interactive runs were allowed beyond 90 s, with at most three initial connection
+attempts. Automated tests kept their timeout and could not reuse an old PASS result
+after failure. No system Python or shell settings were modified.
 
-Son İngilizce kontrolde BACK açıklaması 171 px ile 168 px güvenli alanı aştı.
-“BACK to map” 154 px oldu; iki dil testi ve İngilizce menü görüntüsüyle doğrulandı.
-Ağ deneyi bu tek metin değişikliğinden önceydi; kaynak kimlikleri kanıtta ayrı tutulur.
+The final English BACK hint was 171 px against a 168 px safe width. The shorter
+BACK to map label measured 154 px and passed both language checks. That text change
+was after the network test, so evidence keeps separate source identities.

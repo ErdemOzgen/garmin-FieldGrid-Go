@@ -1,0 +1,96 @@
+{
+  "status": "PASS",
+  "target": "fr165",
+  "sdkVersion": "9.2.0",
+  "deviceVersion": "3d0fb192a2cf01699aefd0f384af3f527e5885bd",
+  "sourceSha256": "e43b2a7cea2605e3d09b52bca9ec33f7db30bf614c5f7842509fac824c1109a1",
+  "sourceCommit": "b06f5313381a356b72b74f02712982fc50a2930e",
+  "watchSourcesDirty": true,
+  "artifactSha256": "e3f29827ddae900b2ab56dd6a9f1c9b8671a25351d04624ed8418075b37d8fc1",
+  "unitTests": false,
+  "simulator": false,
+  "offline": true,
+  "networkEnabled": false,
+  "activityRecording": false,
+  "dataRetention": "memory-only",
+  "warnings": 0,
+  "measuredAtUtc": "2026-09-15T09:43:47.001910+00:00",
+  "artifactBytes": 119084,
+  "watchTests": {
+    "status": "PASS",
+    "passed": 20,
+    "rawSdkExitCode": 1,
+    "sourceSha256": "e43b2a7cea2605e3d09b52bca9ec33f7db30bf614c5f7842509fac824c1109a1",
+    "artifactSha256": "1c458838f228b7034912c1fa4ce9a0f54ba18e14a7a23244e85bb6fc421131cc"
+  },
+  "pythonTests": {
+    "passed": 93,
+    "failures": 0,
+    "legacyRendererCoveragePercent": 96
+  },
+  "visualReview": {
+    "status": "PASS",
+    "target": "fr165",
+    "size": [
+      390,
+      390
+    ],
+    "syntheticOnly": true,
+    "checks": [
+      "English home, live stats, day/night grid, paused session and diagnostics visually inspected",
+      "Resume and End session replace all recording/save/sync choices",
+      "GPS session ended before simulator exit"
+    ],
+    "screenshots": [
+      "synthetic-diagnostics.png",
+      "synthetic-grid-day.png",
+      "synthetic-grid-night.png",
+      "synthetic-home.png",
+      "synthetic-paused.png",
+      "synthetic-stats.png"
+    ],
+    "observedProductionAppHeapKiB": 25,
+    "limits": "Snapshot of application heap in simulator; not physical battery or total native memory."
+  },
+  "resourceTests": {
+    "traceCapacity": 180,
+    "filterCapacity": 3,
+    "networkRequests": 0,
+    "mapImages": 0,
+    "activityRecordings": 0,
+    "applicationPersistentWrites": 0,
+    "stationary600FixesTracePoints": 1,
+    "stationaryTraceDistanceMeters": 0,
+    "repeatedTraceSessions": 30,
+    "repeatedTraceFixes": 30000,
+    "repeatedTracePeakHeapBytes": 54728,
+    "drawFrames": 1000,
+    "drawPeakHeapBytes": 56816,
+    "gpsLifecycleCycles": 40,
+    "gpsLifecycleFixes": 12000,
+    "postStopPeakHeapBytes": 35464,
+    "postWarmupAllowedGrowthBytes": 512,
+    "limits": "Test heaps include harness. Physical GPS drift, OS storage and battery endurance remain unmeasured."
+  },
+  "physicalSideloadAndReadback": "PASS",
+  "physicalAcceptance": "NOT RUN",
+  "remaining": [
+    "Two-hour physical stationary/walking/GPS interruption and battery validation",
+    "Explicit physical end-session and reopen state check"
+  ],
+  "commands": [
+    "make test: PASS (93 tests; two upstream Python deprecation warnings)",
+    "make test-watch: PASS (20 fr165 tests; raw SDK test-runner exit 1 is normalized only with full PASSED summary)",
+    "make build-watch: PASS (fr165, zero warnings)",
+    "OpenMTP USB transfer and exact PRG readback comparison: PASS"
+  ],
+  "failuresResolved": [
+    "Official locked SDK and OpenMTP restored under /tmp after temporary tools cleanup",
+    "Initial grid test helper/import/typing issues corrected before final tests",
+    "Sandboxed USB query gave false empty result; escalated read-only USB query confirmed MTP",
+    "Automatic review blocked Desktop browsing; used isolated /tmp/fieldgrid-transfer staging instead"
+  ],
+  "physicalLaunchAndGrid": "PASS - user report",
+  "physicalUserCheck": "physical-user-check.json",
+  "sourcePackageValidation": "PASS - 93 tests and clean fr165 build, identical watch source hash"
+}
